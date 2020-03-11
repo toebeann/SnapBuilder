@@ -185,18 +185,18 @@ namespace SnapBuilder
             {
                 string optionsJSON = File.ReadAllText(ConfigPath);
                 OptionsObject options = JsonMapper.ToObject<OptionsObject>(optionsJSON);
-                EnabledByDefault = options.EnabledByDefault;
-                ToggleSnappingKey = options.ToggleSnappingKey;
-                ToggleSnappingMode = options.ToggleSnappingMode;
-                FineSnappingKey = options.FineSnappingKey;
-                FineSnappingMode = options.FineSnappingMode;
-                FineRotationKey = options.FineRotationKey;
-                FineRotationMode = options.FineRotationMode;
-                SnapRounding = (float)options.SnapRounding;
-                FineSnapRounding = (float)options.FineSnapRounding;
-                RotationRounding = options.RotationRounding;
-                FineRotationRounding = options.FineRotationRounding;
                 JsonData data = JsonMapper.ToObject(optionsJSON);
+                EnabledByDefault = data.ContainsKey("EnabledByDefault") ? options.EnabledByDefault : EnabledByDefault;
+                ToggleSnappingKey = data.ContainsKey("ToggleSnappingKey") ? options.ToggleSnappingKey : ToggleSnappingKey;
+                ToggleSnappingMode = data.ContainsKey("ToggleSnappingMode") ? options.ToggleSnappingMode : ToggleSnappingMode;
+                FineSnappingKey = data.ContainsKey("FineSnappingKey") ? options.FineSnappingKey : FineSnappingKey;
+                FineSnappingMode = data.ContainsKey("FineSnappingMode") ? options.FineSnappingMode : FineSnappingMode;
+                FineRotationKey = data.ContainsKey("FineRotationKey") ? options.FineRotationKey : FineRotationKey;
+                FineRotationMode = data.ContainsKey("FineRotationMode") ? options.FineRotationMode : FineRotationMode;
+                SnapRounding = data.ContainsKey("SnapRounding") ? (float)options.SnapRounding : SnapRounding;
+                FineSnapRounding = data.ContainsKey("FineSnapRounding") ? (float)options.FineSnapRounding : FineSnapRounding; ;
+                RotationRounding = data.ContainsKey("RotationRounding") ? options.RotationRounding : RotationRounding;
+                FineRotationRounding = data.ContainsKey("FineRotationRounding") ? options.FineRotationRounding : FineRotationRounding;
                 if (!data.ContainsKey("EnabledByDefault") ||
                     !data.ContainsKey("ToggleSnappingKey") || !data.ContainsKey("ToggleSnappingMode") ||
                     !data.ContainsKey("FineSnappingKey") || !data.ContainsKey("FineSnappingMode") ||
