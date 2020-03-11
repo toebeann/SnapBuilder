@@ -76,7 +76,7 @@ namespace SnapBuilder
         {
             switch (eventArgs.Id)
             {
-                case "invert":
+                case "toggle":
                     ToggleSnappingKey = eventArgs.Key;
                     break;
                 case "fineSnap":
