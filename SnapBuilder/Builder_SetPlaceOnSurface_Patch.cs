@@ -107,14 +107,40 @@ namespace SnapBuilder
                 // Get the rotation factor from user options based on whether the fine snapping key is held or not
                 float rotationFactor = Input.GetKey(SnapBuilder.Options.FineRotationKey) ? SnapBuilder.Options.FineRotationRounding : SnapBuilder.Options.RotationRounding;
 
-                // If the user is rotating, apply the additive rotation speed multiplied by the rotation factor.
-                if (GameInput.GetButtonHeld(Builder.buttonRotateCW))
+                // If the user is rotating, apply the additive rotation
+                if (GameInput.GetButtonHeld(Builder.buttonRotateCW)) // Clockwise
                 {
-                    Builder.additiveRotation = MathExtensions.RepeatAngle(Builder.additiveRotation - Time.deltaTime * Builder.additiveRotationSpeed * (rotationFactor / 3));
+                    if (SnapBuilder.LastButton != Builder.buttonRotateCW)
+                    {   // Clear previous rotation held time
+                        SnapBuilder.LastButton = Builder.buttonRotateCW;
+                        SnapBuilder.LastButtonHeldTime = -1f;
+                    }
+
+                    float buttonHeldTime = SnapBuilder.FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCW), 0.15f);
+                    if (buttonHeldTime > SnapBuilder.LastButtonHeldTime)
+                    {   // Store rotation held time
+                        SnapBuilder.LastButtonHeldTime = buttonHeldTime;
+                        Builder.additiveRotation -= rotationFactor; // Decrement rotation
+                    }
                 }
-                else if (GameInput.GetButtonHeld(Builder.buttonRotateCCW))
+                else if (GameInput.GetButtonHeld(Builder.buttonRotateCCW)) // Counter-clockwise
                 {
-                    Builder.additiveRotation = MathExtensions.RepeatAngle(Builder.additiveRotation + Time.deltaTime * Builder.additiveRotationSpeed * (rotationFactor / 3));
+                    if (SnapBuilder.LastButton != Builder.buttonRotateCCW)
+                    {   // Clear previous rotation held time
+                        SnapBuilder.LastButton = Builder.buttonRotateCCW;
+                        SnapBuilder.LastButtonHeldTime = -1f;
+                    }
+
+                    float buttonHeldTime = SnapBuilder.FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCCW), 0.15f);
+                    if (buttonHeldTime > SnapBuilder.LastButtonHeldTime)
+                    {   // Store rotation held time
+                        SnapBuilder.LastButtonHeldTime = buttonHeldTime;
+                        Builder.additiveRotation += rotationFactor; // Increment rotation
+                    }
+                }
+                else if (GameInput.GetButtonUp(Builder.buttonRotateCW) || GameInput.GetButtonUp(Builder.buttonRotateCCW))
+                {   // User is not rotating, clear rotation held time
+                    SnapBuilder.LastButtonHeldTime = -1f;
                 }
 
                 // Round to the nearest rotation factor for rotation snapping
