@@ -4,8 +4,13 @@ namespace SnapBuilder
 {
     internal class ToggleKey
     {
+        internal enum Mode
+        {
+            Press, Hold
+        }
+
         private readonly KeyCode keyCode;
-        private readonly KeyMode keyMode;
+        private readonly Mode keyMode;
         private readonly bool onByDefault;
 
         private bool enabled;
@@ -15,13 +20,13 @@ namespace SnapBuilder
             {
                 switch (keyMode)
                 {
-                    case KeyMode.Press:
+                    case Mode.Press:
                         if (Input.GetKeyUp(keyCode))
                         {
                             enabled = !enabled;
                         }
                         break;
-                    case KeyMode.Hold:
+                    case Mode.Hold:
                         if (Input.GetKeyDown(keyCode))
                         {
                             enabled = !onByDefault;
@@ -36,7 +41,7 @@ namespace SnapBuilder
             }
         }
 
-        public ToggleKey(KeyCode _keyCode, KeyMode _keyMode, bool _onByDefault)
+        public ToggleKey(KeyCode _keyCode, Mode _keyMode, bool _onByDefault)
         {
             keyCode = _keyCode;
             keyMode = _keyMode;

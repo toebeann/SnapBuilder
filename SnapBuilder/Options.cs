@@ -8,20 +8,15 @@ using UnityEngine;
 
 namespace SnapBuilder
 {
-    internal enum KeyMode
-    {
-        Press, Hold
-    }
-
     internal struct OptionsObject
     {
         public bool EnabledByDefault { get; set; }
         public KeyCode ToggleSnappingKey { get; set; }
-        public KeyMode ToggleSnappingMode { get; set; }
+        public ToggleKey.Mode ToggleSnappingMode { get; set; }
         public KeyCode FineSnappingKey { get; set; }
-        public KeyMode FineSnappingMode { get; set; }
+        public ToggleKey.Mode FineSnappingMode { get; set; }
         public KeyCode FineRotationKey { get; set; }
-        public KeyMode FineRotationMode { get; set; }
+        public ToggleKey.Mode FineRotationMode { get; set; }
         public double SnapRounding { get; set; }
         public double FineSnapRounding { get; set; }
         public int RotationRounding { get; set; }
@@ -32,11 +27,11 @@ namespace SnapBuilder
     {
         public bool EnabledByDefault = true;
         public KeyCode ToggleSnappingKey = KeyCode.Mouse2;
-        public KeyMode ToggleSnappingMode = KeyMode.Press;
+        public ToggleKey.Mode ToggleSnappingMode = ToggleKey.Mode.Press;
         public KeyCode FineSnappingKey = KeyCode.LeftControl;
-        public KeyMode FineSnappingMode = KeyMode.Hold;
+        public ToggleKey.Mode FineSnappingMode = ToggleKey.Mode.Hold;
         public KeyCode FineRotationKey = KeyCode.LeftAlt;
-        public KeyMode FineRotationMode = KeyMode.Hold;
+        public ToggleKey.Mode FineRotationMode = ToggleKey.Mode.Hold;
         public float SnapRounding = 0.25f;
         public float FineSnapRounding = 0.05f;
         public int RotationRounding = 45;
@@ -73,11 +68,11 @@ namespace SnapBuilder
         {
             AddToggleOption("enabledByDefault", "Snapping enabled by default", EnabledByDefault);
             AddKeybindOption("toggle", "Toggle snapping button", GameInput.GetPrimaryDevice(), ToggleSnappingKey);
-            AddChoiceOption<KeyMode>("toggleMode", "Toggle snapping mode", ToggleSnappingMode);
+            AddChoiceOption<ToggleKey.Mode>("toggleMode", "Toggle snapping mode", ToggleSnappingMode);
             AddKeybindOption("fineSnap", "Fine snapping button", GameInput.GetPrimaryDevice(), FineSnappingKey);
-            AddChoiceOption<KeyMode>("fineSnapMode", "Fine snapping mode", FineSnappingMode);
+            AddChoiceOption<ToggleKey.Mode>("fineSnapMode", "Fine snapping mode", FineSnappingMode);
             AddKeybindOption("fineRotate", "Fine rotation button", GameInput.GetPrimaryDevice(), FineRotationKey);
-            AddChoiceOption<KeyMode>("fineRotateMode", "Fine rotation mode", FineRotationMode);
+            AddChoiceOption<ToggleKey.Mode>("fineRotateMode", "Fine rotation mode", FineRotationMode);
             AddSliderOption("snapRounding", "Snap rounding", 0, 1, SnapRounding);
             AddSliderOption("fineSnapRounding", "Fine snap rounding", 0, 1, FineSnapRounding * 2);
             AddSliderOption("rotationRounding", "Rotation rounding (degrees)", 0, 90, RotationRounding);
@@ -121,15 +116,15 @@ namespace SnapBuilder
             switch (eventArgs.Id)
             {
                 case "toggleMode":
-                    ToggleSnappingMode = (KeyMode)eventArgs.Index;
+                    ToggleSnappingMode = (ToggleKey.Mode)eventArgs.Index;
                     Snapping = new ToggleKey(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
                     break;
                 case "fineSnapMode":
-                    FineSnappingMode = (KeyMode)eventArgs.Index;
+                    FineSnappingMode = (ToggleKey.Mode)eventArgs.Index;
                     FineSnapping = new ToggleKey(FineSnappingKey, FineSnappingMode, false);
                     break;
                 case "fineRotateMode":
-                    FineRotationMode = (KeyMode)eventArgs.Index;
+                    FineRotationMode = (ToggleKey.Mode)eventArgs.Index;
                     FineRotation = new ToggleKey(FineRotationKey, FineRotationMode, false);
                     break;
             }
