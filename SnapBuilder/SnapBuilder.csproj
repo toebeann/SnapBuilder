@@ -78,8 +78,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(ProjectDir)\bin\SnapBuilder\$(TargetName)$(TargetExt)
-xcopy $(ProjectDir)\bin\SnapBuilder E:\SteamLibrary\steamapps\common\Subnautica\QMods\SnapBuilder /E /Y
+    <PostBuildEvent>if not exist $(ProjectDir)\bin\SnapBuilder mkdir $(ProjectDir)\bin\SnapBuilder
+copy $(ProjectDir)\mod.json $(ProjectDir)\bin\SnapBuilder\
+copy $(TargetPath) $(ProjectDir)\bin\SnapBuilder\$(TargetName)$(TargetExt)
+xcopy $(ProjectDir)\bin\SnapBuilder\* E:\SteamLibrary\steamapps\common\Subnautica\QMods\SnapBuilder\ /E /Y
 "C:\Program Files (x86)\Steam\steam" steam://rungameid/264710</PostBuildEvent>
   </PropertyGroup>
 </Project>
