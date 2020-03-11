@@ -8,7 +8,9 @@ namespace SnapBuilder
     {
         static void Prefix()
         {
-            SnapBuilder.Enabled = SnapBuilder.Options.EnabledByDefault;
+            SnapBuilder.Options.Snapping.Reset();
+            SnapBuilder.Options.FineSnapping.Reset();
+            SnapBuilder.Options.FineRotation.Reset();
         }
     }
 }

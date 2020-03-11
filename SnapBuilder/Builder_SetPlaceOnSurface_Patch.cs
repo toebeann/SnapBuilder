@@ -10,7 +10,7 @@ namespace SnapBuilder
     {
         static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
-            if (!SnapBuilder.Enabled)
+            if (!SnapBuilder.Options.Snapping.Enabled)
             {
                 return true; // Pass to the original function if SnapBuilder is disabled
             }
@@ -25,7 +25,7 @@ namespace SnapBuilder
             localNormal = localNormal.normalized; // For sanity's sake, make sure the normal is normalised
 
             // Get the rounding factor from user options based on whether the fine snapping key is held or not
-            float roundFactor = Input.GetKey(SnapBuilder.Options.FineSnappingKey) ? SnapBuilder.Options.FineSnapRounding : SnapBuilder.Options.SnapRounding;
+            float roundFactor = SnapBuilder.Options.FineSnapping.Enabled ? SnapBuilder.Options.FineSnapRounding : SnapBuilder.Options.SnapRounding;
 
             // Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
             if (localNormal.x < 1)
@@ -105,7 +105,7 @@ namespace SnapBuilder
             {   // New calculation of the rotation
 
                 // Get the rotation factor from user options based on whether the fine snapping key is held or not
-                float rotationFactor = Input.GetKey(SnapBuilder.Options.FineRotationKey) ? SnapBuilder.Options.FineRotationRounding : SnapBuilder.Options.RotationRounding;
+                float rotationFactor = SnapBuilder.Options.FineRotation.Enabled ? SnapBuilder.Options.FineRotationRounding : SnapBuilder.Options.RotationRounding;
 
                 // If the user is rotating, apply the additive rotation
                 if (GameInput.GetButtonHeld(Builder.buttonRotateCW)) // Clockwise

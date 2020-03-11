@@ -8,7 +8,6 @@ namespace SnapBuilder
     internal class SnapBuilder
     {
         public static Options Options = new Options();
-        public static bool Enabled = Options.EnabledByDefault;
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
 

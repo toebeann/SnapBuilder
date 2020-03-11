@@ -2,7 +2,7 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.0.2",
+    "Version": "1.1.0",
     "AssemblyName": "SnapBuilder.dll",
     "EntryMethod": "SnapBuilder.SnapBuilder.Patch",
     "Enable": true,

@@ -71,10 +71,10 @@
   <ItemGroup>
     <Compile Include="Builder_Begin_Patch.cs" />
     <Compile Include="Builder_SetPlaceOnSurface_Patch.cs" />
-    <Compile Include="Builder_Update_Patch.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="SnapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ToggleKey.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -86,6 +86,7 @@
 copy $(ProjectDir)\mod.json $(ProjectDir)\bin\SnapBuilder\
 copy $(TargetPath) $(ProjectDir)\bin\SnapBuilder\$(TargetName)$(TargetExt)
 xcopy $(ProjectDir)\bin\SnapBuilder\* E:\SteamLibrary\steamapps\common\Subnautica\QMods\SnapBuilder\ /E /Y
+if exist E:\SteamLibrary\steamapps\common\Subnautica\QMods\SnapBuilder\config.json del /q /f E:\SteamLibrary\steamapps\common\Subnautica\QMods\SnapBuilder\config.json
 "C:\Program Files (x86)\Steam\steam" steam://rungameid/264710</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />
