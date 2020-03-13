@@ -4,7 +4,7 @@
     "Author": "Tobey Blaber",
     "Version": "1.1.1",
     "AssemblyName": "SnapBuilder.dll",
-    "EntryMethod": "SnapBuilder.SnapBuilder.Patch",
+    "EntryMethod": "SnapBuilder.HarmonyPatcher.ApplyPatches",
     "Enable": true,
     "Game": "Subnautica",
     "VersionDependencies": {

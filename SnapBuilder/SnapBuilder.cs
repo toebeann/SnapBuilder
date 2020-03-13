@@ -11,11 +11,8 @@ namespace SnapBuilder
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
 
-        public static void Patch()
+        public static void Initialise()
         {
-            var harmony = HarmonyInstance.Create("com.tobeyblaber.subnautica.snapbuilder.mod");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
-
             SMLHelper.V2.Handlers.OptionsPanelHandler.RegisterModOptions(Options);
         }
 
