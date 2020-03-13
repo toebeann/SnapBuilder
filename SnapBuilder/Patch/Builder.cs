@@ -2,11 +2,23 @@
 using Harmony;
 using UnityEngine;
 
-namespace SnapBuilder
+namespace SnapBuilder.Patch
 {
     [HarmonyPatch(typeof(Builder))]
+    [HarmonyPatch("Begin")]
+    static class Builder_Begin
+    {
+        static void Prefix()
+        {
+            SnapBuilder.Options.Snapping.Reset();
+            SnapBuilder.Options.FineSnapping.Reset();
+            SnapBuilder.Options.FineRotation.Reset();
+        }
+    }
+
+    [HarmonyPatch(typeof(Builder))]
     [HarmonyPatch("SetPlaceOnSurface")]
-    static class Builder_SetPlaceOnSurface_Patch
+    static class Builder_SetPlaceOnSurface
     {
         static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
