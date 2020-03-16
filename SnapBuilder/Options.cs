@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -6,7 +7,7 @@ using LitJson;
 using SMLHelper.V2.Options;
 using UnityEngine;
 
-namespace SnapBuilder
+namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     internal struct OptionsObject
     {
@@ -37,19 +38,50 @@ namespace SnapBuilder
         public int RotationRounding = 45;
         public int FineRotationRounding = 5;
 
-        public Toggle.Key Snapping;
-        public Toggle.Key FineSnapping;
-        public Toggle.Key FineRotation;
+        public Toggle Snapping;
+        public Toggle FineSnapping;
+        public Toggle FineRotation;
 
         private string ConfigPath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
 
         public Options() : base("SnapBuilder")
         {
+            InitEvents();
+            InitLanguage();
+            LoadDefaults();
+        }
+
+        private void InitEvents()
+        {
             ToggleChanged += OnToggleChanged;
             KeybindChanged += OnKeybindChanged;
             ChoiceChanged += OnChoiceChanged;
             SliderChanged += OnSliderChanged;
+        }
 
+        private void InitLanguage()
+        {
+            foreach (var entry in new Dictionary<string, string>()
+        {
+            { "Options.SnappingEnabledByDefault", "Snapping enabled by default" },
+            { "Options.ToggleSnappingKey", "Toggle snapping button" },
+            { "Options.ToggleSnappingMode", "Toggle snapping mode" },
+            { "Options.FineSnappingKey", "Fine snapping button" },
+            { "Options.FineSnappingMode", "Fine snapping mode" },
+            { "Options.FineRotationKey", "Fine rotation button" },
+            { "Options.FineRotationMode", "Fine rotation mode" },
+            { "Options.SnapRounding", "Snap rounding" },
+            { "Options.FineSnapRounding", "Fine snap rounding" },
+            { "Options.RotationRounding", "Rotation rounding (degrees)" },
+            { "Options.FineRotationRounding", "Fine rotation rounding (degrees)" }
+        })
+            {
+                SnapBuilder.SetLanguage(entry.Key, entry.Value);
+            }
+        }
+
+        private void LoadDefaults()
+        {
             if (!File.Exists(ConfigPath))
             {
                 UpdateJSON();
@@ -59,24 +91,24 @@ namespace SnapBuilder
                 ReadOptionsFromJSON();
             }
 
-            Snapping = new Toggle.Key(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
-            FineSnapping = new Toggle.Key(FineSnappingKey, FineSnappingMode, false);
-            FineRotation = new Toggle.Key(FineRotationKey, FineRotationMode, false);
+            Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
+            FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
+            FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
         }
 
         public override void BuildModOptions()
         {
-            AddToggleOption("enabledByDefault", "Snapping enabled by default", EnabledByDefault);
-            AddKeybindOption("toggle", "Toggle snapping button", GameInput.GetPrimaryDevice(), ToggleSnappingKey);
-            AddChoiceOption<Toggle.Mode>("toggleMode", "Toggle snapping mode", ToggleSnappingMode);
-            AddKeybindOption("fineSnap", "Fine snapping button", GameInput.GetPrimaryDevice(), FineSnappingKey);
-            AddChoiceOption<Toggle.Mode>("fineSnapMode", "Fine snapping mode", FineSnappingMode);
-            AddKeybindOption("fineRotate", "Fine rotation button", GameInput.GetPrimaryDevice(), FineRotationKey);
-            AddChoiceOption<Toggle.Mode>("fineRotateMode", "Fine rotation mode", FineRotationMode);
-            AddSliderOption("snapRounding", "Snap rounding", 0, 1, SnapRounding);
-            AddSliderOption("fineSnapRounding", "Fine snap rounding", 0, 1, FineSnapRounding * 2);
-            AddSliderOption("rotationRounding", "Rotation rounding (degrees)", 0, 90, RotationRounding);
-            AddSliderOption("fineRotationRounding", "Fine rotation rounding (degrees)", 0, 45, FineRotationRounding);
+            AddToggleOption("enabledByDefault", SnapBuilder.GetLanguage("Options.SnappingEnabledByDefault"), EnabledByDefault);
+            AddKeybindOption("toggle", SnapBuilder.GetLanguage("Options.ToggleSnappingKey"), GameInput.GetPrimaryDevice(), ToggleSnappingKey);
+            AddChoiceOption("toggleMode", SnapBuilder.GetLanguage("Options.ToggleSnappingMode"), ToggleSnappingMode);
+            AddKeybindOption("fineSnap", SnapBuilder.GetLanguage("Options.FineSnappingKey"), GameInput.GetPrimaryDevice(), FineSnappingKey);
+            AddChoiceOption("fineSnapMode", SnapBuilder.GetLanguage("Options.FineSnappingMode"), FineSnappingMode);
+            AddKeybindOption("fineRotate", SnapBuilder.GetLanguage("Options.FineRotationKey"), GameInput.GetPrimaryDevice(), FineRotationKey);
+            AddChoiceOption("fineRotateMode", SnapBuilder.GetLanguage("Options.FineRotationMode"), FineRotationMode);
+            AddSliderOption("snapRounding", SnapBuilder.GetLanguage("Options.SnapRounding"), 0, 1, SnapRounding);
+            AddSliderOption("fineSnapRounding", SnapBuilder.GetLanguage("Options.FineSnapRounding"), 0, 1, FineSnapRounding * 2);
+            AddSliderOption("rotationRounding", SnapBuilder.GetLanguage("Options.RotationRounding"), 0, 90, RotationRounding);
+            AddSliderOption("fineRotationRounding", SnapBuilder.GetLanguage("Options.FineRotationRounding"), 0, 45, FineRotationRounding);
         }
 
         public void OnToggleChanged(object sender, ToggleChangedEventArgs eventArgs)
@@ -85,7 +117,7 @@ namespace SnapBuilder
             {
                 case "enabledByDefault":
                     EnabledByDefault = eventArgs.Value;
-                    Snapping = new Toggle.Key(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
+                    Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
                     break;
             }
             UpdateJSON();
@@ -97,15 +129,15 @@ namespace SnapBuilder
             {
                 case "toggle":
                     ToggleSnappingKey = eventArgs.Key;
-                    Snapping = new Toggle.Key(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
+                    Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
                     break;
                 case "fineSnap":
                     FineSnappingKey = eventArgs.Key;
-                    FineSnapping = new Toggle.Key(FineSnappingKey, FineSnappingMode, false);
+                    FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
                     break;
                 case "fineRotate":
                     FineRotationKey = eventArgs.Key;
-                    FineRotation = new Toggle.Key(FineRotationKey, FineRotationMode, false);
+                    FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
                     break;
             }
             UpdateJSON();
@@ -117,15 +149,15 @@ namespace SnapBuilder
             {
                 case "toggleMode":
                     ToggleSnappingMode = (Toggle.Mode)eventArgs.Index;
-                    Snapping = new Toggle.Key(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
+                    Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
                     break;
                 case "fineSnapMode":
                     FineSnappingMode = (Toggle.Mode)eventArgs.Index;
-                    FineSnapping = new Toggle.Key(FineSnappingKey, FineSnappingMode, false);
+                    FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
                     break;
                 case "fineRotateMode":
                     FineRotationMode = (Toggle.Mode)eventArgs.Index;
-                    FineRotation = new Toggle.Key(FineRotationKey, FineRotationMode, false);
+                    FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
                     break;
             }
             UpdateJSON();

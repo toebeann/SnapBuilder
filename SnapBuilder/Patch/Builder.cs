@@ -2,7 +2,7 @@
 using Harmony;
 using UnityEngine;
 
-namespace SnapBuilder.Patch
+namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 {
     [HarmonyPatch(typeof(Builder))]
     [HarmonyPatch("Begin")]
@@ -13,6 +13,33 @@ namespace SnapBuilder.Patch
             SnapBuilder.Options.Snapping.Reset();
             SnapBuilder.Options.FineSnapping.Reset();
             SnapBuilder.Options.FineRotation.Reset();
+        }
+    }
+
+    [HarmonyPatch(typeof(Builder))]
+    [HarmonyPatch("CreateGhost")]
+    static class Builder_CreateGhost
+    {
+        static void Prefix(ref bool __state)
+        {
+            __state = Builder.ghostModel == null;
+
+            if (__state)
+            {
+                ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleSnappingHint")}" +
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.Snapping)})");
+                ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleFineSnappingHint")}" +
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.FineSnapping)})");
+            }
+        }
+
+        static void Postfix(bool __state)
+        {
+            if (__state && Builder.rotationEnabled)
+            {
+                ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleFineRotationHint")}" +
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.FineRotation)})");
+            }
         }
     }
 
