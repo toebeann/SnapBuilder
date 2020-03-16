@@ -2,9 +2,9 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.1.1",
-    "AssemblyName": "SnapBuilder.dll",
-    "EntryMethod": "SnapBuilder.HarmonyPatcher.ApplyPatches",
+    "Version": "1.2.0",
+    "AssemblyName": "Straitjacket.Subnautica.Mods.SnapBuilder.dll",
+    "EntryMethod": "Straitjacket.Subnautica.Mods.SnapBuilder.HarmonyPatcher.ApplyPatches",
     "Enable": true,
     "Game": "Subnautica",
     "VersionDependencies": {

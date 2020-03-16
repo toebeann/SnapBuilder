@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.852
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapBuilder", "SnapBuilder\SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapBuilder", "SnapBuilder\Straitjacket.Subnautica.Mods.SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
