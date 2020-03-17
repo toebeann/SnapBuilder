@@ -82,12 +82,16 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             // Now, perform a new raycast so that we can get the normal of the new position
             Transform aimTransform = Builder.GetAimTransform();
-            Physics.Raycast(aimTransform.position,
+            if (!Physics.Raycast(aimTransform.position,
                 hit.transform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
                 out hit, // overwrite hit
                 Builder.placeMaxDistance,
                 Builder.placeLayerMask.value,
-                QueryTriggerInteraction.Ignore);
+                QueryTriggerInteraction.Ignore))
+            {   // If there is no new hit, then the position we're snapping to isn't valid and we can just return false
+                // without setting the position or rotation and it will be treated as if no hit occurred
+                return false;
+            }
 
             // Set the position equal to the new hit point
             position = hit.point;
@@ -97,7 +101,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             // If the hit.collider is a MeshCollider and has a sharedMesh, it is a surface like the ground or the roof of a multipurpose room,
             // in which case we want a more accurate normal where possible
             MeshCollider meshCollider = hit.collider as MeshCollider;
-            if (meshCollider != null && meshCollider.sharedMesh != null)
+            if (meshCollider?.sharedMesh != null)
             {
                 // Set up the offsets for raycasts around the point
                 Vector3[] offsets = new Vector3[]
@@ -186,7 +190,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
                 Builder.additiveRotation = SnapBuilder.RoundToNearest(Builder.additiveRotation, rotationFactor) % 360;
 
                 Transform hitTransform = hit.transform;
-                if (!Player.main.IsInSub())
+                if (!Player.main.IsInside())
                 {   // If the player is outside, get the root transform if there is one, otherwise default to the original
                     hitTransform = UWE.Utils.GetEntityRoot(hit.transform.gameObject)?.transform ?? hit.transform;
                 }
@@ -253,6 +257,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
                 rotation = Quaternion.LookRotation(vector, vector2);
             }
+
             return false; // Do not run the original method
         }
     }
