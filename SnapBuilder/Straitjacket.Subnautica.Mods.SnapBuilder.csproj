@@ -41,25 +41,24 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony-1.2.0.1, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\0Harmony-1.2.0.1.dll</HintPath>
+    <Reference Include="0Harmony-1.2.0.1">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\0Harmony-1.2.0.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LitJson">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\LitJson.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\LitJson.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Straitjacket.ToggleModule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -74,19 +73,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>E:\SteamLibrary\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -103,7 +102,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -ProjectDir $(ProjectDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath) -ApplicationPath E:\SteamLibrary\steamapps\common\Subnautica -SteamGameID 264710</PostBuildEvent>
+    <PostBuildEvent>if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -ProjectDir $(ProjectDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath) -ApplicationPath "C:\Program Files (x86)\Steam\steamapps\common\Subnautica" -SteamGameID 264710</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />
 </Project>
