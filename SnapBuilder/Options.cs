@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SMLHelper.V2.Options;
+using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
@@ -72,12 +73,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             switch (eventArgs.Id)
             {
                 case "enabledByDefault":
-                    SnapBuilder.Config.EnabledByDefault = eventArgs.Value;
-                    SnapBuilder.Config.ResetToggle(
-                        ref SnapBuilder.Config.Snapping,
-                        SnapBuilder.Config.ToggleSnappingKey,
-                        SnapBuilder.Config.ToggleSnappingMode,
-                        SnapBuilder.Config.EnabledByDefault);
+                    SnapBuilder.Config.Snapping.EnabledByDefault = SnapBuilder.Config.EnabledByDefault = eventArgs.Value;
                     break;
             }
             SnapBuilder.Config.Save();
@@ -88,26 +84,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             switch (eventArgs.Id)
             {
                 case "toggle":
-                    SnapBuilder.Config.ToggleSnappingKey = eventArgs.Key;
-                    SnapBuilder.Config.ResetToggle(
-                        ref SnapBuilder.Config.Snapping,
-                        SnapBuilder.Config.ToggleSnappingKey,
-                        SnapBuilder.Config.ToggleSnappingMode,
-                        SnapBuilder.Config.EnabledByDefault);
+                    SnapBuilder.Config.Snapping.KeyCode = SnapBuilder.Config.ToggleSnappingKey = eventArgs.Key;
                     break;
                 case "fineSnap":
-                    SnapBuilder.Config.FineSnappingKey = eventArgs.Key;
-                    SnapBuilder.Config.ResetToggle(ref SnapBuilder.Config.FineSnapping,
-                        SnapBuilder.Config.FineSnappingKey,
-                        SnapBuilder.Config.FineSnappingMode,
-                        false);
+                    SnapBuilder.Config.FineSnapping.KeyCode = SnapBuilder.Config.FineSnappingKey = eventArgs.Key;
                     break;
                 case "fineRotate":
-                    SnapBuilder.Config.FineRotationKey = eventArgs.Key;
-                    SnapBuilder.Config.ResetToggle(ref SnapBuilder.Config.FineRotation,
-                        SnapBuilder.Config.FineRotationKey,
-                        SnapBuilder.Config.FineRotationMode,
-                        false);
+                    SnapBuilder.Config.FineRotation.KeyCode = SnapBuilder.Config.FineRotationKey = eventArgs.Key;
                     break;
             }
             SnapBuilder.Config.Save();
@@ -118,26 +101,16 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             switch (eventArgs.Id)
             {
                 case "toggleMode":
-                    SnapBuilder.Config.ToggleSnappingMode = (Toggle.Mode)eventArgs.Index;
-                    SnapBuilder.Config.ResetToggle(
-                        ref SnapBuilder.Config.Snapping,
-                        SnapBuilder.Config.ToggleSnappingKey,
-                        SnapBuilder.Config.ToggleSnappingMode,
-                        SnapBuilder.Config.EnabledByDefault);
+                    SnapBuilder.Config.Snapping.KeyMode = SnapBuilder.Config.ToggleSnappingMode
+                        = (Toggle.Mode)eventArgs.Index;
                     break;
                 case "fineSnapMode":
-                    SnapBuilder.Config.FineSnappingMode = (Toggle.Mode)eventArgs.Index;
-                    SnapBuilder.Config.ResetToggle(ref SnapBuilder.Config.FineSnapping,
-                        SnapBuilder.Config.FineSnappingKey,
-                        SnapBuilder.Config.FineSnappingMode,
-                        false);
+                    SnapBuilder.Config.FineSnapping.KeyMode = SnapBuilder.Config.FineSnappingMode
+                        = (Toggle.Mode)eventArgs.Index;
                     break;
                 case "fineRotateMode":
-                    SnapBuilder.Config.FineRotationMode = (Toggle.Mode)eventArgs.Index;
-                    SnapBuilder.Config.ResetToggle(ref SnapBuilder.Config.FineRotation,
-                        SnapBuilder.Config.FineRotationKey,
-                        SnapBuilder.Config.FineRotationMode,
-                        false);
+                    SnapBuilder.Config.FineRotation.KeyMode = SnapBuilder.Config.FineRotationMode
+                        = (Toggle.Mode)eventArgs.Index;
                     break;
             }
             SnapBuilder.Config.Save();
@@ -148,10 +121,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             switch (eventArgs.Id)
             {
                 case "snapRounding":
-                    SnapBuilder.Config.SnapRounding = (float)Math.Max(Math.Round(eventArgs.Value, 2), 0.01);
+                    SnapBuilder.Config.SnapRounding = Mathf.Max(eventArgs.Value, 0.01f);
                     break;
                 case "fineSnapRounding":
-                    SnapBuilder.Config.FineSnapRounding = (float)Math.Max(Math.Round(eventArgs.Value / 2, 2), 0.01);
+                    SnapBuilder.Config.FineSnapRounding = Mathf.Max(eventArgs.Value / 2, 0.01f);
                     break;
                 case "rotationRounding":
                     SnapBuilder.Config.RotationRounding = eventArgs.IntegerValue;
