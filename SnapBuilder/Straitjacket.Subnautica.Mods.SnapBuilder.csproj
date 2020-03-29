@@ -61,10 +61,6 @@
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Straitjacket.ToggleModule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\ToggleModule\ToggleModule\bin\Release\Straitjacket.ToggleModule.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -100,6 +96,8 @@
     <None Include=".editorconfig" />
     <None Include="mod.json" />
   </ItemGroup>
+  <Import Project="..\..\..\..\SMLHelper\SMLHelper\SMLHelper.projitems" Label="Shared" />
+  <Import Project="..\..\..\..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -ProjectDir $(ProjectDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath) -ApplicationPath "C:\Program Files (x86)\Steam\steamapps\common\Subnautica" -SteamGameID 264710</PostBuildEvent>

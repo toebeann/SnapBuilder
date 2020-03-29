@@ -1,11 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.852
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapBuilder", "SnapBuilder\Straitjacket.Subnautica.Mods.SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Straitjacket.Subnautica.Mods.SnapBuilder", "SnapBuilder\Straitjacket.Subnautica.Mods.SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SMLHelper", "..\..\..\SMLHelper\SMLHelper\SMLHelper.shproj", "{8BE2EE17-2FAD-4E56-BF48-F9DEF4880348}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Toggle", "..\..\..\Toggle\Toggle\Toggle.shproj", "{80D31744-67AA-4DA8-B006-D73F7B345A87}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\..\Toggle\Toggle\Toggle.projitems*{80d31744-67aa-4da8-b006-d73f7b345a87}*SharedItemsImports = 13
+		..\..\..\SMLHelper\SMLHelper\SMLHelper.projitems*{8be2ee17-2fad-4e56-bf48-f9def4880348}*SharedItemsImports = 13
+		..\..\..\SMLHelper\SMLHelper\SMLHelper.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
+		..\..\..\Toggle\Toggle\Toggle.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
