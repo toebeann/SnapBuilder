@@ -10,9 +10,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
     {
         static void Prefix()
         {
-            SnapBuilder.Options.Snapping.Reset();
-            SnapBuilder.Options.FineSnapping.Reset();
-            SnapBuilder.Options.FineRotation.Reset();
+            SnapBuilder.Config.Snapping.Reset();
+            SnapBuilder.Config.FineSnapping.Reset();
+            SnapBuilder.Config.FineRotation.Reset();
         }
     }
 
@@ -27,9 +27,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             if (__state)
             {
                 ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleSnappingHint")}" +
-                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.Snapping)})");
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Config.Snapping)})");
                 ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleFineSnappingHint")}" +
-                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.FineSnapping)})");
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Config.FineSnapping)})");
             }
         }
 
@@ -38,7 +38,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             if (__state && Builder.rotationEnabled)
             {
                 ErrorMessage.AddError($"{SnapBuilder.GetLanguage("GhostToggleFineRotationHint")}" +
-                    $" ({SnapBuilder.FormatButton(SnapBuilder.Options.FineRotation)})");
+                    $" ({SnapBuilder.FormatButton(SnapBuilder.Config.FineRotation)})");
             }
         }
     }
@@ -49,7 +49,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
     {
         static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
-            if (!SnapBuilder.Options.Snapping.Enabled)
+            if (!SnapBuilder.Config.Snapping.Enabled)
             {
                 return true; // Pass to the original function if SnapBuilder is disabled
             }
@@ -64,7 +64,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             localNormal = localNormal.normalized; // For sanity's sake, make sure the normal is normalised
 
             // Get the rounding factor from user options based on whether the fine snapping key is held or not
-            float roundFactor = SnapBuilder.Options.FineSnapping.Enabled ? SnapBuilder.Options.FineSnapRounding : SnapBuilder.Options.SnapRounding;
+            float roundFactor = SnapBuilder.Config.FineSnapping.Enabled ? SnapBuilder.Config.FineSnapRounding : SnapBuilder.Config.SnapRounding;
 
             // Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
             if (localNormal.x < 1)
@@ -148,7 +148,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             {   // New calculation of the rotation
 
                 // Get the rotation factor from user options based on whether the fine snapping key is held or not
-                float rotationFactor = SnapBuilder.Options.FineRotation.Enabled ? SnapBuilder.Options.FineRotationRounding : SnapBuilder.Options.RotationRounding;
+                float rotationFactor = SnapBuilder.Config.FineRotation.Enabled ? SnapBuilder.Config.FineRotationRounding : SnapBuilder.Config.RotationRounding;
 
                 // If the user is rotating, apply the additive rotation
                 if (GameInput.GetButtonHeld(Builder.buttonRotateCW)) // Clockwise

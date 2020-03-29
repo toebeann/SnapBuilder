@@ -1,17 +1,20 @@
 ﻿using System;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     internal static class SnapBuilder
     {
-        public static Options Options = new Options();
+        public static Config Config = new Config();
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
 
         public static void Initialise()
         {
-            SMLHelper.V2.Handlers.OptionsPanelHandler.RegisterModOptions(Options);
+            Config.Load();
+            Config.SetupToggles();
+            SMLHelper.V2.Handlers.OptionsPanelHandler.RegisterModOptions(new Options());
             InitLanguage();
         }
 
@@ -31,7 +34,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
             else
             {
-                string bindingName = SMLHelper.V2.Utility.KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
+#pragma warning disable CS0436 // Type conflicts with imported type
+                string bindingName = 
+                    KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
+#pragma warning restore CS0436 // Type conflicts with imported type
                 if (!string.IsNullOrEmpty(bindingName))
                 {
                     displayText = uGUI.GetDisplayTextForBinding(bindingName);
