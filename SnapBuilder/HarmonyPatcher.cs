@@ -1,5 +1,5 @@
-﻿using Harmony;
-using System.Reflection;
+﻿using System.Reflection;
+using Harmony;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
@@ -7,7 +7,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     {
         public static void ApplyPatches()
         {
-            HarmonyInstance harmony = HarmonyInstance.Create("com.tobeyblaber.straitjacket.subnautica.snapbuilder.mod");
+            HarmonyInstance harmony = HarmonyInstance.Create("SnapBuilder");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             SnapBuilder.Initialise();
