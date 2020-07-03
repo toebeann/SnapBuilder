@@ -34,10 +34,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
             else
             {
-#pragma warning disable CS0436 // Type conflicts with imported type
                 string bindingName = 
                     KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
-#pragma warning restore CS0436 // Type conflicts with imported type
                 if (!string.IsNullOrEmpty(bindingName))
                 {
                     displayText = uGUI.GetDisplayTextForBinding(bindingName);

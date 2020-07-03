@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SMLHelper.V2.Options;
 using UnityEngine;
 
