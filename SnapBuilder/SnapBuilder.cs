@@ -34,8 +34,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
             else
             {
-                string bindingName = 
-                    KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
+                string bindingName = KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
                 if (!string.IsNullOrEmpty(bindingName))
                 {
                     displayText = uGUI.GetDisplayTextForBinding(bindingName);
