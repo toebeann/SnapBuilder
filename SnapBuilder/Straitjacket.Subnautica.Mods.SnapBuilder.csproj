@@ -42,7 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony-1.2.0.1">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\0Harmony-1.2.0.1.dll</HintPath>
+      <HintPath>..\..\..\..\QModManager\Dependencies\0Harmony-1.2.0.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
@@ -97,7 +97,6 @@
     <None Include=".editorconfig" />
     <None Include="mod.json" />
   </ItemGroup>
-  <Import Project="..\..\..\..\SMLHelper\SMLHelper\SMLHelper.projitems" Label="Shared" />
   <Import Project="..\..\..\..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

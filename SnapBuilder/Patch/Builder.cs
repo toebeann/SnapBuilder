@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 {
-    [HarmonyPatch(typeof(Builder))]
-    [HarmonyPatch("Begin")]
-    static class Builder_Begin
+    [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
+    internal static class Builder_Begin
     {
         static void Prefix()
         {
@@ -16,9 +15,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
         }
     }
 
-    [HarmonyPatch(typeof(Builder))]
-    [HarmonyPatch("CreateGhost")]
-    static class Builder_CreateGhost
+    [HarmonyPatch(typeof(Builder), nameof(Builder.CreateGhost))]
+    internal static class Builder_CreateGhost
     {
         static void Prefix(ref bool __state)
         {
@@ -33,7 +31,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             }
         }
 
-        static void Postfix(bool __state)
+        public static void Postfix(bool __state)
         {
             if (__state && Builder.rotationEnabled)
             {
@@ -43,11 +41,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
         }
     }
 
-    [HarmonyPatch(typeof(Builder))]
-    [HarmonyPatch("SetPlaceOnSurface")]
-    static class Builder_SetPlaceOnSurface
+    [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
+    internal static class Builder_SetPlaceOnSurface
     {
-        static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
+        public static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
             if (!SnapBuilder.Config.Snapping.Enabled)
             {
@@ -190,7 +187,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
                 Builder.additiveRotation = SnapBuilder.RoundToNearest(Builder.additiveRotation, rotationFactor) % 360;
 
                 Transform hitTransform = hit.transform;
-                if (!Player.main.IsInside())
+                if (!Player.main.IsInSub())
                 {   // If the player is outside, get the root transform if there is one, otherwise default to the original
                     hitTransform = UWE.Utils.GetEntityRoot(hit.transform.gameObject)?.transform ?? hit.transform;
                 }
@@ -259,6 +256,131 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             }
 
             return false; // Do not run the original method
+        }
+    }
+
+    [HarmonyPatch(typeof(Builder), nameof(Builder.CheckAsSubModule))]
+    internal static class Builder_CheckAsSubModule
+    {
+        static void Postfix(bool __result)
+        {
+            //if (!SnapBuilder.Config.Snapping.Enabled)
+            //{
+            //    return; // Don't do anything if SnapBuilder is disabled
+            //}
+
+            //float roundFactor = SnapBuilder.Config.FineSnapping.Enabled ? SnapBuilder.Config.FineSnapRounding : SnapBuilder.Config.SnapRounding;
+
+            //// Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
+            //position.x = SnapBuilder.RoundToNearest(position.x, roundFactor);
+            //position.y = SnapBuilder.RoundToNearest(position.y, roundFactor);
+            //position.z = SnapBuilder.RoundToNearest(position.z, roundFactor);
+
+            //// Instantiate empty game objects for applying rotations
+            //GameObject empty = new GameObject();
+            //GameObject child = new GameObject();
+            //child.transform.parent = empty.transform; // parent the child to the empty
+            //child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
+            //empty.transform.position = position; // Set the parent transform's position to our chosen position
+
+            //empty.transform.forward = Vector3.forward; // Set the parent transform's forward to match the forward of the hit.transform
+            ////if (!Builder.forceUpright)
+            ////{   // Rotate the parent transform so that it's Y axis is aligned with the hit.normal, but only when if it isn't forced upright
+            ////    empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, hitNormal) * empty.transform.rotation;
+            ////}
+
+            ////if (Builder.rotationEnabled)
+            //{
+            //    float rotationFactor = SnapBuilder.Config.FineRotation.Enabled ? SnapBuilder.Config.FineRotationRounding : SnapBuilder.Config.RotationRounding;
+
+            //    child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
+            //    child.transform.localEulerAngles
+            //        = new Vector3(0,
+            //        SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + Builder.additiveRotation, rotationFactor) % 360,
+            //        0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
+
+            //    rotation = child.transform.rotation; // Our final rotation
+            //}
+
+            //// Clean up after ourselves
+            //GameObject.DestroyImmediate(child);
+            //GameObject.DestroyImmediate(empty);
+        }
+    }
+
+    [HarmonyPatch(typeof(Builder), nameof(Builder.UpdateAllowed))]
+    internal static class Builder_UpdateAllowed
+    {
+        static void Prefix(ref bool __result)
+        {
+            //if (!SnapBuilder.Config.Snapping.Enabled)
+            //{
+            //    return true;
+            //}
+
+            //var constructableBase = Builder.ghostModel.GetComponentInParent<ConstructableBase>();
+            //if (constructableBase == null)
+            //{
+            //    return true;
+            //}
+
+            //Builder.SetDefaultPlaceTransform(ref Builder.placePosition, ref Builder.placeRotation);
+            //constructableBase.transform.position = Builder.placePosition;
+            //constructableBase.transform.rotation = Builder.placeRotation;
+            //__result = constructableBase.UpdateGhostModel(Builder.GetAimTransform(), Builder.ghostModel, default,
+            //    out bool geometryChanged, constructableBase);
+            //Builder.placePosition = constructableBase.transform.position;
+            //Builder.placeRotation = constructableBase.transform.rotation;
+
+            ////float roundFactor = SnapBuilder.Config.FineSnapping.Enabled ? SnapBuilder.Config.FineSnapRounding : SnapBuilder.Config.SnapRounding;
+
+            ////Builder.placePosition.x = SnapBuilder.RoundToNearest(Builder.placePosition.x, roundFactor * 5);
+            ////Builder.placePosition.y = SnapBuilder.RoundToNearest(Builder.placePosition.y, roundFactor * 5);
+            ////Builder.placePosition.z = SnapBuilder.RoundToNearest(Builder.placePosition.z, roundFactor * 5);
+
+            ////if (Builder.rotationEnabled)
+            ////{
+            ////    GameObject empty = new GameObject();
+            ////    GameObject child = new GameObject();
+            ////    child.transform.parent = empty.transform; // parent the child to the empty
+            ////    child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
+            ////    empty.transform.position = Builder.placePosition; // Set the parent transform's position to our chosen position
+
+            ////    empty.transform.forward = Vector3.forward; // Set the parent transform's forward to match the forward of the hit.transform
+
+            ////    {
+            ////        float rotationFactor = SnapBuilder.Config.FineRotation.Enabled ? SnapBuilder.Config.FineRotationRounding : SnapBuilder.Config.RotationRounding;
+
+            ////        child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
+            ////        child.transform.localEulerAngles
+            ////            = new Vector3(0,
+            ////            SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + Builder.additiveRotation, rotationFactor) % 360,
+            ////            0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
+
+            ////        Builder.placeRotation = child.transform.rotation; // Our final rotation
+            ////    }
+
+            ////    // Clean up after ourselves
+            ////    GameObject.DestroyImmediate(child);
+            ////    GameObject.DestroyImmediate(empty);
+            ////}
+
+            //if (geometryChanged/* || constructableBase.transform.position != Builder.placePosition
+            //    || constructableBase.transform.rotation != Builder.placeRotation*/)
+            //{
+            //    Builder.renderers = MaterialExtensions.AssignMaterial(Builder.ghostModel, Builder.ghostStructureMaterial);
+            //    Builder.InitBounds(Builder.ghostModel);
+            //}
+
+            //if (__result)
+            //{
+            //    var gameObjects = new List<GameObject>();
+            //    Builder.GetObstacles(Builder.placePosition, Builder.placeRotation, Builder.bounds, gameObjects);
+            //    __result = gameObjects.Count == 0;
+            //    gameObjects.Clear();
+            //}
+
+            //return false;
         }
     }
 }
