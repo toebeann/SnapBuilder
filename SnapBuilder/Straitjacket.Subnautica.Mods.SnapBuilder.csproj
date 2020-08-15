@@ -77,12 +77,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -109,7 +104,7 @@
     <None Include="mod_BELOWZERO.json" />
     <None Include="mod_SUBNAUTICA.json" />
   </ItemGroup>
-  <Import Project="..\..\..\..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
+  <Import Project="..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y
