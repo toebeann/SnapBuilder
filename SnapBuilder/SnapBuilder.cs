@@ -1,4 +1,5 @@
 ﻿using System;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -13,8 +14,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static void Initialise()
         {
             Config.Load();
-            Config.SetupToggles();
-            SMLHelper.V2.Handlers.OptionsPanelHandler.RegisterModOptions(new Options());
+            OptionsPanelHandler.RegisterModOptions(new Options());
             InitLanguage();
         }
 
