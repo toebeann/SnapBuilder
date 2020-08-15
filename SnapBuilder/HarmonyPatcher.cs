@@ -1,15 +1,15 @@
-﻿using Harmony;
-using System.Reflection;
+﻿using HarmonyLib;
+using QModManager.API.ModLoading;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
-    internal class HarmonyPatcher
+    [QModCore]
+    public static class HarmonyPatcher
     {
+        [QModPatch]
         public static void ApplyPatches()
         {
-            HarmonyInstance harmony = HarmonyInstance.Create("com.tobeyblaber.straitjacket.subnautica.snapbuilder.mod");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+            new Harmony("SnapBuilder").PatchAll();
             SnapBuilder.Initialise();
         }
     }
