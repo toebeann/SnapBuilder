@@ -1,0 +1,3 @@
+[submodule "Toggle"]
+	path = Toggle
+	url = https://github.com/tobeyStraitjacket/Straitjacket.Toggle

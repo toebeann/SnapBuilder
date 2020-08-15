@@ -5,12 +5,12 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Straitjacket.Subnautica.Mods.SnapBuilder", "SnapBuilder\Straitjacket.Subnautica.Mods.SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.Toggle", "..\..\..\Toggle\Toggle\Straitjacket.Toggle.shproj", "{2E9FEC3F-6690-46E8-B676-9778D4B1292A}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.Toggle", "Toggle\Toggle\Straitjacket.Toggle.shproj", "{2E9FEC3F-6690-46E8-B676-9778D4B1292A}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\..\..\Toggle\Toggle\Toggle.projitems*{2e9fec3f-6690-46e8-b676-9778d4b1292a}*SharedItemsImports = 13
-		..\..\..\Toggle\Toggle\Toggle.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
+		Toggle\Toggle\Toggle.projitems*{2e9fec3f-6690-46e8-b676-9778d4b1292a}*SharedItemsImports = 13
+		Toggle\Toggle\Toggle.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		BELOWZERO|Any CPU = BELOWZERO|Any CPU
