@@ -2,12 +2,14 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.2.2",
+    "Version": "1.2.3",
     "AssemblyName": "Straitjacket.Subnautica.Mods.SnapBuilder.dll",
-    "EntryMethod": "Straitjacket.Subnautica.Mods.SnapBuilder.HarmonyPatcher.ApplyPatches",
     "Enable": true,
     "Game": "Subnautica",
     "VersionDependencies": {
-        "SMLHelper": "2.6.1"
+        "SMLHelper": "2.8"
+    },
+    "VersionChecker": {
+        "LatestVersionURL": "https://github.com/tobeyStraitjacket/VersionChecker/raw/master/VersionChecker/mod.json"
     }
 }
