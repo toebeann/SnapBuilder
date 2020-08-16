@@ -43,5 +43,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
             FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
         }
+
+        public void ResetToggles()
+        {
+            Snapping.Reset();
+            FineSnapping.Reset();
+            FineRotation.Reset();
+        }
     }
 }
