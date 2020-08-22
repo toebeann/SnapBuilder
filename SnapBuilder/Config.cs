@@ -31,13 +31,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public int FineRotationRounding { get; set; } = 5;
 
         [JsonIgnore]
-        public readonly Toggle Snapping;
+        public Toggle Snapping { get; private set; }
         [JsonIgnore]
-        public readonly Toggle FineSnapping;
+        public Toggle FineSnapping { get; private set; }
         [JsonIgnore]
-        public readonly Toggle FineRotation;
+        public Toggle FineRotation { get; private set; }
 
-        public Config()
+        public void Initialise()
         {
             Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
             FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
