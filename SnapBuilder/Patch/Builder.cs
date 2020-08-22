@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 {
-    [HarmonyPatch(typeof(Builder), nameof(Builder.CreateGhost))]
-    internal static class Builder_CreateGhost
+    [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
+    internal static class Builder_Begin
     {
         static void Prefix(ref bool __state)
         {
