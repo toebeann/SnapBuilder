@@ -15,6 +15,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static void Initialise()
         {
             Config.Load();
+            Config.Initialise();
             OptionsPanelHandler.RegisterModOptions(new Options());
             InitLanguage();
         }
