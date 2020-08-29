@@ -224,7 +224,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
 
             Transform hitTransform = hit.transform;
-            if (!Player.main.IsInside())
+            if (!Player.main.IsInsideWalkable())
             {   // If the player is outside, get the root transform if there is one, otherwise default to the original
                 hitTransform = UWE.Utils.GetEntityRoot(hit.transform.gameObject)?.transform ?? hit.transform;
             }

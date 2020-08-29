@@ -103,7 +103,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             SubRoot currentSub = Player.main.GetCurrentSub();
 
-            bool isInside = Player.main.IsInside();
+            bool isInside = Player.main.IsInsideWalkable();
 
             bool inSub = bHit && hit.collider.gameObject.GetComponentInParent<SubRoot>() != null;
 
