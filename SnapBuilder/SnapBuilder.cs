@@ -77,11 +77,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
         }
 
-        public static bool TryGetSnappedHitPoint(ref RaycastHit hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal,
-            Transform aimTransform = null)
+        public static bool TryGetSnappedHitPoint(LayerMask layerMask, ref RaycastHit hit,
+            out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, float maxDistance = 5f)
         {
-            if (aimTransform == null)
-                aimTransform = Builder.GetAimTransform();
+            Transform aimTransform = Builder.GetAimTransform();
 
             Vector3 localPoint = hit.transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
             Vector3 localNormal = hit.transform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
@@ -113,8 +112,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!Physics.Raycast(aimTransform.position,
                 hit.transform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
                 out hit, // overwrite hit
-                Builder.placeMaxDistance,
-                Builder.placeLayerMask.value,
+                maxDistance,
+                layerMask,
                 QueryTriggerInteraction.Ignore))
             {
                 snappedHitPoint = Vector3.zero;
@@ -219,7 +218,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             additiveRotation = RoundToNearest(additiveRotation, rotationFactor) % 360;
         }
 
-        public static Quaternion CalculateRotation(ref float additiveRotation, RaycastHit hit, Vector3 snappedHitPoint, Vector3 snappedHitNormal)
+        public static Quaternion CalculateRotation(ref float additiveRotation, RaycastHit hit,
+            Vector3 snappedHitPoint, Vector3 snappedHitNormal, bool forceUpright)
         {
             ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
 
@@ -243,7 +243,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform
             }
 
-            if (!Builder.forceUpright)
+            if (!forceUpright)
             {   // Rotate the parent transform so that it's Y axis is aligned with the hit.normal, but only when it isn't forced upright
                 empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, snappedHitNormal) * empty.transform.rotation;
             }
@@ -251,7 +251,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
             child.transform.localEulerAngles
                 = new Vector3(0,
-                SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + Builder.additiveRotation, rotationFactor) % 360,
+                SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
                 0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
