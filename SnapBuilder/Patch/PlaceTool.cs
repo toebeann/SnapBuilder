@@ -27,7 +27,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
         public static bool Prefix(PlaceTool __instance)
         {
             if (__instance.usingPlayer == null || !SnapBuilder.Config.Snapping.Enabled)
+            {
+                Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
                 return true;
+            }
+
+            Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled);
 
             Transform aimTransform = Builder.GetAimTransform();
             RaycastHit hit;
@@ -35,9 +40,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             Vector3 position = __instance.ghostModel.transform.position;
             Quaternion rotation = __instance.ghostModel.transform.rotation;
 
+            SnapBuilder.ApplyAdditiveRotation(ref __instance.additiveRotation, out var _);
+
             if (bHit)
             {
-                bHit = SnapBuilder.TryGetSnappedHitPoint(ref hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, aimTransform);
+                bHit = SnapBuilder.TryGetSnappedHitPoint(PlaceTool.placeLayerMask, ref hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal);
 
                 if (bHit)
                 {
@@ -51,7 +58,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
                     if (__instance.rotationEnabled)
                     {   // New calculation of the rotation
-                        rotation = SnapBuilder.CalculateRotation(ref __instance.additiveRotation, hit, snappedHitPoint, snappedHitNormal);
+                        rotation = SnapBuilder.CalculateRotation(ref __instance.additiveRotation, hit, snappedHitPoint, snappedHitNormal, true);
                     }
                     else
                     {   // Calculate rotation in the same manner as the original method
@@ -88,7 +95,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
                 rotation = Quaternion.LookRotation(-aimTransform.forward, Vector3.up);
                 if (__instance.rotationEnabled)
                     rotation *= Quaternion.AngleAxis(__instance.additiveRotation, Vector3.up);
-                __instance.validPosition = false;
             }
 
             __instance.ghostModel.transform.position = position;
@@ -103,9 +109,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             SubRoot currentSub = Player.main.GetCurrentSub();
 
-            bool isInside = Player.main.IsInside();
-
-            bool inSub = bHit && hit.collider.gameObject.GetComponentInParent<SubRoot>() != null;
+            bool isInside = Player.main.IsInsideWalkable();
 
             if (bHit && hit.collider.gameObject.CompareTag("DenyBuilding"))
                 __instance.validPosition = false;
@@ -150,6 +154,16 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             }
 
             return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnPlace))]
+    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnHolster))]
+    internal static class PlaceTool_OnPlace_OnHolster
+    {
+        public static void Postfix()
+        {
+            Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
         }
     }
 }

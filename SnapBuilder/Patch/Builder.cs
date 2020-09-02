@@ -33,7 +33,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             Transform aimTransform = Builder.GetAimTransform();
 
-            if (!SnapBuilder.TryGetSnappedHitPoint(ref hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, aimTransform))
+            if (!SnapBuilder.TryGetSnappedHitPoint(
+                Builder.placeLayerMask,
+                ref hit,
+                out Vector3 snappedHitPoint,
+                out Vector3 snappedHitNormal,
+                Builder.placeMaxDistance))
             {   // If there is no new hit, then the position we're snapping to isn't valid and we can just return false
                 // without setting the position or rotation and it will be treated as if no hit occurred
                 return false;
@@ -44,7 +49,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             if (Builder.rotationEnabled)
             {   // New calculation of the rotation
-                rotation = SnapBuilder.CalculateRotation(ref Builder.additiveRotation, hit, snappedHitPoint, snappedHitNormal);
+                rotation = SnapBuilder.CalculateRotation(ref Builder.additiveRotation, hit, snappedHitPoint, snappedHitNormal, Builder.forceUpright);
             }
             else
             {   // Calculate rotation in the same manner as the original method
