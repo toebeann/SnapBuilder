@@ -98,7 +98,6 @@
     <Compile Include="Config.cs" />
     <Compile Include="Patch\Builder.cs" />
     <Compile Include="HarmonyPatcher.cs" />
-    <Compile Include="Options.cs" />
     <Compile Include="Patch\PlaceTool.cs" />
     <Compile Include="SnapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
