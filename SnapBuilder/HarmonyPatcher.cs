@@ -2,16 +2,29 @@
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     [QModCore]
     public static class HarmonyPatcher
     {
+        private enum SupportedGame
+        {
+            Subnautica,
+            BelowZero
+        }
+
+#if SUBNAUTICA
+        private const SupportedGame TargetGame = SupportedGame.Subnautica;
+#elif BELOWZERO
+        private const SupportedGame TargetGame = SupportedGame.BelowZero;
+#endif
+
         [QModPatch]
         public static void ApplyPatches()
         {
-            Logger.LogInfo("Initialising...");
+            Logger.LogInfo($"Initialising SnapBuilder for {TargetGame} v{Assembly.GetExecutingAssembly().GetName().Version}...");
 
             var stopwatch = Stopwatch.StartNew();
             new Harmony("SnapBuilder").PatchAll();
