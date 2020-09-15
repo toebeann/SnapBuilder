@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
+namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 {
-    [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
-    internal static class Builder_Begin
+    internal static class BuilderPatch
     {
-        static void Prefix(ref bool __state)
+        #region Builder.Begin
+        [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
+        [HarmonyPrefix]
+        public static void BeginPrefix(ref bool __state)
         {
             SnapBuilder.Config.ResetToggles();
 
@@ -15,16 +17,18 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             SnapBuilder.ShowSnappingHint(__state);
         }
 
-        public static void Postfix(bool __state)
+        [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
+        [HarmonyPostfix]
+        public static void BeginPostfix(bool __state)
         {
             SnapBuilder.ShowRotationHint(__state && Builder.rotationEnabled);
         }
-    }
+        #endregion
 
-    [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
-    internal static class Builder_SetPlaceOnSurface
-    {
-        public static bool Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
+        #region Builder.SetPlaceOnSurface
+        [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
+        [HarmonyPrefix]
+        public static bool SetPlaceOnSurfacePrefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
             if (!SnapBuilder.Config.Snapping.Enabled)
             {
@@ -91,5 +95,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             return false; // Do not run the original method
         }
+        #endregion
     }
 }
