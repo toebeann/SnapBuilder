@@ -252,7 +252,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             empty.transform.position = snappedHitPoint; // Set the parent transform's position to our chosen position
 
 #if BELOWZERO
-                if (Builder.constructableTechType != TechType.Hoverpad)
+            if (Builder.constructableTechType != TechType.Hoverpad)
 #endif
             {   // Stupid hoverpad, working differently to everything else in the game...
                 empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform
