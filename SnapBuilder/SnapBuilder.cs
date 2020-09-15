@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
+using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using Straitjacket.Subnautica.Mods.SnapBuilder.Patches;
 using UnityEngine;
+using Logger = BepInEx.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
@@ -12,10 +17,41 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static GameInput.Button LastButton;
         public static Config Config = OptionsPanelHandler.RegisterModOptions<Config>();
 
+        private enum SupportedGame
+        {
+            Subnautica,
+            BelowZero
+        }
+
+#if SUBNAUTICA
+        private const SupportedGame TargetGame = SupportedGame.Subnautica;
+#elif BELOWZERO
+        private const SupportedGame TargetGame = SupportedGame.BelowZero;
+#endif
+
         public static void Initialise()
         {
+            Logger.LogInfo($"Initialising SnapBuilder for {TargetGame} v{Assembly.GetExecutingAssembly().GetName().Version}...");
+            var stopwatch = Stopwatch.StartNew();
+
+            ApplyHarmonyPatches();
             Config.Initialise();
             InitLanguage();
+
+            stopwatch.Stop();
+            Logger.LogInfo($"Initialised in {stopwatch.ElapsedMilliseconds}ms.");
+        }
+
+        public static void ApplyHarmonyPatches()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var harmony = new Harmony("SnapBuilder");
+            harmony.PatchAll(typeof(BuilderPatch));
+            harmony.PatchAll(typeof(PlaceToolPatch));
+
+            stopwatch.Stop();
+            Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
         public static void InitLanguage()

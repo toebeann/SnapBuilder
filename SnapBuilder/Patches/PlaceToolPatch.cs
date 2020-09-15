@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
+namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 {
-    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
-    internal static class PlaceTool_CreateGhostModel
+    internal static class PlaceToolPatch
     {
-        static void Prefix(PlaceTool __instance, ref bool __state)
+        #region PlaceTool.CreateGhostModel
+        [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
+        [HarmonyPrefix]
+        public static void CreateGhostModelPrefix(PlaceTool __instance, ref bool __state)
         {
             SnapBuilder.Config.ResetToggles();
 
@@ -15,16 +17,18 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
             SnapBuilder.ShowSnappingHint(__state);
         }
 
+        [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
+        [HarmonyPostfix]
         public static void Postfix(PlaceTool __instance, bool __state)
         {
             SnapBuilder.ShowRotationHint(__state && __instance.rotationEnabled);
         }
-    }
+        #endregion
 
-    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.LateUpdate))]
-    internal static class PlaceTool_LateUpdate
-    {
-        public static bool Prefix(PlaceTool __instance)
+        #region PlaceTool.LateUpdate
+        [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.LateUpdate))]
+        [HarmonyPrefix]
+        public static bool LateUpdatePrefix(PlaceTool __instance)
         {
             if (__instance.usingPlayer == null || !SnapBuilder.Config.Snapping.Enabled)
             {
@@ -155,15 +159,16 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patch
 
             return false;
         }
-    }
+        #endregion
 
-    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnPlace))]
-    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnHolster))]
-    internal static class PlaceTool_OnPlace_OnHolster
-    {
-        public static void Postfix()
+        #region PlaceTool.OnPlace & PlaceTool.OnHolster
+        [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnPlace))]
+        [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnHolster))]
+        [HarmonyPostfix]
+        public static void OnPlaceOrOnHolsterPostfix()
         {
             Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
         }
+        #endregion
     }
 }

@@ -96,9 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="Patch\Builder.cs" />
-    <Compile Include="HarmonyPatcher.cs" />
-    <Compile Include="Patch\PlaceTool.cs" />
+    <Compile Include="Patches\BuilderPatch.cs" />
+    <Compile Include="Patches\PlaceToolPatch.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="SnapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
