@@ -7,7 +7,7 @@
     "Enable": true,
     "Game": "Subnautica",
     "VersionDependencies": {
-        "SMLHelper": "2.8"
+        "SMLHelper": "2.9"
     },
     "VersionChecker": {
         "LatestVersionURL": "https://github.com/tobeyStraitjacket/Straitjacket.Subnautica.Mods.SnapBuilder/raw/master/SnapBuilder/mod_SUBNAUTICA.json"
