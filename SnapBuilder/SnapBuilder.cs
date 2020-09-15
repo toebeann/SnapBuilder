@@ -1,30 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
+using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using Straitjacket.Subnautica.Mods.SnapBuilder.Patches;
 using UnityEngine;
+using Logger = BepInEx.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     internal static class SnapBuilder
     {
-        public static Config Config = new Config();
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
+        public static Config Config = OptionsPanelHandler.RegisterModOptions<Config>();
+
+        private enum SupportedGame
+        {
+            Subnautica,
+            BelowZero
+        }
+
+#if SUBNAUTICA
+        private const SupportedGame TargetGame = SupportedGame.Subnautica;
+#elif BELOWZERO
+        private const SupportedGame TargetGame = SupportedGame.BelowZero;
+#endif
 
         public static void Initialise()
         {
-            Config.Load();
+            Logger.LogInfo($"Initialising SnapBuilder for {TargetGame} v{Assembly.GetExecutingAssembly().GetName().Version}...");
+            var stopwatch = Stopwatch.StartNew();
+
+            ApplyHarmonyPatches();
             Config.Initialise();
-            OptionsPanelHandler.RegisterModOptions(new Options());
             InitLanguage();
+
+            stopwatch.Stop();
+            Logger.LogInfo($"Initialised in {stopwatch.ElapsedMilliseconds}ms.");
+        }
+
+        public static void ApplyHarmonyPatches()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var harmony = new Harmony("SnapBuilder");
+            harmony.PatchAll(typeof(BuilderPatch));
+            harmony.PatchAll(typeof(PlaceToolPatch));
+
+            stopwatch.Stop();
+            Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
         public static void InitLanguage()
         {
-            SetLanguage("GhostToggleSnappingHint", "Toggle snapping");
-            SetLanguage("GhostToggleFineSnappingHint", "Toggle fine snapping");
-            SetLanguage("GhostToggleFineRotationHint", "Toggle fine rotation");
+            foreach (var entry in new Dictionary<string, string>()
+            {
+                ["GhostToggleSnappingHint"] = "Toggle snapping",
+                ["GhostToggleFineSnappingHint"] = "Toggle fine snapping",
+                ["GhostToggleFineRotationHint"] = "Toggle fine rotation",
+                ["Options.SnappingEnabledByDefault"] = "Snapping enabled by default",
+                ["Options.ToggleSnappingKey"] = "Toggle snapping button",
+                ["Options.ToggleSnappingMode"] = "Toggle snapping mode",
+                ["Options.FineSnappingKey"] = "Fine snapping button",
+                ["Options.FineSnappingMode"] = "Fine snapping mode",
+                ["Options.FineRotationKey"] = "Fine rotation button",
+                ["Options.FineRotationMode"] = "Fine rotation mode",
+                ["Options.SnapRounding"] = "Snap rounding",
+                ["Options.FineSnapRounding"] = "Fine snap rounding",
+                ["Options.RotationRounding"] = "Rotation rounding (degrees)",
+                ["Options.FineRotationRounding"] = "Fine rotation rounding (degrees)"
+            })
+            {
+                SetLanguage(entry.Key, entry.Value);
+            }
         }
 
         public static string FormatButton(Toggle toggle)
@@ -55,7 +106,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static double FloorToNearest(double x, double y) => y * Math.Floor(x / y);
 
         public static string GetLanguage(string id) => Language.main.Get(id);
-        public static void SetLanguage(string id, string value) => SMLHelper.V2.Handlers.LanguageHandler.SetLanguageLine(id, value);
+        public static void SetLanguage(string id, string value) => LanguageHandler.SetLanguageLine(id, value);
 
         public static void ShowSnappingHint(bool shouldShow = true)
         {
@@ -237,7 +288,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             empty.transform.position = snappedHitPoint; // Set the parent transform's position to our chosen position
 
 #if BELOWZERO
-                if (Builder.constructableTechType != TechType.Hoverpad)
+            if (Builder.constructableTechType != TechType.Hoverpad)
 #endif
             {   // Stupid hoverpad, working differently to everything else in the game...
                 empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform

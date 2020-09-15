@@ -13,18 +13,18 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SUBNAUTICA|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <OutputPath>..\Build\</OutputPath>
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
+    <DebugType>none</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Optimize>true</Optimize>
@@ -34,13 +34,12 @@
     <ManagedDir>$(DataDir)\Managed</ManagedDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BELOWZERO|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <OutputPath>..\Build\</OutputPath>
     <DefineConstants>TRACE;BELOWZERO</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
+    <DebugType>none</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Optimize>true</Optimize>
@@ -60,6 +59,10 @@
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
       <HintPath>$(ManagedDir)\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -93,10 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="Patch\Builder.cs" />
-    <Compile Include="HarmonyPatcher.cs" />
-    <Compile Include="Options.cs" />
-    <Compile Include="Patch\PlaceTool.cs" />
+    <Compile Include="Patches\BuilderPatch.cs" />
+    <Compile Include="Patches\PlaceToolPatch.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="SnapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -106,6 +108,7 @@
     <None Include="mod_SUBNAUTICA.json" />
   </ItemGroup>
   <Import Project="..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
+  <Import Project="..\BepInEx.Logger\Logger\Logger.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y

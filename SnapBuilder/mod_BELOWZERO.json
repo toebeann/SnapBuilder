@@ -2,12 +2,12 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.3.3",
+    "Version": "1.3.4",
     "AssemblyName": "Straitjacket.Subnautica.Mods.SnapBuilder.dll",
     "Enable": true,
     "Game": "BelowZero",
     "VersionDependencies": {
-        "SMLHelper": "2.8"
+        "SMLHelper": "2.9"
     },
     "VersionChecker": {
         "LatestVersionURL": "https://github.com/tobeyStraitjacket/Straitjacket.Subnautica.Mods.SnapBuilder/raw/master/SnapBuilder/mod_BELOWZERO.json"

@@ -1,3 +1,6 @@
 [submodule "Toggle"]
 	path = Toggle
 	url = https://github.com/tobeyStraitjacket/Straitjacket.Toggle
+[submodule "BepInEx.Logger"]
+	path = BepInEx.Logger
+	url = https://github.com/tobeyStraitjacket/BepInEx.Logger
