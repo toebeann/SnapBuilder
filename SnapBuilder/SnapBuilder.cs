@@ -143,7 +143,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             localNormal = localNormal.normalized; // For sanity's sake, make sure the normal is normalised
 
             // Get the rounding factor from user options based on whether the fine snapping key is held or not
-            float roundFactor = Config.FineSnapping.Enabled ? Config.FineSnapRounding : Config.SnapRounding;
+            float roundFactor = Config.FineSnapping.Enabled ? Config.FineSnapRounding / 2f : Config.SnapRounding;
 
             // Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
             if (localNormal.x < 1)
