@@ -7,7 +7,7 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using Straitjacket.Subnautica.Mods.SnapBuilder.Patches;
 using UnityEngine;
-using Logger = BepInEx.Logger;
+using Logger = BepInEx.Subnautica.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
