@@ -75,7 +75,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [Slider(0, 45, LabelLanguageId = "Options.FineRotationRounding", DefaultValue = 5)]
         public int FineRotationRounding { get; set; } = 5;
 
-        public bool ShouldUpgrade = true;
+        public bool HasUpgraded = false;
 
         public void Initialise()
         {
@@ -95,10 +95,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
         private void Upgrade()
         {
-            if (!ShouldUpgrade)
+            if (HasUpgraded)
                 return;
 
-            ShouldUpgrade = false;
+            HasUpgraded = true;
             Save();
 
             if (!Main.PreviousConfigFileExists)
