@@ -17,11 +17,21 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     internal class Config : ConfigFile
     {
         [JsonIgnore]
-        public Toggle Snapping { get; private set; }
+        private Toggle snapping;
+
         [JsonIgnore]
-        public Toggle FineSnapping { get; private set; }
+        public Toggle Snapping => snapping ??= new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
+
         [JsonIgnore]
-        public Toggle FineRotation { get; private set; }
+        private Toggle fineSnapping;
+
+        [JsonIgnore]
+        public Toggle FineSnapping => fineSnapping ??= new Toggle(FineSnappingKey, FineSnappingMode, false);
+
+        [JsonIgnore]
+        private Toggle fineRotation;
+        [JsonIgnore]
+        public Toggle FineRotation => fineRotation ??= new Toggle(FineRotationKey, FineRotationMode, false);
 
         [Toggle(LabelLanguageId = "Options.SnappingEnabledByDefault"), OnChange(nameof(EnabledByDefaultChanged))]
         public bool EnabledByDefault { get; set; } = true;
@@ -80,10 +90,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public void Initialise()
         {
             Upgrade();
-
-            Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
-            FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
-            FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
         }
 
         public void ResetToggles()
