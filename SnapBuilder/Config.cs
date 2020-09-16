@@ -66,8 +66,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public float SnapRounding { get; set; } = 0.5f;
 
         [JsonConverter(typeof(FloatConverter), 2)]
-        [Slider(0.01f, 0.5f, LabelLanguageId = "Options.FineSnapRounding", Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.1f)]
-        public float FineSnapRounding { get; set; } = 0.1f;
+        [Slider(0.01f, 1, LabelLanguageId = "Options.FineSnapRounding", Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.2f)]
+        public float FineSnapRounding { get; set; } = 0.2f;
 
         [Slider(0, 90, LabelLanguageId = "Options.RotationRounding", DefaultValue = 45)]
         public int RotationRounding { get; set; } = 45;
@@ -75,8 +75,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [Slider(0, 45, LabelLanguageId = "Options.FineRotationRounding", DefaultValue = 5)]
         public int FineRotationRounding { get; set; } = 5;
 
+        public bool ShouldUpgrade = true;
+
         public void Initialise()
         {
+            Upgrade();
+
             Snapping = new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
             FineSnapping = new Toggle(FineSnappingKey, FineSnappingMode, false);
             FineRotation = new Toggle(FineRotationKey, FineRotationMode, false);
@@ -87,6 +91,21 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Snapping.Reset();
             FineSnapping.Reset();
             FineRotation.Reset();
+        }
+
+        private void Upgrade()
+        {
+            if (!ShouldUpgrade)
+                return;
+
+            ShouldUpgrade = false;
+            Save();
+
+            if (!Main.PreviousConfigFileExists)
+                return;
+
+            FineSnapRounding *= 2;
+            Save();
         }
     }
 }
