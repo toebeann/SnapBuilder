@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Straitjacket.Subnautica.Mod
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.Toggle", "Toggle\Toggle\Straitjacket.Toggle.shproj", "{2E9FEC3F-6690-46E8-B676-9778D4B1292A}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BepInEx.Logger", "BepInEx.Logger\Logger\BepInEx.Logger.shproj", "{32F6ED8C-0F9A-409D-A404-EE068789C72F}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BepInEx.Subnautica.Logger", "BepInEx.Logger\Logger\BepInEx.Subnautica.Logger.shproj", "{32F6ED8C-0F9A-409D-A404-EE068789C72F}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
