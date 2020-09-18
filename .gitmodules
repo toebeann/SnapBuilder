@@ -4,3 +4,6 @@
 [submodule "BepInEx.Logger"]
 	path = BepInEx.Logger
 	url = https://github.com/tobeyStraitjacket/BepInEx.Logger
+[submodule "SMLHelper.Language"]
+	path = SMLHelper.Language
+	url = https://github.com/tobeyStraitjacket/SMLHelper.Language

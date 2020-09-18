@@ -36,7 +36,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             ApplyHarmonyPatches();
             Config.Initialise();
-            InitLanguage();
+            Lang.Initialise();
 
             stopwatch.Stop();
             Logger.LogInfo($"Initialised in {stopwatch.ElapsedMilliseconds}ms.");
@@ -54,40 +54,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
-        public static void InitLanguage()
-        {
-            foreach (var entry in new Dictionary<string, string>()
-            {
-                [Lang.Hint.TOGGLE_SNAPPING] = "Toggle snapping",
-                [Lang.Hint.TOGGLE_FINE_SNAPPING] = "Toggle fine snapping",
-                [Lang.Hint.TOGGLE_ROTATION] = "Toggle rotation",
-                [Lang.Hint.TOGGLE_FINE_ROTATION] = "Toggle fine rotation",
-                [Lang.Hint.HOLSTER_ITEM] = "Holster item",
-                [Lang.Option.DEFAULT_SNAPPING_ENABLED] = "Snapping enabled by default",
-                [Lang.Option.TOGGLE_SNAPPING_KEY] = "Toggle snapping button",
-                [Lang.Option.TOGGLE_SNAPPING_MODE] = "Toggle snapping mode",
-                [Lang.Option.FINE_SNAPPING_KEY] = "Fine snapping button",
-                [Lang.Option.FINE_SNAPPING_MODE] = "Fine snapping mode",
-                [Lang.Option.FINE_ROTATION_KEY] = "Fine rotation button",
-                [Lang.Option.FINE_ROTATION_MODE] = "Fine rotation mode",
-                [Lang.Option.TOGGLE_ROTATION_KEY] = "Toggle rotation button (for placeable items)",
-                [Lang.Option.TOGGLE_ROTATION_MODE] = "Toggle rotation mode (for placeable items)",
-                [Lang.Option.SNAP_ROUNDING] = "Snap rounding",
-                [Lang.Option.FINE_SNAP_ROUNDING] = "Fine snap rounding",
-                [Lang.Option.ROTATION_ROUNDING] = "Rotation rounding (degrees)",
-                [Lang.Option.FINE_ROTATION_ROUNDING] = "Fine rotation rounding (degrees)"
-            })
-            {
-                SetLanguage(entry.Key, entry.Value);
-            }
-        }
-
         public static string FormatButton(Toggle toggle)
         {
             string displayText = null;
             if (toggle.KeyCode == KeyCode.None)
             {
-                displayText = GetLanguage("NoInputAssigned");
+                displayText = SMLHelper.Language.Get("NoInputAssigned");
             }
             else
             {
@@ -98,7 +70,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
                 if (string.IsNullOrEmpty(displayText))
                 {
-                    displayText = GetLanguage("NoInputAssigned");
+                    displayText = SMLHelper.Language.Get("NoInputAssigned");
                 }
             }
             return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
@@ -109,17 +81,14 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static float FloorToNearest(float x, float y) => y * Mathf.Floor(x / y);
         public static double FloorToNearest(double x, double y) => y * Math.Floor(x / y);
 
-        public static string GetLanguage(string id) => Language.main.Get(id);
-        public static void SetLanguage(string id, string value) => LanguageHandler.SetLanguageLine(id, value);
-
         public static void ShowSnappingHint(bool shouldShow = true)
         {
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_SNAPPING) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_SNAPPING) +
                     $" ({FormatButton(Config.Snapping)})");
-            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_FINE_SNAPPING) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_SNAPPING) +
                 $" ({FormatButton(Config.FineSnapping)})");
         }
 
@@ -128,7 +97,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_FINE_ROTATION) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_ROTATION) +
                 $" ({FormatButton(Config.FineRotation)})");
         }
 
@@ -137,7 +106,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_ROTATION) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_ROTATION) +
                 $" ({FormatButton(Config.ToggleRotation)})");
         }
 
@@ -146,7 +115,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(GetLanguage(Lang.Hint.HOLSTER_ITEM) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.HOLSTER_ITEM) +
                 $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
@@ -323,8 +292,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
             child.transform.localEulerAngles
-                = new Vector3(0,
-                SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
+                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
                 0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
