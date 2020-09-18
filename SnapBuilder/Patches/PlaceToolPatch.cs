@@ -21,7 +21,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static void Postfix(PlaceTool __instance, bool __state)
         {
-            SnapBuilder.ShowRotationHint(__state && __instance.rotationEnabled);
+            SnapBuilder.ShowToggleRotationHint(__state && __instance.rotationEnabled);
+            SnapBuilder.ShowToggleFineRotationHint(__state && __instance.rotationEnabled);
+            SnapBuilder.ShowHolsterHint(__state && __instance.rotationEnabled);
         }
         #endregion
 
@@ -36,7 +38,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                 return true;
             }
 
-            Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled);
+            Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && SnapBuilder.Config.ToggleRotation.Enabled);
 
             Transform aimTransform = Builder.GetAimTransform();
             RaycastHit hit;

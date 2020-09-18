@@ -42,7 +42,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Logger.LogInfo($"Initialised in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
-        public static void ApplyHarmonyPatches()
+        private static void ApplyHarmonyPatches()
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -58,20 +58,24 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         {
             foreach (var entry in new Dictionary<string, string>()
             {
-                ["GhostToggleSnappingHint"] = "Toggle snapping",
-                ["GhostToggleFineSnappingHint"] = "Toggle fine snapping",
-                ["GhostToggleFineRotationHint"] = "Toggle fine rotation",
-                ["Options.SnappingEnabledByDefault"] = "Snapping enabled by default",
-                ["Options.ToggleSnappingKey"] = "Toggle snapping button",
-                ["Options.ToggleSnappingMode"] = "Toggle snapping mode",
-                ["Options.FineSnappingKey"] = "Fine snapping button",
-                ["Options.FineSnappingMode"] = "Fine snapping mode",
-                ["Options.FineRotationKey"] = "Fine rotation button",
-                ["Options.FineRotationMode"] = "Fine rotation mode",
-                ["Options.SnapRounding"] = "Snap rounding",
-                ["Options.FineSnapRounding"] = "Fine snap rounding",
-                ["Options.RotationRounding"] = "Rotation rounding (degrees)",
-                ["Options.FineRotationRounding"] = "Fine rotation rounding (degrees)"
+                [Lang.Hint.TOGGLE_SNAPPING] = "Toggle snapping",
+                [Lang.Hint.TOGGLE_FINE_SNAPPING] = "Toggle fine snapping",
+                [Lang.Hint.TOGGLE_ROTATION] = "Toggle rotation",
+                [Lang.Hint.TOGGLE_FINE_ROTATION] = "Toggle fine rotation",
+                [Lang.Hint.HOLSTER_ITEM] = "Holster item",
+                [Lang.Option.DEFAULT_SNAPPING_ENABLED] = "Snapping enabled by default",
+                [Lang.Option.TOGGLE_SNAPPING_KEY] = "Toggle snapping button",
+                [Lang.Option.TOGGLE_SNAPPING_MODE] = "Toggle snapping mode",
+                [Lang.Option.FINE_SNAPPING_KEY] = "Fine snapping button",
+                [Lang.Option.FINE_SNAPPING_MODE] = "Fine snapping mode",
+                [Lang.Option.FINE_ROTATION_KEY] = "Fine rotation button",
+                [Lang.Option.FINE_ROTATION_MODE] = "Fine rotation mode",
+                [Lang.Option.TOGGLE_ROTATION_KEY] = "Toggle rotation button (for placeable items)",
+                [Lang.Option.TOGGLE_ROTATION_MODE] = "Toggle rotation mode (for placeable items)",
+                [Lang.Option.SNAP_ROUNDING] = "Snap rounding",
+                [Lang.Option.FINE_SNAP_ROUNDING] = "Fine snap rounding",
+                [Lang.Option.ROTATION_ROUNDING] = "Rotation rounding (degrees)",
+                [Lang.Option.FINE_ROTATION_ROUNDING] = "Fine rotation rounding (degrees)"
             })
             {
                 SetLanguage(entry.Key, entry.Value);
@@ -110,22 +114,40 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
         public static void ShowSnappingHint(bool shouldShow = true)
         {
-            if (shouldShow)
-            {
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleSnappingHint")}" +
-                        $" ({FormatButton(Config.Snapping)})");
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleFineSnappingHint")}" +
-                    $" ({FormatButton(Config.FineSnapping)})");
-            }
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_SNAPPING) +
+                    $" ({FormatButton(Config.Snapping)})");
+            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_FINE_SNAPPING) +
+                $" ({FormatButton(Config.FineSnapping)})");
         }
 
-        public static void ShowRotationHint(bool shouldShow = true)
+        public static void ShowToggleFineRotationHint(bool shouldShow = true)
         {
-            if (shouldShow)
-            {
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleFineRotationHint")}" +
-                    $" ({FormatButton(Config.FineRotation)})");
-            }
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_FINE_ROTATION) +
+                $" ({FormatButton(Config.FineRotation)})");
+        }
+
+        public static void ShowToggleRotationHint(bool shouldShow = true)
+        {
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(GetLanguage(Lang.Hint.TOGGLE_ROTATION) +
+                $" ({FormatButton(Config.ToggleRotation)})");
+        }
+
+        public static void ShowHolsterHint(bool shouldShow = true)
+        {
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(GetLanguage(Lang.Hint.HOLSTER_ITEM) +
+                $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
         public static bool TryGetSnappedHitPoint(LayerMask layerMask, ref RaycastHit hit,
