@@ -1,4 +1,6 @@
-﻿namespace Straitjacket.Subnautica.Mods.SnapBuilder
+﻿using System.Collections.Generic;
+
+namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     internal static class Lang
     {
@@ -26,6 +28,31 @@
             public const string FINE_SNAP_ROUNDING = "Options.FineSnapRounding";
             public const string ROTATION_ROUNDING = "Options.RotationRounding";
             public const string FINE_ROTATION_ROUNDING = "Options.FineRotationRounding";
+        }
+
+        public static void Initialise()
+        {
+            SMLHelper.Language.Set(new Dictionary<string, string>()
+            {
+                [Hint.TOGGLE_SNAPPING] = "Toggle snapping",
+                [Hint.TOGGLE_FINE_SNAPPING] = "Toggle fine snapping",
+                [Hint.TOGGLE_ROTATION] = "Toggle rotation",
+                [Hint.TOGGLE_FINE_ROTATION] = "Toggle fine rotation",
+                [Hint.HOLSTER_ITEM] = "Holster item",
+                [Option.DEFAULT_SNAPPING_ENABLED] = "Snapping enabled by default",
+                [Option.TOGGLE_SNAPPING_KEY] = "Toggle snapping button",
+                [Option.TOGGLE_SNAPPING_MODE] = "Toggle snapping mode",
+                [Option.FINE_SNAPPING_KEY] = "Fine snapping button",
+                [Option.FINE_SNAPPING_MODE] = "Fine snapping mode",
+                [Option.FINE_ROTATION_KEY] = "Fine rotation button",
+                [Option.FINE_ROTATION_MODE] = "Fine rotation mode",
+                [Option.TOGGLE_ROTATION_KEY] = "Toggle rotation button (for placeable items)",
+                [Option.TOGGLE_ROTATION_MODE] = "Toggle rotation mode (for placeable items)",
+                [Option.SNAP_ROUNDING] = "Snap rounding",
+                [Option.FINE_SNAP_ROUNDING] = "Fine snap rounding",
+                [Option.ROTATION_ROUNDING] = "Rotation rounding (degrees)",
+                [Option.FINE_ROTATION_ROUNDING] = "Fine rotation rounding (degrees)"
+            });
         }
     }
 }
