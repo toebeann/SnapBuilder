@@ -21,7 +21,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static void BeginPostfix(bool __state)
         {
-            SnapBuilder.ShowRotationHint(__state && Builder.rotationEnabled);
+            SnapBuilder.ShowToggleFineRotationHint(__state && Builder.rotationEnabled);
         }
         #endregion
 

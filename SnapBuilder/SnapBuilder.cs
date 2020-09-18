@@ -36,13 +36,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             ApplyHarmonyPatches();
             Config.Initialise();
-            InitLanguage();
+            Lang.Initialise();
 
             stopwatch.Stop();
             Logger.LogInfo($"Initialised in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
-        public static void ApplyHarmonyPatches()
+        private static void ApplyHarmonyPatches()
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -54,36 +54,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
-        public static void InitLanguage()
-        {
-            foreach (var entry in new Dictionary<string, string>()
-            {
-                ["GhostToggleSnappingHint"] = "Toggle snapping",
-                ["GhostToggleFineSnappingHint"] = "Toggle fine snapping",
-                ["GhostToggleFineRotationHint"] = "Toggle fine rotation",
-                ["Options.SnappingEnabledByDefault"] = "Snapping enabled by default",
-                ["Options.ToggleSnappingKey"] = "Toggle snapping button",
-                ["Options.ToggleSnappingMode"] = "Toggle snapping mode",
-                ["Options.FineSnappingKey"] = "Fine snapping button",
-                ["Options.FineSnappingMode"] = "Fine snapping mode",
-                ["Options.FineRotationKey"] = "Fine rotation button",
-                ["Options.FineRotationMode"] = "Fine rotation mode",
-                ["Options.SnapRounding"] = "Snap rounding",
-                ["Options.FineSnapRounding"] = "Fine snap rounding",
-                ["Options.RotationRounding"] = "Rotation rounding (degrees)",
-                ["Options.FineRotationRounding"] = "Fine rotation rounding (degrees)"
-            })
-            {
-                SetLanguage(entry.Key, entry.Value);
-            }
-        }
-
         public static string FormatButton(Toggle toggle)
         {
             string displayText = null;
             if (toggle.KeyCode == KeyCode.None)
             {
-                displayText = GetLanguage("NoInputAssigned");
+                displayText = SMLHelper.Language.Get("NoInputAssigned");
             }
             else
             {
@@ -94,7 +70,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
                 if (string.IsNullOrEmpty(displayText))
                 {
-                    displayText = GetLanguage("NoInputAssigned");
+                    displayText = SMLHelper.Language.Get("NoInputAssigned");
                 }
             }
             return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
@@ -105,27 +81,42 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static float FloorToNearest(float x, float y) => y * Mathf.Floor(x / y);
         public static double FloorToNearest(double x, double y) => y * Math.Floor(x / y);
 
-        public static string GetLanguage(string id) => Language.main.Get(id);
-        public static void SetLanguage(string id, string value) => LanguageHandler.SetLanguageLine(id, value);
-
         public static void ShowSnappingHint(bool shouldShow = true)
         {
-            if (shouldShow)
-            {
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleSnappingHint")}" +
-                        $" ({FormatButton(Config.Snapping)})");
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleFineSnappingHint")}" +
-                    $" ({FormatButton(Config.FineSnapping)})");
-            }
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_SNAPPING) +
+                    $" ({FormatButton(Config.Snapping)})");
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_SNAPPING) +
+                $" ({FormatButton(Config.FineSnapping)})");
         }
 
-        public static void ShowRotationHint(bool shouldShow = true)
+        public static void ShowToggleFineRotationHint(bool shouldShow = true)
         {
-            if (shouldShow)
-            {
-                ErrorMessage.AddError($"{GetLanguage("GhostToggleFineRotationHint")}" +
-                    $" ({FormatButton(Config.FineRotation)})");
-            }
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_ROTATION) +
+                $" ({FormatButton(Config.FineRotation)})");
+        }
+
+        public static void ShowToggleRotationHint(bool shouldShow = true)
+        {
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_ROTATION) +
+                $" ({FormatButton(Config.ToggleRotation)})");
+        }
+
+        public static void ShowHolsterHint(bool shouldShow = true)
+        {
+            if (!shouldShow)
+                return;
+
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.HOLSTER_ITEM) +
+                $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
         public static bool TryGetSnappedHitPoint(LayerMask layerMask, ref RaycastHit hit,
@@ -301,8 +292,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
             child.transform.localEulerAngles
-                = new Vector3(0,
-                SnapBuilder.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
+                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
                 0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
