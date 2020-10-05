@@ -2,7 +2,7 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.3.5",
+    "Version": "1.3.6",
     "AssemblyName": "Straitjacket.Subnautica.Mods.SnapBuilder.dll",
     "Enable": true,
     "Game": "Subnautica",
@@ -11,5 +11,8 @@
     },
     "VersionChecker": {
         "LatestVersionURL": "https://github.com/tobeyStraitjacket/Straitjacket.Subnautica.Mods.SnapBuilder/raw/master/SnapBuilder/mod_SUBNAUTICA.json"
+    },
+    "NexusId": {
+        "Subnautica": "427"
     }
 }
