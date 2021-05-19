@@ -28,7 +28,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         #region Builder.SetPlaceOnSurface
         [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
         [HarmonyPrefix]
-        public static bool SetPlaceOnSurfacePrefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
+        public static bool SetPlaceOnSurfacePrefix(ref Vector3 position, ref Quaternion rotation)
         {
             if (!SnapBuilder.Config.Snapping.Enabled)
             {
@@ -39,7 +39,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             if (!SnapBuilder.TryGetSnappedHitPoint(
                 Builder.placeLayerMask,
-                ref hit,
+                out RaycastHit hit,
                 out Vector3 snappedHitPoint,
                 out Vector3 snappedHitNormal,
                 Builder.placeMaxDistance))
