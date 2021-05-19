@@ -7,3 +7,6 @@
 [submodule "SMLHelper.Language"]
 	path = SMLHelper.Language
 	url = https://github.com/tobeyStraitjacket/SMLHelper.Language
+[submodule "Straitjacket.ExtensionMethods.UnityEngine"]
+	path = Straitjacket.ExtensionMethods.UnityEngine
+	url = https://github.com/tobeyStraitjacket/Straitjacket.ExtensionMethods.UnityEngine
