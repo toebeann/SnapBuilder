@@ -109,6 +109,7 @@
   <Import Project="..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="..\BepInEx.Logger\Logger\Logger.projitems" Label="Shared" />
   <Import Project="..\SMLHelper.Language\SMLHelper.Language\Language.projitems" Label="Shared" />
+  <Import Project="..\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y

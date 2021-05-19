@@ -50,7 +50,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             if (bHit)
             {
-                bHit = SnapBuilder.TryGetSnappedHitPoint(PlaceTool.placeLayerMask, ref hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal);
+                bHit = SnapBuilder.TryGetSnappedHitPoint(PlaceTool.placeLayerMask, out hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal);
 
                 if (bHit)
                 {
