@@ -5,12 +5,14 @@ using System.Reflection;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
-using Straitjacket.Subnautica.Mods.SnapBuilder.Patches;
 using UnityEngine;
 using Logger = BepInEx.Subnautica.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
+    using ExtensionMethods.UnityEngine;
+    using Patches;
+
     internal static class SnapBuilder
     {
         public static float LastButtonHeldTime = -1f;
@@ -119,13 +121,30 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
-        public static bool TryGetSnappedHitPoint(LayerMask layerMask, ref RaycastHit hit,
+        public static bool TryGetSnappedHitPoint(LayerMask layerMask, out RaycastHit hit,
             out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, float maxDistance = 5f)
         {
             Transform aimTransform = Builder.GetAimTransform();
+            aimTransform = aimTransform.FindAncestor("camOffset").parent; // Use a non-moving parent of the aimTransform instead, to counteract the movement of the camera
+            aimTransform ??= aimTransform.FindAncestor(transform => !transform.position.Equals(aimTransform.position)) ?? Builder.GetAimTransform();
 
-            Vector3 localPoint = hit.transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            Vector3 localNormal = hit.transform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            // Get a new hit based on our preferred aimTransform
+            if (!Physics.Raycast(aimTransform.position,
+                                 Builder.GetAimTransform().forward,
+                                 out hit,
+                                 maxDistance,
+                                 layerMask,
+                                 QueryTriggerInteraction.Ignore))
+            {
+                snappedHitPoint = Vector3.zero;
+                snappedHitNormal = Vector3.zero;
+                return false;
+            }
+
+            Transform hitTransform = hit.transform.parent ?? hit.transform; // Where possible, use the transform of the parent as this should be a better reference point for localisation
+                                                                            // (especially useful inside a base)
+            Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
+            Vector3 localNormal = hitTransform.parent.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
 
             // Set the localised normal to absolute values for comparison
             localNormal.x = Mathf.Abs(localNormal.x);
@@ -152,17 +171,18 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // Now, perform a new raycast so that we can get the normal of the new position
             if (!Physics.Raycast(aimTransform.position,
-                hit.transform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
-                out hit, // overwrite hit
-                maxDistance,
-                layerMask,
-                QueryTriggerInteraction.Ignore))
+                                 hitTransform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
+                                 out hit, // overwrite hit
+                                 maxDistance,
+                                 layerMask,
+                                 QueryTriggerInteraction.Ignore))
             {
                 snappedHitPoint = Vector3.zero;
                 snappedHitNormal = Vector3.zero;
                 return false;
             }
 
+            Builder.placementTarget = hit.collider.gameObject;
             snappedHitPoint = hit.point;
             snappedHitNormal = hit.normal; // Store the hit.normal as we may need to change this in certain circumstances
 
@@ -279,9 +299,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             empty.transform.position = snappedHitPoint; // Set the parent transform's position to our chosen position
 
 #if BELOWZERO
-            if (Builder.constructableTechType != TechType.Hoverpad)
+            if (Builder.constructableTechType != TechType.Hoverpad) // Stupid hoverpad, working differently to everything else in the game...
 #endif
-            {   // Stupid hoverpad, working differently to everything else in the game...
+            {
                 empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform
             }
 
