@@ -141,8 +141,14 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 return false;
             }
 
-            Transform hitTransform = hit.transform.parent ?? hit.transform; // Where possible, use the transform of the parent as this should be a better reference point for localisation
-                                                                            // (especially useful inside a base)
+            // Where possible, use the transform of the parent as this should be a better reference point for localisation
+            // (especially useful inside a base)
+            Transform hitTransform = Builder.GetSurfaceType(hit.normal) switch
+            {
+                SurfaceType.Ground => hit.transform.parent ?? hit.transform,
+                _ => hit.transform
+            };
+
             Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
             Vector3 localNormal = hitTransform.parent.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
 
