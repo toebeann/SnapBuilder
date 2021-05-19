@@ -125,9 +125,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, float maxDistance = 5f)
         {
             Transform aimTransform = Builder.GetAimTransform();
-            aimTransform = aimTransform.FindAncestor("camOffset").parent;
+            aimTransform = aimTransform.FindAncestor("camOffset").parent; // Use a non-moving parent of the aimTransform instead, to counteract the movement of the camera
             aimTransform ??= aimTransform.FindAncestor(transform => !transform.position.Equals(aimTransform.position)) ?? Builder.GetAimTransform();
 
+            // Get a new hit based on our preferred aimTransform
             if (!Physics.Raycast(aimTransform.position,
                                  Builder.GetAimTransform().forward,
                                  out hit,
@@ -140,7 +141,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 return false;
             }
 
-            Transform hitTransform = hit.transform.parent ?? hit.transform;
+            Transform hitTransform = hit.transform.parent ?? hit.transform; // Where possible, use the transform of the parent as this should be a better reference point for localisation
+                                                                            // (especially useful inside a base)
             Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
             Vector3 localNormal = hitTransform.parent.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
 
