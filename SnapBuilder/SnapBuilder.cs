@@ -140,8 +140,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 return false;
             }
 
-            Vector3 localPoint = hit.transform.parent.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            Vector3 localNormal = hit.transform.parent.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            Transform hitTransform = hit.transform.parent ?? hit.transform;
+            Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
+            Vector3 localNormal = hitTransform.parent.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
 
             // Set the localised normal to absolute values for comparison
             localNormal.x = Mathf.Abs(localNormal.x);
@@ -168,7 +169,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // Now, perform a new raycast so that we can get the normal of the new position
             if (!Physics.Raycast(aimTransform.position,
-                                 hit.transform.parent.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
+                                 hitTransform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
                                  out hit, // overwrite hit
                                  maxDistance,
                                  layerMask,
