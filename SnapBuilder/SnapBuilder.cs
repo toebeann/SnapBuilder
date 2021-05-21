@@ -304,13 +304,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
             empty.transform.position = snappedHitPoint; // Set the parent transform's position to our chosen position
 
-#if BELOWZERO
-            if (Builder.constructableTechType != TechType.Hoverpad) // Stupid hoverpad, working differently to everything else in the game...
-#endif
-            {
-                empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform
-            }
-
             // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
             // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
             if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh && hit.transform.forward.y != 0 && !Player.main.IsInsideWalkable())
