@@ -155,6 +155,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 Builder.placeLayerMask,
                 QueryTriggerInteraction.Ignore))
             {
+                snapBuilderAimTransform.position = offsetAimTransform.position;
+                snapBuilderAimTransform.forward = builderAimTransform.forward;
                 return snapBuilderAimTransform;
             }
 
