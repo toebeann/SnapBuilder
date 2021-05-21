@@ -204,14 +204,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             // in which case we want a more accurate normal where possible
             if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
             {
-                var gameObject = new GameObject();
-                var renderer = gameObject.AddComponent<MeshRenderer>();
-                var filter = gameObject.AddComponent<MeshFilter>();
-                filter.mesh = meshCollider.sharedMesh;
-                gameObject.transform.SetParent(hit.transform, false);
-                gameObject.transform.localScale = hit.transform.localScale * 1.01f;
-                renderer.sharedMaterial = Builder.ghostStructureMaterial;
-
                 // Set up the offsets for raycasts around the point
                 Vector3[] offsets = new Vector3[]
                 {
@@ -311,7 +303,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             child.transform.parent = empty.transform; // parent the child to the empty
             child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
             empty.transform.position = hit.point; // Set the parent transform's position to our chosen position
-            
+
             // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
             // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
             if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh && hit.transform.forward.y != 0 && !Player.main.IsInsideWalkable())
