@@ -121,24 +121,41 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
-        public static bool TryGetSnappedHitPoint(LayerMask layerMask, out RaycastHit hit,
-            out Vector3 snappedHitPoint, out Vector3 snappedHitNormal, float maxDistance = 5f)
+        private static Transform snapBuilderAimTransform;
+        private const string SnapBuilderAimTransform = "SnapBuilderAimTransform";
+        private static int lastCalculationFrame;
+        public static Transform GetAimTransform()
         {
-            Transform aimTransform = Builder.GetAimTransform();
-            aimTransform = aimTransform.FindAncestor("camOffset").parent; // Use a non-moving parent of the aimTransform instead, to counteract the movement of the camera
-            aimTransform ??= aimTransform.FindAncestor(transform => !transform.position.Equals(aimTransform.position)) ?? Builder.GetAimTransform();
-
-            // Get a new hit based on our preferred aimTransform
-            if (!Physics.Raycast(aimTransform.position,
-                                 Builder.GetAimTransform().forward,
-                                 out hit,
-                                 maxDistance,
-                                 layerMask,
-                                 QueryTriggerInteraction.Ignore))
+            Transform builderAimTransform = MainCamera.camera.transform;
+            if (!Config.Snapping.Enabled)
             {
-                snappedHitPoint = Vector3.zero;
-                snappedHitNormal = Vector3.zero;
-                return false;
+                return builderAimTransform;
+            }
+
+            snapBuilderAimTransform ??= builderAimTransform.Find(SnapBuilderAimTransform);
+            if (snapBuilderAimTransform is null)
+            {
+                snapBuilderAimTransform = new GameObject(SnapBuilderAimTransform).transform;
+                snapBuilderAimTransform.SetParent(builderAimTransform, false);
+            }
+
+            if (lastCalculationFrame == Time.frameCount)
+            {
+                return snapBuilderAimTransform;
+            }
+            lastCalculationFrame = Time.frameCount;
+
+            Transform offsetAimTransform = builderAimTransform.FindAncestor("camOffset").parent; // Use a non-moving parent of the aimTransform instead, to counteract the movement of the camera
+            offsetAimTransform ??= offsetAimTransform.FindAncestor(transform => !transform.position.Equals(offsetAimTransform.position)) ?? Builder.GetAimTransform();
+
+            if (!Physics.Raycast(offsetAimTransform.position,
+                builderAimTransform.forward,
+                out RaycastHit hit,
+                Builder.placeMaxDistance,
+                Builder.placeLayerMask,
+                QueryTriggerInteraction.Ignore))
+            {
+                return snapBuilderAimTransform;
             }
 
             // Where possible, use the transform of the parent as this should be a better reference point for localisation
@@ -175,27 +192,17 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 localPoint.z = RoundToNearest(localPoint.z, roundFactor);
             }
 
-            // Now, perform a new raycast so that we can get the normal of the new position
-            if (!Physics.Raycast(aimTransform.position,
-                                 hitTransform.TransformPoint(localPoint) - aimTransform.position, // direction from the aim transform to the new world space position of the rounded/snapped position
-                                 out hit, // overwrite hit
-                                 maxDistance,
-                                 layerMask,
-                                 QueryTriggerInteraction.Ignore))
-            {
-                snappedHitPoint = Vector3.zero;
-                snappedHitNormal = Vector3.zero;
-                return false;
-            }
+            snapBuilderAimTransform.position = offsetAimTransform.position;
+            snapBuilderAimTransform.forward = hitTransform.TransformPoint(localPoint) - snapBuilderAimTransform.position;
 
-            Builder.placementTarget = hit.collider.gameObject;
-            snappedHitPoint = hit.point;
-            snappedHitNormal = hit.normal; // Store the hit.normal as we may need to change this in certain circumstances
+            return snapBuilderAimTransform;
+        }
 
+        public static void ImproveHitNormal(ref RaycastHit hit)
+        {
             // If the hit.collider is a MeshCollider and has a sharedMesh, it is a surface like the ground or the roof of a multipurpose room,
             // in which case we want a more accurate normal where possible
-            MeshCollider meshCollider = hit.collider as MeshCollider;
-            if (meshCollider?.sharedMesh != null)
+            if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
             {
                 // Set up the offsets for raycasts around the point
                 Vector3[] offsets = new Vector3[]
@@ -214,7 +221,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 // Perform a raycast from each offset, pointing down toward the surface
                 foreach (Vector3 offset in offsets)
                 {
-                    Physics.Raycast(snappedHitPoint + Vector3.up * .1f + offset * .2f,
+                    Physics.Raycast(hit.point + Vector3.up * .1f + offset * .2f,
                         Vector3.down,
                         out RaycastHit offsetHit,
                         Builder.placeMaxDistance,
@@ -228,17 +235,16 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
                 foreach (Vector3 normal in normals)
                 {
-                    if (normal != hit.normal)
+                    if (!normal.Equals(hit.normal))
                     {   // If the normal is not the same as the original, add it to the normal and average
-                        snappedHitNormal += normal / 2;
+                        hit.normal += normal;
+                        hit.normal /= 2;
                     }
                 }
 
                 // For sanity's sake, make sure the normal is normalised after summing & averaging
-                snappedHitNormal = snappedHitNormal.normalized;
+                hit.normal = hit.normal.normalized;
             }
-
-            return true;
         }
 
         public static void ApplyAdditiveRotation(ref float additiveRotation, out float rotationFactor)
@@ -286,28 +292,28 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             additiveRotation = RoundToNearest(additiveRotation, rotationFactor) % 360;
         }
 
-        public static Quaternion CalculateRotation(ref float additiveRotation, RaycastHit hit,
-            Vector3 snappedHitPoint, Vector3 snappedHitNormal, bool forceUpright)
+        public static Quaternion CalculateRotation(ref float additiveRotation, RaycastHit hit, bool forceUpright)
         {
             ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
+            ImproveHitNormal(ref hit);
 
             // Instantiate empty game objects for applying rotations
             GameObject empty = new GameObject();
             GameObject child = new GameObject();
             child.transform.parent = empty.transform; // parent the child to the empty
             child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
-            empty.transform.position = snappedHitPoint; // Set the parent transform's position to our chosen position
+            empty.transform.position = hit.point; // Set the parent transform's position to our chosen position
 
             // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
             // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
             if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh && hit.transform.forward.y != 0 && !Player.main.IsInsideWalkable())
             {
                 empty.transform.forward = Vector3.forward;
-                empty.transform.up = snappedHitNormal;
+                empty.transform.up = hit.normal;
             }
             else if (!forceUpright)
             {   // Rotate the parent transform so that its Y axis is aligned with the hit.normal, but only when it isn't forced upright
-                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, snappedHitNormal) * hit.transform.rotation;
+                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal) * hit.transform.rotation;
             }
             else
             {
