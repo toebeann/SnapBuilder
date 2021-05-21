@@ -307,7 +307,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
             else if (!forceUpright)
             {   // Rotate the parent transform so that its Y axis is aligned with the hit.normal, but only when it isn't forced upright
-                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, snappedHitNormal) * empty.transform.rotation;
+                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, snappedHitNormal) * hit.transform.rotation;
+            }
+            else
+            {
+                empty.transform.forward = hit.transform.forward;
             }
 
             // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
