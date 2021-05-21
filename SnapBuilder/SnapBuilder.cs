@@ -204,14 +204,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             // in which case we want a more accurate normal where possible
             if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
             {
-                var gameObject = new GameObject();
-                var renderer = gameObject.AddComponent<MeshRenderer>();
-                var filter = gameObject.AddComponent<MeshFilter>();
-                filter.mesh = meshCollider.sharedMesh;
-                gameObject.transform.SetParent(hit.transform, false);
-                gameObject.transform.localScale = hit.transform.localScale * 1.01f;
-                renderer.sharedMaterial = Builder.ghostStructureMaterial;
-
                 // Set up the offsets for raycasts around the point
                 Vector3[] offsets = new Vector3[]
                 {
