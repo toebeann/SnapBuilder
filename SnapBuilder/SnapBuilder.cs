@@ -311,15 +311,24 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 empty.transform.forward = hitTransform.forward; // Set the parent transform's forward to match the forward of the hit.transform
             }
 
-            if (!forceUpright)
-            {   // Rotate the parent transform so that it's Y axis is aligned with the hit.normal, but only when it isn't forced upright
+            // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
+            // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
+            if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh && hit.transform.forward.y != 0 && !Player.main.IsInsideWalkable())
+            {
+                empty.transform.forward = Vector3.forward;
+                empty.transform.up = snappedHitNormal;
+            }
+            else if (!forceUpright)
+            {   // Rotate the parent transform so that its Y axis is aligned with the hit.normal, but only when it isn't forced upright
                 empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, snappedHitNormal) * empty.transform.rotation;
             }
 
-            child.transform.LookAt(Player.main.transform); // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
+            // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
+            child.transform.LookAt(Player.main.transform);
+
+            // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
             child.transform.localEulerAngles
-                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360,
-                0); // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
+                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360, 0);
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
 
