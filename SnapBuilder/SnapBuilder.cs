@@ -257,7 +257,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             return SnapBuilderAimTransform;
         }
 
-        public static void ImproveHitNormal(ref RaycastHit hit)
+        private static void ImproveHitNormal(ref RaycastHit hit)
         {
             // If the hit.collider is a MeshCollider and has a sharedMesh, it is a surface like the ground or the roof of a multipurpose room,
             // in which case we want a more accurate normal where possible
@@ -306,7 +306,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
         }
 
-        public static void ApplyAdditiveRotation(ref float additiveRotation, out float rotationFactor)
+        private static void ApplyAdditiveRotation(ref float additiveRotation, out float rotationFactor)
         {
             // Get the rotation factor from user options based on whether the fine snapping key is held or not
             rotationFactor = Config.FineRotation.Enabled ? Config.FineRotationRounding : Config.RotationRounding;
