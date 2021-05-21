@@ -121,83 +121,140 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
-        private static Transform snapBuilderAimTransform;
-        private const string SnapBuilderAimTransform = "SnapBuilderAimTransform";
-        private static int lastCalculationFrame;
-        public static Transform GetAimTransform()
+        /// <summary>
+        /// The camera transform, as per the original Builder.GetAimTransform()
+        /// </summary>
+        public static Transform BuilderAimTransform => MainCamera.camera.transform;
+        public const string SnapBuilderAimTransformName = "SnapBuilderAimTransform";
+
+        private static Transform offsetAimTransform;
+        /// <summary>
+        /// A non-moving parent of the MainCamera transform, to counteract head-bobbing
+        /// </summary>
+        public static Transform OffsetAimTransform
         {
-            Transform builderAimTransform = MainCamera.camera.transform;
-            if (!Config.Snapping.Enabled)
+            get
             {
-                return builderAimTransform;
+                offsetAimTransform ??= BuilderAimTransform.FindAncestor("camOffset").parent
+                    ?? BuilderAimTransform.FindAncestor(transform => !transform.position.Equals(OffsetAimTransform.position))
+                    ?? BuilderAimTransform;
+                return offsetAimTransform;
             }
+        }
 
-            snapBuilderAimTransform ??= builderAimTransform.Find(SnapBuilderAimTransform);
-            if (snapBuilderAimTransform is null)
+        private static Transform snapBuilderAimTransform;
+        /// <summary>
+        /// The transform attached to our custom GameObject for snapped aiming
+        /// </summary>
+        public static Transform SnapBuilderAimTransform
+        {
+            get
             {
-                snapBuilderAimTransform = new GameObject(SnapBuilderAimTransform).transform;
-                snapBuilderAimTransform.SetParent(builderAimTransform, false);
-            }
-
-            if (lastCalculationFrame == Time.frameCount)
-            {
+                snapBuilderAimTransform ??= BuilderAimTransform.Find(SnapBuilderAimTransformName);
+                if (snapBuilderAimTransform is null)
+                {
+                    snapBuilderAimTransform = new GameObject(SnapBuilderAimTransformName).transform;
+                    snapBuilderAimTransform.SetParent(BuilderAimTransform, false);
+                }
                 return snapBuilderAimTransform;
             }
-            lastCalculationFrame = Time.frameCount;
+        }
 
-            Transform offsetAimTransform = builderAimTransform.FindAncestor("camOffset").parent; // Use a non-moving parent of the aimTransform instead, to counteract the movement of the camera
-            offsetAimTransform ??= offsetAimTransform.FindAncestor(transform => !transform.position.Equals(offsetAimTransform.position)) ?? Builder.GetAimTransform();
+        /// <summary>
+        /// Where possible, use the transform of the parent as this should be a better reference point for localisation
+        /// (especially useful inside a base)
+        /// </summary>
+        /// <param name="hit"></param>
+        /// <returns></returns>
+        private static Transform GetAppropriateTransform(RaycastHit hit) => Builder.GetSurfaceType(hit.normal) switch
+        {
+            SurfaceType.Ground => hit.transform.parent ?? hit.transform,
+            _ => hit.transform
+        };
 
-            if (!Physics.Raycast(offsetAimTransform.position,
-                builderAimTransform.forward,
-                out RaycastHit hit,
-                Builder.placeMaxDistance,
-                Builder.placeLayerMask,
-                QueryTriggerInteraction.Ignore))
-            {
-                snapBuilderAimTransform.position = offsetAimTransform.position;
-                snapBuilderAimTransform.forward = builderAimTransform.forward;
-                return snapBuilderAimTransform;
-            }
+        /// <summary>
+        /// Get the hit point and normal localised to the hit transform
+        /// </summary>
+        /// <param name="hit"></param>
+        /// <param name="localisedHitPoint"></param>
+        /// <param name="localisedHitNormal"></param>
+        /// <param name="transform"></param>
+        private static void GetLocalisedHit(RaycastHit hit, out Vector3 localisedHitPoint, out Vector3 localisedHitNormal, Transform transform = null)
+        {
+            transform ??= hit.transform;
+            localisedHitPoint = transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
+            localisedHitNormal = (transform.parent ?? transform).InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+        }
 
-            // Where possible, use the transform of the parent as this should be a better reference point for localisation
-            // (especially useful inside a base)
-            Transform hitTransform = Builder.GetSurfaceType(hit.normal) switch
-            {
-                SurfaceType.Ground => hit.transform.parent ?? hit.transform,
-                _ => hit.transform
-            };
-
-            Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            Vector3 localNormal = (hitTransform.parent ?? hitTransform).InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
-
-            // Set the localised normal to absolute values for comparison
-            localNormal.x = Mathf.Abs(localNormal.x);
-            localNormal.y = Mathf.Abs(localNormal.y);
-            localNormal.z = Mathf.Abs(localNormal.z);
-            localNormal = localNormal.normalized; // For sanity's sake, make sure the normal is normalised
+        /// <summary>
+        /// Get the hit point snapped based on the hit normal and current round factor
+        /// </summary>
+        /// <param name="hitPoint"></param>
+        /// <param name="hitNormal"></param>
+        /// <returns></returns>
+        private static Vector3 GetSnappedHitPoint(Vector3 hitPoint, Vector3 hitNormal)
+        {
+            hitNormal.x = Mathf.Abs(hitNormal.x);
+            hitNormal.y = Mathf.Abs(hitNormal.y);
+            hitNormal.z = Mathf.Abs(hitNormal.z);
+            hitNormal = hitNormal.normalized; // For sanity's sake, make sure the normal is normalised
 
             // Get the rounding factor from user options based on whether the fine snapping key is held or not
             float roundFactor = Config.FineSnapping.Enabled ? Config.FineSnapRounding / 2f : Config.SnapRounding;
 
             // Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
-            if (localNormal.x < 1)
+            if (hitNormal.x < 1)
             {
-                localPoint.x = RoundToNearest(localPoint.x, roundFactor);
+                hitPoint.x = RoundToNearest(hitPoint.x, roundFactor);
             }
-            if (localNormal.y < 1)
+            if (hitNormal.y < 1)
             {
-                localPoint.y = RoundToNearest(localPoint.y, roundFactor);
+                hitPoint.y = RoundToNearest(hitPoint.y, roundFactor);
             }
-            if (localNormal.z < 1)
+            if (hitNormal.z < 1)
             {
-                localPoint.z = RoundToNearest(localPoint.z, roundFactor);
+                hitPoint.z = RoundToNearest(hitPoint.z, roundFactor);
             }
 
-            snapBuilderAimTransform.position = offsetAimTransform.position;
-            snapBuilderAimTransform.forward = hitTransform.TransformPoint(localPoint) - snapBuilderAimTransform.position;
+            return hitPoint;
+        }
 
-            return snapBuilderAimTransform;
+        private static int lastCalculationFrame;
+        public static Transform GetAimTransform()
+        {
+            if (!Config.Snapping.Enabled)
+            {
+                return BuilderAimTransform;
+            }
+
+            // Skip recalculating multiple times per frame
+            if (lastCalculationFrame == Time.frameCount)
+            {
+                return SnapBuilderAimTransform;
+            }
+            lastCalculationFrame = Time.frameCount;
+
+            // If no hit, exit early
+            if (!Physics.Raycast(OffsetAimTransform.position,
+                BuilderAimTransform.forward,
+                out RaycastHit hit,
+                Builder.placeMaxDistance,
+                Builder.placeLayerMask,
+                QueryTriggerInteraction.Ignore))
+            {
+                SnapBuilderAimTransform.position = OffsetAimTransform.position;
+                SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
+                return SnapBuilderAimTransform;
+            }
+
+            Transform hitTransform = GetAppropriateTransform(hit);
+            GetLocalisedHit(hit, out Vector3 localPoint, out Vector3 localNormal, hitTransform);
+            Vector3 snappedPoint = GetSnappedHitPoint(localPoint, localNormal);
+
+            SnapBuilderAimTransform.position = OffsetAimTransform.position;
+            SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - SnapBuilderAimTransform.position;
+
+            return SnapBuilderAimTransform;
         }
 
         public static void ImproveHitNormal(ref RaycastHit hit)
