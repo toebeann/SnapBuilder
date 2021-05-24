@@ -356,35 +356,34 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
             ImproveHitNormal(ref hit);
 
-            Transform hitTransform = hit.transform;
-            if (!Player.main.IsInsideWalkable())
-            {   // If the player is outside, get the root transform if there is one, otherwise default to the original
-                hitTransform = UWE.Utils.GetEntityRoot(hit.transform.gameObject)?.transform ?? hit.transform;
-            }
+            Transform hitTransform = GetAppropriateTransform(hit);
 
             // Instantiate empty game objects for applying rotations
             GameObject empty = new GameObject();
             GameObject child = new GameObject();
             empty.transform.position = hit.point; // Set the parent transform's position to our chosen position
 
-            // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
-            // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
-            if (hit.collider is MeshCollider meshCollider 
-                && meshCollider.sharedMesh is Mesh 
-                && hitTransform.InverseTransformDirection(hitTransform.forward).y != 0 
+            // choose whether we should use the global forward, or the forward of the hitTransform
+            Vector3 forward = hitTransform.forward.y != 0
                 && !Player.main.IsInsideWalkable()
-                && hitTransform.GetComponent<BaseCell>() is null)
+                && hitTransform.GetComponent<BaseCell>() is null
+                    ? Vector3.forward
+                    : hitTransform.forward;
+
+            // align the empty to face the chosen forward direction
+            empty.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+
+#if BELOWZERO
+            if (Builder.constructableTechType != TechType.Hoverpad)
+#endif
             {
-                empty.transform.forward = Vector3.forward;
-                empty.transform.up = hit.normal;
-            }
-            else if (!forceUpright)
-            {   // Rotate the parent transform so that its Y axis is aligned with the hit.normal, but only when it isn't forced upright
-                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-            }
-            else
-            {
-                empty.transform.forward = hitTransform.forward;
+                // for components that are not forced upright, align the empty's up direction with the hit.normal
+                if (!forceUpright
+                    || (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh))
+                {
+                    empty.transform.up = hit.normal;
+                    empty.transform.rotation *= Quaternion.FromToRotation(Vector3.forward, forward);
+                }
             }
 
             child.transform.SetParent(empty.transform, false); // parent the child to the empty
