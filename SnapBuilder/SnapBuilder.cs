@@ -356,28 +356,38 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
             ImproveHitNormal(ref hit);
 
+            Transform hitTransform = hit.transform;
+            if (!Player.main.IsInsideWalkable())
+            {   // If the player is outside, get the root transform if there is one, otherwise default to the original
+                hitTransform = UWE.Utils.GetEntityRoot(hit.transform.gameObject)?.transform ?? hit.transform;
+            }
+
             // Instantiate empty game objects for applying rotations
             GameObject empty = new GameObject();
             GameObject child = new GameObject();
-            child.transform.parent = empty.transform; // parent the child to the empty
-            child.transform.localPosition = Vector3.zero; // Make sure the child's local position is Vector3.zero
             empty.transform.position = hit.point; // Set the parent transform's position to our chosen position
 
             // In the case that the forward of the hitTransform isn't completely flat and our hit is from a MeshCollider, we are probably working with some 
             // outside piece of rock or something weird, so just use the global Vector3.forward and set the up to match the hit normal
-            if (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh && hit.transform.forward.y != 0 && !Player.main.IsInsideWalkable())
+            if (hit.collider is MeshCollider meshCollider 
+                && meshCollider.sharedMesh is Mesh 
+                && hitTransform.InverseTransformDirection(hitTransform.forward).y != 0 
+                && !Player.main.IsInsideWalkable()
+                && hitTransform.GetComponent<BaseCell>() is null)
             {
                 empty.transform.forward = Vector3.forward;
                 empty.transform.up = hit.normal;
             }
             else if (!forceUpright)
             {   // Rotate the parent transform so that its Y axis is aligned with the hit.normal, but only when it isn't forced upright
-                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal) * hit.transform.rotation;
+                empty.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
             }
             else
             {
-                empty.transform.forward = hit.transform.forward;
+                empty.transform.forward = hitTransform.forward;
             }
+
+            child.transform.SetParent(empty.transform, false); // parent the child to the empty
 
             // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
             child.transform.LookAt(Player.main.transform);
