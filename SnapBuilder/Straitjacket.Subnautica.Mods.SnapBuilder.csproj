@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="ControlHint.cs" />
     <Compile Include="Lang.cs" />
     <Compile Include="Patches\BuilderPatch.cs" />
     <Compile Include="Patches\PlaceToolPatch.cs" />

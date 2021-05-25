@@ -14,14 +14,21 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             __state = Builder.ghostModel == null;
 
-            SnapBuilder.ShowSnappingHint(__state);
+            if (__state)
+            {
+                ControlHint.Show(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping);
+                ControlHint.Show(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping);
+            }
         }
 
         [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
         [HarmonyPostfix]
         public static void BeginPostfix(bool __state)
         {
-            SnapBuilder.ShowToggleFineRotationHint(__state && Builder.rotationEnabled);
+            if (__state && Builder.rotationEnabled)
+            {
+                ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
+            }
         }
         #endregion
 

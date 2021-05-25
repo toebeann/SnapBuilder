@@ -36,7 +36,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [JsonIgnore]
         private Toggle toggleRotation;
         [JsonIgnore]
-        public Toggle ToggleRotation => toggleRotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
+        public Toggle Rotation => toggleRotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
 
         [JsonIgnore]
         public float RotationFactor => FineRotation.Enabled ? FineRotationRounding : RotationRounding;
@@ -82,12 +82,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [Keybind(LabelLanguageId = Lang.Option.ToggleRotationKey), OnChange(nameof(EnableRotationKeyChanged))]
         public KeyCode ToggleRotationKey { get; set; } = KeyCode.Q;
         private void EnableRotationKeyChanged(KeybindChangedEventArgs e)
-            => ToggleRotation.KeyCode = e.Key;
+            => Rotation.KeyCode = e.Key;
 
         [Choice(LabelLanguageId = Lang.Option.ToggleRotationMode), OnChange(nameof(EnableRotationModeChanged))]
         public Toggle.Mode ToggleRotationMode { get; set; } = Toggle.Mode.Hold;
         private void EnableRotationModeChanged(ChoiceChangedEventArgs e)
-            => ToggleRotation.KeyMode = (Toggle.Mode)e.Index;
+            => Rotation.KeyMode = (Toggle.Mode)e.Index;
 
         [JsonConverter(typeof(FloatConverter), 2)]
         [Slider(0.01f, 1, LabelLanguageId = Lang.Option.SnapRounding, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.5f)]
@@ -115,7 +115,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Snapping.Reset();
             FineSnapping.Reset();
             FineRotation.Reset();
-            ToggleRotation.Reset();
+            Rotation.Reset();
         }
 
         private void Upgrade()
