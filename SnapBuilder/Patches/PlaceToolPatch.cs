@@ -13,16 +13,23 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             __state = __instance.ghostModel == null;
 
-            SnapBuilder.ShowSnappingHint(__state);
+            if (__state && SnapBuilder.Config.DisplayControlHints)
+            {
+                ControlHint.Show(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping);
+                ControlHint.Show(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping);
+            }
         }
 
         [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
         [HarmonyPostfix]
         public static void Postfix(PlaceTool __instance, bool __state)
         {
-            SnapBuilder.ShowToggleRotationHint(__state && __instance.rotationEnabled);
-            SnapBuilder.ShowToggleFineRotationHint(__state && __instance.rotationEnabled);
-            SnapBuilder.ShowHolsterHint(__state && __instance.rotationEnabled);
+            if (__state && SnapBuilder.Config.DisplayControlHints && __instance.rotationEnabled)
+            {
+                ControlHint.Show(Lang.Hint.ToggleRotation, SnapBuilder.Config.Rotation);
+                ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
+                ControlHint.Show(Lang.Hint.HolsterItem, GameInput.Button.Exit);
+            }
         }
         #endregion
 
@@ -37,7 +44,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             }
             else
             {
-                Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && SnapBuilder.Config.ToggleRotation.Enabled);
+                Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && SnapBuilder.Config.Rotation.Enabled);
             }
         }
         #endregion

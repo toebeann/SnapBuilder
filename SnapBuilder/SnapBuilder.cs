@@ -3,12 +3,11 @@ using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
-using Logger = BepInEx.Subnautica.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
+    using BepInEx.Subnautica;
     using ExtensionMethods.UnityEngine;
     using Patches;
 
@@ -50,69 +49,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             var harmony = new Harmony("SnapBuilder");
             harmony.PatchAll(typeof(BuilderPatch));
             harmony.PatchAll(typeof(PlaceToolPatch));
+#if BELOWZERO
+            harmony.PatchAll(typeof(BuilderToolPatch));
+#endif
 
             stopwatch.Stop();
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
-        }
-
-        public static string FormatButton(Toggle toggle)
-        {
-            string displayText = null;
-            if (toggle.KeyCode == KeyCode.None)
-            {
-                displayText = SMLHelper.Language.Get("NoInputAssigned");
-            }
-            else
-            {
-                string bindingName = KeyCodeUtils.KeyCodeToString(toggle.KeyCode);
-                if (!string.IsNullOrEmpty(bindingName))
-                {
-                    displayText = uGUI.GetDisplayTextForBinding(bindingName);
-                }
-                if (string.IsNullOrEmpty(displayText))
-                {
-                    displayText = SMLHelper.Language.Get("NoInputAssigned");
-                }
-            }
-            return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
-        }
-
-        public static void ShowSnappingHint(bool shouldShow = true)
-        {
-            if (!shouldShow)
-                return;
-
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleSnapping) +
-                    $" ({FormatButton(Config.Snapping)})");
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleFineSnapping) +
-                $" ({FormatButton(Config.FineSnapping)})");
-        }
-
-        public static void ShowToggleFineRotationHint(bool shouldShow = true)
-        {
-            if (!shouldShow)
-                return;
-
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleFineRotation) +
-                $" ({FormatButton(Config.FineRotation)})");
-        }
-
-        public static void ShowToggleRotationHint(bool shouldShow = true)
-        {
-            if (!shouldShow)
-                return;
-
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleRotation) +
-                $" ({FormatButton(Config.ToggleRotation)})");
-        }
-
-        public static void ShowHolsterHint(bool shouldShow = true)
-        {
-            if (!shouldShow)
-                return;
-
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.HolsterItem) +
-                $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
         /// <summary>

@@ -94,8 +94,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="ControlHint.cs" />
     <Compile Include="Lang.cs" />
     <Compile Include="Patches\BuilderPatch.cs" />
+    <Compile Include="Patches\BuilderToolPatch.cs" />
     <Compile Include="Patches\PlaceToolPatch.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="SnapBuilder.cs" />

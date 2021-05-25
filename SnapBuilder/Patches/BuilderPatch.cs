@@ -6,23 +6,34 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
     internal static class BuilderPatch
     {
         #region Builder.Begin
+#if SUBNAUTICA
         [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
         [HarmonyPrefix]
-        public static void BeginPrefix(ref bool __state)
+        public static void BeginHintsPrefix(out bool __state)
         {
-            SnapBuilder.Config.ResetToggles();
+            __state = SnapBuilder.Config.DisplayControlHints && Builder.ghostModel == null;
 
-            __state = Builder.ghostModel == null;
-
-            SnapBuilder.ShowSnappingHint(__state);
+            if (__state)
+            {
+                ControlHint.Show(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping);
+                ControlHint.Show(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping);
+            }
         }
 
         [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
         [HarmonyPostfix]
-        public static void BeginPostfix(bool __state)
+        public static void BeginHintsPostfix(bool __state)
         {
-            SnapBuilder.ShowToggleFineRotationHint(__state && Builder.rotationEnabled);
+            if (__state && Builder.rotationEnabled)
+            {
+                ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
+            }
         }
+#endif
+
+        [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
+        [HarmonyPostfix]
+        public static void BeginResetTogglesPostfix() => SnapBuilder.Config.ResetToggles();
         #endregion
 
         #region Builder.GetAimTransform
