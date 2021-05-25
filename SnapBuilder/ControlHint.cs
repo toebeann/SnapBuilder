@@ -26,7 +26,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     displayText = Language.Get("NoInputAssigned");
                 }
             }
-            return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
+            return $"<color=#ADF8FFFF>{displayText}</color>";
         }
 
         public static string Get(string hintId, Toggle toggle) => $"{Language.Get(hintId)} ({FormatButton(toggle)})";
