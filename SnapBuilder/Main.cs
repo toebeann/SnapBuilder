@@ -12,7 +12,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [Obsolete("Should not be used!", true)]
         public static void Patch() => SnapBuilder.Initialise();
 
-        internal static bool PreviousConfigFileExists = File.Exists(
+        internal static readonly bool PreviousConfigFileExists = File.Exists(
             Path.Combine(Path.GetDirectoryName(QModServices.Main.GetMyMod().LoadedAssembly.Location), "config.json"));
     }
 }
