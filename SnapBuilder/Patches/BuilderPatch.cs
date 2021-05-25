@@ -28,7 +28,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             {
                 ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
             }
-            if (__state && SnapBuilder.ColliderIsImprovable)
+            if (__state && SnapBuilder.IsColliderImprovable())
             {
                 ControlHint.Show(Lang.Hint.DetailedCollider, SnapBuilder.Config.DetailedCollider);
             }

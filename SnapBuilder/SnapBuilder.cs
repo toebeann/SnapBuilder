@@ -11,7 +11,6 @@ using UnityEngine;
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     using BepInEx.Subnautica;
-    using ExtensionMethods.UnityEngine;
     using Patches;
 
     internal static class SnapBuilder
@@ -19,6 +18,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
         public static Config Config = OptionsPanelHandler.RegisterModOptions<Config>();
+        public static Cache Cache = new Cache();
 
         private enum SupportedGame
         {
@@ -58,45 +58,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             stopwatch.Stop();
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
-        }
-
-        /// <summary>
-        /// The camera transform, as per the original Builder.GetAimTransform()
-        /// </summary>
-        public static Transform BuilderAimTransform => MainCamera.camera.transform;
-        public const string SnapBuilderAimTransformName = "SnapBuilderAimTransform";
-
-        private static Transform offsetAimTransform;
-        /// <summary>
-        /// A non-moving parent of the MainCamera transform, to counteract head-bobbing
-        /// </summary>
-        public static Transform OffsetAimTransform
-        {
-            get
-            {
-                offsetAimTransform ??= BuilderAimTransform.FindAncestor("camOffset").parent
-                    ?? BuilderAimTransform.FindAncestor(transform => !transform.position.Equals(OffsetAimTransform.position))
-                    ?? BuilderAimTransform;
-                return offsetAimTransform;
-            }
-        }
-
-        private static Transform snapBuilderAimTransform;
-        /// <summary>
-        /// The transform attached to our custom GameObject for snapped aiming
-        /// </summary>
-        public static Transform SnapBuilderAimTransform
-        {
-            get
-            {
-                snapBuilderAimTransform ??= BuilderAimTransform.Find(SnapBuilderAimTransformName);
-                if (snapBuilderAimTransform is null)
-                {
-                    snapBuilderAimTransform = new GameObject(SnapBuilderAimTransformName).transform;
-                    snapBuilderAimTransform.SetParent(BuilderAimTransform, false);
-                }
-                return snapBuilderAimTransform;
-            }
         }
 
         /// <summary>
@@ -162,40 +123,39 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         private static Color OriginalCollider { get; } = Color.gray;
 
         private static int lastCalculationFrame;
-        private static Collider collider;
         public static Transform GetAimTransform()
         {
             if (!Config.Snapping.Enabled)
             {
-                return BuilderAimTransform;
+                return Cache.BuilderAimTransform;
             }
 
             // Skip recalculating multiple times per frame
             if (lastCalculationFrame == Time.frameCount)
             {
-                return SnapBuilderAimTransform;
+                return Cache.SnapBuilderAimTransform;
             }
             lastCalculationFrame = Time.frameCount;
 
             // If no hit, exit early
-            if (!Physics.Raycast(OffsetAimTransform.position,
-                BuilderAimTransform.forward,
+            if (!Physics.Raycast(Cache.OffsetAimTransform.position,
+                Cache.BuilderAimTransform.forward,
                 out RaycastHit hit,
                 Builder.placeMaxDistance,
                 Builder.placeLayerMask,
                 QueryTriggerInteraction.Ignore))
             {
-                collider = null;
+                Cache.LastCollider = null;
 
-                SnapBuilderAimTransform.position = OffsetAimTransform.position;
-                SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
-                return SnapBuilderAimTransform;
+                Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                return Cache.SnapBuilderAimTransform;
             }
 
-            collider = hit.collider;
+            Cache.LastCollider = hit.collider;
             if (IsColliderImprovable(hit.collider, out Mesh _))
             {
-                colliderIsImprovedDictionary.TryGetValue(hit.collider, out bool isImproved);
+                Cache.IsImprovedByCollider.TryGetValue(hit.collider, out bool isImproved);
 
                 if (Config.DetailedCollider.Enabled && !isImproved)
                 {
@@ -203,11 +163,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
                     if (hit.collider is null)
                     {
-                        collider = null;
+                        Cache.LastCollider = null;
 
-                        SnapBuilderAimTransform.position = OffsetAimTransform.position;
-                        SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
-                        return SnapBuilderAimTransform;
+                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                        return Cache.SnapBuilderAimTransform;
                     }
                 }
                 else if (!Config.DetailedCollider.Enabled && isImproved)
@@ -216,32 +176,30 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
                     if (hit.collider is null)
                     {
-                        collider = null;
+                        Cache.LastCollider = null;
 
-                        SnapBuilderAimTransform.position = OffsetAimTransform.position;
-                        SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
-                        return SnapBuilderAimTransform;
+                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                        return Cache.SnapBuilderAimTransform;
                     }
                 }
 
-                ColliderMaterial.SetColor(ShaderPropertyID._Tint, isImproved ? ImprovedCollider : OriginalCollider);
-                RenderCollider(hit.collider, ColliderMaterial, 1.00001f);
+                Cache.LastCollider = hit.collider;
+                Cache.ColliderMaterial.SetColor(ShaderPropertyID._Tint, isImproved ? ImprovedCollider : OriginalCollider);
+                RenderCollider(hit.collider, Cache.ColliderMaterial, 1.00001f);
             }
 
             Transform hitTransform = GetAppropriateTransform(hit);
             GetLocalisedHit(hit, out Vector3 localPoint, out Vector3 localNormal, hitTransform);
             Vector3 snappedPoint = GetSnappedHitPoint(localPoint, localNormal);
 
-            SnapBuilderAimTransform.position = OffsetAimTransform.position;
-            SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - SnapBuilderAimTransform.position;
+            Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+            Cache.SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - Cache.SnapBuilderAimTransform.position;
 
-            return SnapBuilderAimTransform;
+            return Cache.SnapBuilderAimTransform;
         }
 
-        private static Material colliderMaterial;
-        private static Material ColliderMaterial => colliderMaterial ??= new Material(Builder.ghostStructureMaterial);
-
-        public static bool IsColliderImprovable() => IsColliderImprovable(collider, out Mesh _);
+        public static bool IsColliderImprovable() => IsColliderImprovable(Cache.LastCollider, out Mesh _);
 
         private static bool IsColliderImprovable(Collider collider, out Mesh mesh)
         {
@@ -249,43 +207,51 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             if (collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
             {
-                if (colliderImprovedMeshDictionary.TryGetValue(meshCollider, out mesh))
+                if (Cache.ImprovedMeshByCollider.TryGetValue(meshCollider, out mesh))
                 {
                     return true;
                 }
 
                 Transform rootTransform = UWE.Utils.GetEntityRoot(collider.transform.gameObject)?.transform ?? collider.transform;
-                MeshFilter potentialMeshFilter
-                    = rootTransform.GetComponentsInChildren<MeshFilter>()
-                        .FirstOrDefault(meshFilter => meshFilter?.sharedMesh.isReadable ?? false);
 
-                if (potentialMeshFilter is MeshFilter)
+                // Coral tunnels just don't work well!
+                if (rootTransform.GetComponent<CoralBlendWhite>() is CoralBlendWhite)
                 {
-                    mesh = GetMostDetailedMesh(new[] { meshCollider.sharedMesh, potentialMeshFilter.sharedMesh }.Where(m => (m?.isReadable ?? false) && (!meshCollider.convex || m?.triangles.Count() / 3 <= 255)).ToArray());
-                    if (mesh is Mesh && mesh != meshCollider.sharedMesh)
-                    {
-                        colliderImprovedMeshDictionary[meshCollider] = mesh;
-                        return true;
-                    }
+                    return false;
+                }
+
+                IEnumerable<Mesh> potentialMeshes = rootTransform.GetComponentsInChildren<MeshFilter>()
+                    .Where(meshFilter => meshFilter is MeshFilter)
+                    .Select(meshFilter => meshFilter.sharedMesh)
+                    .AddItem(meshCollider.sharedMesh)
+                    .Where(mesh => mesh is Mesh && mesh.isReadable && (!meshCollider.convex || mesh.triangles.Count() / 3 <= 255))
+                    .Distinct()
+                    .OrderByDescending(mesh => mesh.triangles.Count());
+
+                foreach (var potentialMesh in potentialMeshes.Except(new[] { meshCollider.sharedMesh }))
+                {
+                    Logger.LogWarning(potentialMesh.name);
+                }
+
+                mesh = potentialMeshes.FirstOrDefault();
+
+                if (mesh is Mesh && mesh != meshCollider.sharedMesh)
+                {
+                    Cache.ImprovedMeshByCollider[meshCollider] = mesh;
+                    return true;
                 }
             }
 
             return false;
         }
 
-        private static Mesh GetMostDetailedMesh(params Mesh[] meshes)
-            => meshes.FirstOrDefault(mesh => mesh is Mesh && mesh?.triangles.Count() >= meshes.Max(m => m?.triangles.Count()));
-
-        private static Dictionary<Collider, Mesh> colliderOriginalMeshDictionary = new Dictionary<Collider, Mesh>();
-        private static Dictionary<Collider, Mesh> colliderImprovedMeshDictionary = new Dictionary<Collider, Mesh>();
-        private static Dictionary<Collider, bool> colliderIsImprovedDictionary = new Dictionary<Collider, bool>();
         private static bool TryImproveCollider(RaycastHit hit)
         {
             if (IsColliderImprovable(hit.collider, out Mesh mesh))
             {
                 if (hit.collider is MeshCollider meshCollider)
                 {
-                    colliderOriginalMeshDictionary[hit.collider] = meshCollider.sharedMesh;
+                    Cache.OriginalMeshByCollider[hit.collider] = meshCollider.sharedMesh;
                     SetMesh(meshCollider, mesh);
                 }
                 else
@@ -293,7 +259,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     // code for upgrading box colliders etc. goes here...
                 }
 
-                colliderIsImprovedDictionary[hit.collider] = true;
+                Cache.IsImprovedByCollider[hit.collider] = true;
                 Logger.LogWarning("Upgraded mesh");
 
                 return true;
@@ -306,14 +272,14 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         {
             bool reverted = false;
 
-            if (!colliderIsImprovedDictionary.TryGetValue(collider, out bool isImproved) || !isImproved)
+            if (!Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved) || !isImproved)
             {
                 return false;
             }
 
             if (collider is MeshCollider meshCollider)
             {
-                if (colliderOriginalMeshDictionary.TryGetValue(meshCollider, out Mesh originalMesh))
+                if (Cache.OriginalMeshByCollider.TryGetValue(meshCollider, out Mesh originalMesh))
                 {
                     SetMesh(meshCollider, originalMesh);
                     reverted = true;
@@ -326,7 +292,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             if (reverted)
             {
-                colliderIsImprovedDictionary[collider] = false;
+                Cache.IsImprovedByCollider[collider] = false;
                 Logger.LogWarning("Reverted mesh");
             }
 
@@ -337,8 +303,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         private static void ImproveColliderAndUpdateHit(ref RaycastHit hit)
         {
             if (TryImproveCollider(hit)
-                && !Physics.Raycast(OffsetAimTransform.position,
-                            BuilderAimTransform.forward,
+                && !Physics.Raycast(Cache.OffsetAimTransform.position,
+                            Cache.BuilderAimTransform.forward,
                             out hit,
                             Builder.placeMaxDistance,
                             Builder.placeLayerMask,
@@ -351,8 +317,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         private static void RevertColliderAndUpdateHit(ref RaycastHit hit)
         {
             if (TryRevertCollider(hit)
-                && !Physics.Raycast(OffsetAimTransform.position,
-                            BuilderAimTransform.forward,
+                && !Physics.Raycast(Cache.OffsetAimTransform.position,
+                            Cache.BuilderAimTransform.forward,
                             out hit,
                             Builder.placeMaxDistance,
                             Builder.placeLayerMask,
@@ -364,8 +330,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
         public static void RevertColliders()
         {
-            collider = null;
-            foreach (Collider collider in colliderOriginalMeshDictionary.Keys)
+            Cache.LastCollider = null;
+            foreach (Collider collider in Cache.OriginalMeshByCollider.Keys)
             {
                 TryRevertCollider(collider);
             }
