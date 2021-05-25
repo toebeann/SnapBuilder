@@ -82,9 +82,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_SNAPPING) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleSnapping) +
                     $" ({FormatButton(Config.Snapping)})");
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_SNAPPING) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleFineSnapping) +
                 $" ({FormatButton(Config.FineSnapping)})");
         }
 
@@ -93,7 +93,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_FINE_ROTATION) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleFineRotation) +
                 $" ({FormatButton(Config.FineRotation)})");
         }
 
@@ -102,7 +102,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.TOGGLE_ROTATION) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.ToggleRotation) +
                 $" ({FormatButton(Config.ToggleRotation)})");
         }
 
@@ -111,7 +111,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (!shouldShow)
                 return;
 
-            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.HOLSTER_ITEM) +
+            ErrorMessage.AddError(SMLHelper.Language.Get(Lang.Hint.HolsterItem) +
                 $" ({uGUI.FormatButton(GameInput.Button.Exit, true, ", ", false)})");
         }
 
