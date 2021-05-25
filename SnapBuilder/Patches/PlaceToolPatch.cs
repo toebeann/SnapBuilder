@@ -13,7 +13,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             __state = __instance.ghostModel == null;
 
-            if (__state)
+            if (__state && SnapBuilder.Config.DisplayControlHints)
             {
                 ControlHint.Show(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping);
                 ControlHint.Show(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping);
@@ -24,7 +24,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static void Postfix(PlaceTool __instance, bool __state)
         {
-            if (__state && __instance.rotationEnabled)
+            if (__state && SnapBuilder.Config.DisplayControlHints && __instance.rotationEnabled)
             {
                 ControlHint.Show(Lang.Hint.ToggleRotation, SnapBuilder.Config.Rotation);
                 ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
