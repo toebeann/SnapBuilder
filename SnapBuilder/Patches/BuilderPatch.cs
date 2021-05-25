@@ -5,10 +5,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 {
     internal static class BuilderPatch
     {
+#if SUBNAUTICA
         #region Builder.Begin
         [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
         [HarmonyPrefix]
-        public static void BeginPrefix(ref bool __state)
+        public static void BeginPrefix(out bool __state)
         {
             SnapBuilder.Config.ResetToggles();
 
@@ -31,6 +32,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             }
         }
         #endregion
+#endif
 
         #region Builder.GetAimTransform
         [HarmonyPatch(typeof(Builder), nameof(Builder.GetAimTransform))]

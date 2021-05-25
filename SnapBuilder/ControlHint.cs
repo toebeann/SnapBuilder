@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
-    using Language = SMLHelper.Language;
+    using SMLHelper;
 
     internal static class ControlHint
     {
@@ -12,7 +12,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             string displayText = null;
             if (toggle.KeyCode == KeyCode.None)
             {
-                displayText = SMLHelper.Language.Get("NoInputAssigned");
+                displayText = Language.Get("NoInputAssigned");
             }
             else
             {
@@ -23,20 +23,19 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
                 if (string.IsNullOrEmpty(displayText))
                 {
-                    displayText = SMLHelper.Language.Get("NoInputAssigned");
+                    displayText = Language.Get("NoInputAssigned");
                 }
             }
             return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
         }
 
-        public static void Show(string hintId, Toggle toggle)
-        {
-            ErrorMessage.AddMessage($"{Language.Get(hintId)} ({FormatButton(toggle)})");
-        }
+        public static string Get(string hintId, Toggle toggle) => $"{Language.Get(hintId)} ({FormatButton(toggle)})";
 
-        public static void Show(string hintId, GameInput.Button button)
-        {
-            ErrorMessage.AddMessage($"{Language.Get(hintId)} ({uGUI.FormatButton(button, true, ", ", false)})");
-        }
+        public static string Get(string hintId, GameInput.Button button) 
+            => $"{Language.Get(hintId)} ({uGUI.FormatButton(button, true, ", ", false)})";
+
+        public static void Show(string hintId, Toggle toggle) => ErrorMessage.AddMessage(Get(hintId, toggle));
+
+        public static void Show(string hintId, GameInput.Button button) => ErrorMessage.AddMessage(Get(hintId, button));
     }
 }

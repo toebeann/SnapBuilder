@@ -4,10 +4,10 @@ using System.Reflection;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
-using Logger = BepInEx.Subnautica.Logger;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
+    using BepInEx.Subnautica;
     using ExtensionMethods.UnityEngine;
     using Patches;
 
@@ -49,6 +49,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             var harmony = new Harmony("SnapBuilder");
             harmony.PatchAll(typeof(BuilderPatch));
             harmony.PatchAll(typeof(PlaceToolPatch));
+#if BELOWZERO
+            harmony.PatchAll(typeof(BuilderToolPatch));
+#endif
 
             stopwatch.Stop();
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
