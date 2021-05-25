@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
@@ -77,11 +76,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
             return $"<color=#ADF8FFFF>{displayText}</color>{(toggle.KeyMode == Toggle.Mode.Hold ? " (Hold)" : string.Empty)}";
         }
-
-        public static float RoundToNearest(float x, float y) => y * Mathf.Round(x / y);
-        public static double RoundToNearest(double x, double y) => y * Math.Round(x / y);
-        public static float FloorToNearest(float x, float y) => y * Mathf.Floor(x / y);
-        public static double FloorToNearest(double x, double y) => y * Math.Floor(x / y);
 
         public static void ShowSnappingHint(bool shouldShow = true)
         {
@@ -205,15 +199,15 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             // Round (snap) the localised hit point coords only on axes where the corresponding normal axis is less than 1
             if (hitNormal.x < 1)
             {
-                hitPoint.x = RoundToNearest(hitPoint.x, roundFactor);
+                hitPoint.x = Math.RoundToNearest(hitPoint.x, roundFactor);
             }
             if (hitNormal.y < 1)
             {
-                hitPoint.y = RoundToNearest(hitPoint.y, roundFactor);
+                hitPoint.y = Math.RoundToNearest(hitPoint.y, roundFactor);
             }
             if (hitNormal.z < 1)
             {
-                hitPoint.z = RoundToNearest(hitPoint.z, roundFactor);
+                hitPoint.z = Math.RoundToNearest(hitPoint.z, roundFactor);
             }
 
             return hitPoint;
@@ -317,7 +311,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     LastButtonHeldTime = -1f;
                 }
 
-                float buttonHeldTime = FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCW), 0.15f);
+                float buttonHeldTime = Math.FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCW), 0.15f);
                 if (buttonHeldTime > LastButtonHeldTime)
                 {   // Store rotation held time
                     LastButtonHeldTime = buttonHeldTime;
@@ -332,7 +326,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     LastButtonHeldTime = -1f;
                 }
 
-                float buttonHeldTime = FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCCW), 0.15f);
+                float buttonHeldTime = Math.FloorToNearest(GameInput.GetButtonHeldTime(Builder.buttonRotateCCW), 0.15f);
                 if (buttonHeldTime > LastButtonHeldTime)
                 {   // Store rotation held time
                     LastButtonHeldTime = buttonHeldTime;
@@ -390,7 +384,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
             child.transform.localEulerAngles
-                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, Config.RotationFactor) % 360, 0);
+                = new Vector3(0, Math.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, Config.RotationFactor) % 360, 0);
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
 
