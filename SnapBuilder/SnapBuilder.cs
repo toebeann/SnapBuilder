@@ -306,11 +306,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
         }
 
-        private static void ApplyAdditiveRotation(ref float additiveRotation, out float rotationFactor)
+        private static void ApplyAdditiveRotation(ref float additiveRotation)
         {
-            // Get the rotation factor from user options based on whether the fine snapping key is held or not
-            rotationFactor = Config.FineRotation.Enabled ? Config.FineRotationRounding : Config.RotationRounding;
-
             // If the user is rotating, apply the additive rotation
             if (GameInput.GetButtonHeld(Builder.buttonRotateCW)) // Clockwise
             {
@@ -324,7 +321,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 if (buttonHeldTime > LastButtonHeldTime)
                 {   // Store rotation held time
                     LastButtonHeldTime = buttonHeldTime;
-                    additiveRotation -= rotationFactor; // Decrement rotation
+                    additiveRotation -= Config.RotationFactor; // Decrement rotation
                 }
             }
             else if (GameInput.GetButtonHeld(Builder.buttonRotateCCW)) // Counter-clockwise
@@ -339,7 +336,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 if (buttonHeldTime > LastButtonHeldTime)
                 {   // Store rotation held time
                     LastButtonHeldTime = buttonHeldTime;
-                    additiveRotation += rotationFactor; // Increment rotation
+                    additiveRotation += Config.RotationFactor; // Increment rotation
                 }
             }
             else if (GameInput.GetButtonUp(Builder.buttonRotateCW) || GameInput.GetButtonUp(Builder.buttonRotateCCW))
@@ -348,12 +345,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
 
             // Round to the nearest rotation factor for rotation snapping
-            additiveRotation = RoundToNearest(additiveRotation, rotationFactor) % 360;
+            additiveRotation %= 360;
         }
 
         public static Quaternion CalculateRotation(ref float additiveRotation, RaycastHit hit, bool forceUpright)
         {
-            ApplyAdditiveRotation(ref additiveRotation, out float rotationFactor);
+            ApplyAdditiveRotation(ref additiveRotation);
             ImproveHitNormal(ref hit);
 
             Transform hitTransform = GetAppropriateTransform(hit);
@@ -393,7 +390,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
             child.transform.localEulerAngles
-                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, rotationFactor) % 360, 0);
+                = new Vector3(0, RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, Config.RotationFactor) % 360, 0);
 
             Quaternion rotation = child.transform.rotation; // Our final rotation
 
