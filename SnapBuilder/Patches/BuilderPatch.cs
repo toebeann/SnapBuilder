@@ -28,6 +28,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             {
                 ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
             }
+            if (__state && SnapBuilder.ColliderIsImprovable)
+            {
+                ControlHint.Show(Lang.Hint.DetailedCollider, SnapBuilder.Config.DetailedCollider);
+            }
         }
 #endif
 
@@ -51,6 +55,15 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             {
                 rotation = SnapBuilder.CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright);
             }
+        }
+        #endregion
+
+        #region Builder.End
+        [HarmonyPatch(typeof(Builder), nameof(Builder.End))]
+        [HarmonyPostfix]
+        public static void EndPostfix()
+        {
+            SnapBuilder.RevertColliders();
         }
         #endregion
     }

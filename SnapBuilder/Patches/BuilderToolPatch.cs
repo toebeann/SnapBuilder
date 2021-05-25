@@ -17,29 +17,35 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
             public readonly bool WasPlacingRotatable;
             public readonly bool WasSnappingEnabled;
             public readonly bool WereHintsEnabled;
+            public readonly bool WasColliderImprovable;
 
-            public GetCustomUseTextState(bool wasPlacing, bool wasPlacingRotatable, bool wasSnappingEnabled, bool wereHintsEnabled)
+            public GetCustomUseTextState(bool wasPlacing, bool wasPlacingRotatable, bool wasSnappingEnabled,
+                                         bool wereHintsEnabled, bool wasColliderImprovable)
             {
                 WasPlacing = wasPlacing;
                 WasPlacingRotatable = wasPlacingRotatable;
                 WasSnappingEnabled = wasSnappingEnabled;
                 WereHintsEnabled = wereHintsEnabled;
+                WasColliderImprovable = wasColliderImprovable;
             }
         }
 
         private static bool wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
         private static bool wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
+        private static bool wasColliderImprovable = SnapBuilder.IsColliderImprovable();
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
         [HarmonyPrefix]
         public static void GetCustomUseTextPrefix(BuilderTool __instance, out GetCustomUseTextState __state)
         {
             __state = new GetCustomUseTextState(wasPlacing: __instance.wasPlacing,
-                                wasPlacingRotatable: __instance.wasPlacingRotatable,
-                                wasSnappingEnabled: wasSnappingEnabled,
-                                wereHintsEnabled: wereHintsEnabled);
+                                                wasPlacingRotatable: __instance.wasPlacingRotatable,
+                                                wasSnappingEnabled: wasSnappingEnabled,
+                                                wereHintsEnabled: wereHintsEnabled,
+                                                wasColliderImprovable: wasColliderImprovable);
 
             wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
             wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
+            wasColliderImprovable = SnapBuilder.IsColliderImprovable();
         }
 
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
@@ -48,46 +54,42 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         {
             if (!SnapBuilder.Config.DisplayControlHints && __state.WereHintsEnabled)
             {
-                List<string> lines = customUseText.Split('\n').ToList();
-
-                lines.RemoveAll(line => line.Contains(Language.Get(Lang.Hint.ToggleSnapping))
-                                        || line.Contains(Language.Get(Lang.Hint.ToggleFineSnapping))
-                                        || line.Contains(Language.Get(Lang.Hint.ToggleFineRotation)));
+                __instance.UpdateCustomUseText();
+                return __instance.customUseText;
             }
             else if (SnapBuilder.Config.DisplayControlHints
                      && Builder.isPlacing
                      && (!__state.WereHintsEnabled
                          || !__state.WasPlacing
-                         || (Builder.rotationEnabled != __state.WasPlacingRotatable)
-                         || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)))
+                         || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)
+                         || (SnapBuilder.IsColliderImprovable() != __state.WasColliderImprovable)
+                         || (Builder.rotationEnabled != __state.WasPlacingRotatable)))
             {
+                __instance.UpdateCustomUseText();
+                customUseText = __instance.customUseText;
+
                 List<string> lines = customUseText.Split('\n').ToList();
 
-                if (!SnapBuilder.Config.Snapping.Enabled)
-                {
-                    lines.RemoveAll(line => line.Contains(Language.Get(Lang.Hint.ToggleFineSnapping))
-                                            || line.Contains(Language.Get(Lang.Hint.ToggleFineRotation)));
+                lines[0] += $", {ControlHint.Get(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping)}";
 
-                    lines.Insert(1, ControlHint.Get(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping));
-                }
-                else
+                if (SnapBuilder.Config.Snapping.Enabled)
                 {
-                    lines.RemoveAll(line => line.Contains(Language.Get(Lang.Hint.ToggleSnapping)));
-
-                    lines.Insert(1,
-                        $"{ControlHint.Get(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping)}, " +
-                        $"{ControlHint.Get(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping)}");
+                    lines.Insert(1, ControlHint.Get(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping));
 
                     if (Builder.rotationEnabled
                         && (!__state.WereHintsEnabled
                             || !__state.WasPlacingRotatable
                             || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
                     {
-                        lines.Add(ControlHint.Get(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation));
+                        lines[1] += $", {ControlHint.Get(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation)}";
                     }
-                    else if (!Builder.rotationEnabled)
+
+                    if (SnapBuilder.IsColliderImprovable()
+                        && (!__state.WereHintsEnabled
+                            || !__state.WasColliderImprovable
+                            || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
                     {
-                        lines.RemoveAll(line => line.Contains(Language.Get(Lang.Hint.ToggleFineRotation)));
+                        lines[0] += $", {ControlHint.Get(Lang.Hint.DetailedCollider, SnapBuilder.Config.DetailedCollider)}";
                     }
                 }
 
