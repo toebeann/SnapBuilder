@@ -150,7 +150,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             };
 
             Vector3 localPoint = hitTransform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            Vector3 localNormal = (hitTransform.parent ?? hitTransform).InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            Vector3 localNormal = hitTransform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
 
             // Set the localised normal to absolute values for comparison
             localNormal.x = Mathf.Abs(localNormal.x);
