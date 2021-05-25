@@ -33,9 +33,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public Toggle FineRotation => fineRotation ??= new Toggle(FineRotationKey, FineRotationMode, false);
 
         [JsonIgnore]
-        private Toggle toggleRotation;
+        private Toggle rotation;
         [JsonIgnore]
-        public Toggle Rotation => toggleRotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
+        public Toggle Rotation => rotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
 
         [JsonIgnore]
         public float RotationFactor => FineRotation.Enabled ? FineRotationRounding : RotationRounding;
