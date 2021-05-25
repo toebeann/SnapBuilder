@@ -38,6 +38,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [JsonIgnore]
         public Toggle ToggleRotation => toggleRotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
 
+        [JsonIgnore]
+        public float RotationFactor => FineRotation.Enabled ? FineRotationRounding : RotationRounding;
+
         [Toggle(LabelLanguageId = Lang.Option.DEFAULT_SNAPPING_ENABLED), OnChange(nameof(EnabledByDefaultChanged))]
         public bool EnabledByDefault { get; set; } = true;
         private void EnabledByDefaultChanged(ToggleChangedEventArgs e)
