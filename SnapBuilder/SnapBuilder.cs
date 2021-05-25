@@ -183,7 +183,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         {
             transform ??= hit.transform;
             localisedHitPoint = transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            localisedHitNormal = (transform.parent ?? transform).InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            localisedHitNormal = transform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
         }
 
         /// <summary>
