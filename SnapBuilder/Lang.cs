@@ -15,6 +15,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
         internal static class Option
         {
+            public const string DisplayControlHints = "Options.DisplayControlHints";
             public const string SnappingEnabledByDefault = "Options.SnappingEnabledByDefault";
             public const string ToggleSnappingKey = "Options.ToggleSnappingKey";
             public const string ToggleSnappingMode = "Options.ToggleSnappingMode";
@@ -34,20 +35,21 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         {
             SMLHelper.Language.Set(new Dictionary<string, string>()
             {
-                [Hint.ToggleSnapping] = "Toggle snapping",
-                [Hint.ToggleFineSnapping] = "Toggle fine snapping",
-                [Hint.ToggleRotation] = "Toggle rotation",
-                [Hint.ToggleFineRotation] = "Toggle fine rotation",
+                [Hint.ToggleSnapping] = "Snapping",
+                [Hint.ToggleFineSnapping] = "Fine snapping",
+                [Hint.ToggleRotation] = "Rotation",
+                [Hint.ToggleFineRotation] = "Fine rotation",
                 [Hint.HolsterItem] = "Holster item",
+                [Option.DisplayControlHints] = "Display control hints",
                 [Option.SnappingEnabledByDefault] = "Snapping enabled by default",
-                [Option.ToggleSnappingKey] = "Toggle snapping button",
-                [Option.ToggleSnappingMode] = "Toggle snapping mode",
+                [Option.ToggleSnappingKey] = "Snapping button",
+                [Option.ToggleSnappingMode] = "Snapping mode",
                 [Option.FineSnappingKey] = "Fine snapping button",
                 [Option.FineSnappingMode] = "Fine snapping mode",
                 [Option.FineRotationKey] = "Fine rotation button",
                 [Option.FineRotationMode] = "Fine rotation mode",
-                [Option.ToggleRotationKey] = "Toggle rotation button (for placeable items)",
-                [Option.ToggleRotationMode] = "Toggle rotation mode (for placeable items)",
+                [Option.ToggleRotationKey] = "Rotation button (for placeable items)",
+                [Option.ToggleRotationMode] = "Rotation mode (for placeable items)",
                 [Option.SnapRounding] = "Snap rounding",
                 [Option.FineSnapRounding] = "Fine snap rounding",
                 [Option.RotationRounding] = "Rotation rounding (degrees)",
