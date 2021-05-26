@@ -60,6 +60,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         private void DetailedColliderEnabledByDefaultChanged(ToggleChangedEventArgs e)
             => DetailedCollider.EnabledByDefault = e.Value;
 
+        [Toggle(LabelLanguageId = Lang.Option.RenderImprovableColliders)]
+        public bool RenderImprovableColliders { get; set; } = true;
+
         [Keybind(LabelLanguageId = Lang.Option.ToggleSnappingKey), OnChange(nameof(ToggleSnappingKeyChanged))]
         public KeyCode ToggleSnappingKey { get; set; } = KeyCode.Mouse2;
         private void ToggleSnappingKeyChanged(KeybindChangedEventArgs e)

@@ -13,26 +13,29 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         #region Builder.GetCustomUseText
         public struct GetCustomUseTextState
         {
-            public readonly bool WasPlacing;
-            public readonly bool WasPlacingRotatable;
-            public readonly bool WasSnappingEnabled;
-            public readonly bool WereHintsEnabled;
-            public readonly bool WasColliderImprovable;
+            public bool WasPlacing { get; }
+            public bool WasPlacingRotatable { get; }
+            public bool WasSnappingEnabled { get; }
+            public bool WereHintsEnabled { get; }
+            public bool WasColliderImprovable { get; }
+            public bool WasColliderImproved { get; }
 
             public GetCustomUseTextState(bool wasPlacing, bool wasPlacingRotatable, bool wasSnappingEnabled,
-                                         bool wereHintsEnabled, bool wasColliderImprovable)
+                                         bool wereHintsEnabled, bool wasColliderImprovable, bool wasColliderImproved)
             {
                 WasPlacing = wasPlacing;
                 WasPlacingRotatable = wasPlacingRotatable;
                 WasSnappingEnabled = wasSnappingEnabled;
                 WereHintsEnabled = wereHintsEnabled;
                 WasColliderImprovable = wasColliderImprovable;
+                WasColliderImproved = wasColliderImproved;
             }
         }
 
         private static bool wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
         private static bool wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
         private static bool wasColliderImprovable = SnapBuilder.IsColliderImprovable();
+        private static bool wasColliderImproved = SnapBuilder.IsColliderImproved();
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
         [HarmonyPrefix]
         public static void GetCustomUseTextPrefix(BuilderTool __instance, out GetCustomUseTextState __state)
@@ -41,11 +44,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                                                 wasPlacingRotatable: __instance.wasPlacingRotatable,
                                                 wasSnappingEnabled: wasSnappingEnabled,
                                                 wereHintsEnabled: wereHintsEnabled,
-                                                wasColliderImprovable: wasColliderImprovable);
+                                                wasColliderImprovable: wasColliderImprovable,
+                                                wasColliderImproved: wasColliderImproved);
 
             wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
             wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
             wasColliderImprovable = SnapBuilder.IsColliderImprovable();
+            wasColliderImproved = SnapBuilder.IsColliderImproved();
         }
 
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
@@ -63,6 +68,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                          || !__state.WasPlacing
                          || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)
                          || (SnapBuilder.IsColliderImprovable() != __state.WasColliderImprovable)
+                         || (SnapBuilder.IsColliderImproved() != __state.WasColliderImproved)
                          || (Builder.rotationEnabled != __state.WasPlacingRotatable)))
             {
                 __instance.UpdateCustomUseText();
@@ -87,9 +93,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                     if (SnapBuilder.IsColliderImprovable()
                         && (!__state.WereHintsEnabled
                             || !__state.WasColliderImprovable
+                            || (SnapBuilder.IsColliderImproved() != __state.WasColliderImproved)
                             || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
                     {
-                        lines[0] += $", {ControlHint.Get(Lang.Hint.DetailedCollider, SnapBuilder.Config.DetailedCollider)}";
+                        string hintId = SnapBuilder.IsColliderImproved() ? Lang.Hint.OriginalCollider : Lang.Hint.DetailedCollider;
+                        lines[0] += $", {ControlHint.Get(hintId, SnapBuilder.Config.DetailedCollider)}";
                     }
                 }
 

@@ -153,11 +153,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
 
             Cache.LastCollider = hit.collider;
-            if (IsColliderImprovable(hit.collider, out Mesh _))
+            if (IsColliderImprovable())
             {
-                Cache.IsImprovedByCollider.TryGetValue(hit.collider, out bool isImproved);
-
-                if (Config.DetailedCollider.Enabled && !isImproved)
+                if (Config.DetailedCollider.Enabled && !IsColliderImproved())
                 {
                     ImproveColliderAndUpdateHit(ref hit);
 
@@ -170,7 +168,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                         return Cache.SnapBuilderAimTransform;
                     }
                 }
-                else if (!Config.DetailedCollider.Enabled && isImproved)
+                else if (!Config.DetailedCollider.Enabled && IsColliderImproved())
                 {
                     RevertColliderAndUpdateHit(ref hit);
 
@@ -185,8 +183,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
 
                 Cache.LastCollider = hit.collider;
-                Cache.ColliderMaterial.SetColor(ShaderPropertyID._Tint, isImproved ? ImprovedCollider : OriginalCollider);
-                RenderCollider(hit.collider, Cache.ColliderMaterial, 1.00001f);
+                Cache.ColliderMaterial.SetColor(ShaderPropertyID._Tint, IsColliderImproved() ? ImprovedCollider : OriginalCollider);
+
+                if (Config.RenderImprovableColliders)
+                {
+                    RenderCollider(hit.collider, Cache.ColliderMaterial, 1.00001f);
+                }
             }
 
             Transform hitTransform = GetAppropriateTransform(hit);
@@ -199,7 +201,29 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             return Cache.SnapBuilderAimTransform;
         }
 
+        public static bool IsColliderImproved() => IsColliderImproved(Cache.LastCollider);
         public static bool IsColliderImprovable() => IsColliderImprovable(Cache.LastCollider, out Mesh _);
+
+        private static Type[] ExcludedComponentTypes { get; } = new Type[] {
+            typeof(CoralBlendWhite) // default mesh is good enough and doesn't work well when upgraded
+        };
+
+        private static bool IsExcluded(Transform transform)
+        {
+            foreach (var componentType in ExcludedComponentTypes)
+            {
+                if (!(transform.GetComponent(componentType) is null))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool IsColliderImproved(Collider collider)
+            => collider is Collider
+               && Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved)
+               && isImproved;
 
         private static bool IsColliderImprovable(Collider collider, out Mesh mesh)
         {
@@ -213,25 +237,14 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
 
                 Transform rootTransform = UWE.Utils.GetEntityRoot(collider.transform.gameObject)?.transform ?? collider.transform;
-
-                // Coral tunnels just don't work well!
-                if (rootTransform.GetComponent<CoralBlendWhite>() is CoralBlendWhite)
-                {
-                    return false;
-                }
-
                 IEnumerable<Mesh> potentialMeshes = rootTransform.GetComponentsInChildren<MeshFilter>()
+                    .Where(x => !IsExcluded(rootTransform))
                     .Where(meshFilter => meshFilter is MeshFilter)
                     .Select(meshFilter => meshFilter.sharedMesh)
                     .AddItem(meshCollider.sharedMesh)
                     .Where(mesh => mesh is Mesh && mesh.isReadable && (!meshCollider.convex || mesh.triangles.Count() / 3 <= 255))
                     .Distinct()
                     .OrderByDescending(mesh => mesh.triangles.Count());
-
-                foreach (var potentialMesh in potentialMeshes.Except(new[] { meshCollider.sharedMesh }))
-                {
-                    Logger.LogWarning(potentialMesh.name);
-                }
 
                 mesh = potentialMeshes.FirstOrDefault();
 
