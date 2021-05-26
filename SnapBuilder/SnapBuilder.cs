@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
+using Straitjacket.ExtensionMethods.UnityEngine;
 using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     using BepInEx.Subnautica;
-    using ExtensionMethods.UnityEngine;
+    using ExtensionMethods;
     using Patches;
 
     internal static class SnapBuilder
@@ -109,27 +111,44 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         };
 
         /// <summary>
-        /// Get the hit point and normal localised to the hit transform
+        /// Get a new hit where the point and normal are localised the given transform
         /// </summary>
         /// <param name="hit"></param>
-        /// <param name="localisedHitPoint"></param>
-        /// <param name="localisedHitNormal"></param>
         /// <param name="transform"></param>
-        private static void GetLocalisedHit(RaycastHit hit, out Vector3 localisedHitPoint, out Vector3 localisedHitNormal, Transform transform = null)
+        /// <returns></returns>
+        private static RaycastHit GetLocalisedHit(RaycastHit hit, Transform transform = null)
         {
             transform ??= hit.transform;
-            localisedHitPoint = transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
-            localisedHitNormal = transform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            hit.point = transform.InverseTransformPoint(hit.point); // Get the hit point localised relative to the hit transform
+            hit.normal = transform.InverseTransformDirection(hit.normal).normalized; // Get the hit normal localised to the hit transform
+            return hit;
         }
 
         /// <summary>
-        /// Get the hit point snapped based on the hit normal and current round factor
+        /// Gets a new hit in world space
+        /// </summary>
+        /// <param name="hit"></param>
+        /// <param name="transform"></param>
+        /// <returns></returns>
+        private static RaycastHit GetWorldSpaceHit(RaycastHit hit, Transform transform = null)
+        {
+            transform ??= hit.transform;
+            hit.point = transform.TransformPoint(hit.point);
+            hit.normal = transform.TransformDirection(hit.normal).normalized;
+            return hit;
+        }
+
+        /// <summary>
+        /// Gets a new hit where the point is snapped based on the normal and current round factor
         /// </summary>
         /// <param name="hitPoint"></param>
         /// <param name="hitNormal"></param>
         /// <returns></returns>
-        private static Vector3 GetSnappedHitPoint(Vector3 hitPoint, Vector3 hitNormal)
+        private static RaycastHit GetSnappedHit(RaycastHit hit)
         {
+            Vector3 hitPoint = hit.point;
+            Vector3 hitNormal = hit.normal;
+
             hitNormal.x = Mathf.Abs(hitNormal.x);
             hitNormal.y = Mathf.Abs(hitNormal.y);
             hitNormal.z = Mathf.Abs(hitNormal.z);
@@ -152,7 +171,73 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 hitPoint.z = Math.RoundToNearest(hitPoint.z, roundFactor);
             }
 
-            return hitPoint;
+            hit.point = hitPoint;
+            return hit;
+        }
+
+        /// <summary>
+        /// Gets a new hit popped onto the most appropriate surface at the most appropriate point,
+        /// or the original hit if the operation is not possible
+        /// </summary>
+        /// <param name="hit"></param>
+        /// <returns></returns>
+        private static RaycastHit PopHitOntoBestSurface(RaycastHit hit)
+        {
+            if (!Player.main.IsInsideWalkable())
+                return hit;
+
+            switch (Builder.GetSurfaceType(hit.normal))
+            {
+                case SurfaceType.Wall
+                when !Builder.allowedSurfaceTypes.Contains(SurfaceType.Wall)
+                     && Builder.allowedSurfaceTypes.Contains(SurfaceType.Ground):
+
+                    // Get the rotation of the object
+                    Quaternion rotation = Builder.rotationEnabled
+                        ? CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright || Player.main.IsInsideWalkable())
+                        : Quaternion.identity;
+
+                    // Get the corners of the object based on the Builder.bounds, localised to the hit point
+                    IEnumerable<Vector3> corners = Builder.bounds
+                        .Select(bounds => new { Bounds = bounds, Corners = bounds.GetCorners() })
+                        .SelectMany(x => x.Corners.Select(corner => hit.point + rotation * corner));
+
+                    // Get the farthest corner from the player
+                    Vector3 farthestCorner = corners.OrderByDescending(x
+                        => Vector3.Distance(x, OffsetAimTransform.position)).First();
+
+                    // Center the corner to the hit.point on the local X and Y axes
+                    var empty = new GameObject();
+                    var child = new GameObject();
+                    empty.transform.position = hit.point;
+                    empty.transform.forward = hit.normal;
+                    child.transform.SetParent(empty.transform);
+                    child.transform.position = farthestCorner;
+                    child.transform.localPosition = new Vector3(0, 0, child.transform.localPosition.z);
+                    Vector3 farthestCornerCentered = child.transform.position;
+
+                    // Clean up the GameObjects as we don't need them anymore
+                    GameObject.Destroy(child);
+                    GameObject.Destroy(empty);
+
+                    // Now move the hit.point outward from the wall just enough so that the object can fit
+                    Vector3 poppedPoint = hit.point + hit.normal * Vector3.Distance(farthestCornerCentered, hit.point) * 1.001f;
+
+                    // Try to get a new hit by aiming at the floor from this popped point
+                    if (Physics.Raycast(poppedPoint,
+                                         Vector3.down,
+                                         out RaycastHit poppedHit,
+                                         Builder.placeMaxDistance,
+                                         Builder.placeLayerMask,
+                                         QueryTriggerInteraction.Ignore))
+                    {
+                        return poppedHit;
+                    }
+
+                    break;
+            }
+
+            return hit;
         }
 
         private static int lastCalculationFrame;
@@ -172,11 +257,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // If no hit, exit early
             if (!Physics.Raycast(OffsetAimTransform.position,
-                BuilderAimTransform.forward,
-                out RaycastHit hit,
-                Builder.placeMaxDistance,
-                Builder.placeLayerMask,
-                QueryTriggerInteraction.Ignore))
+                                 BuilderAimTransform.forward,
+                                 out RaycastHit hit,
+                                 Builder.placeMaxDistance,
+                                 Builder.placeLayerMask,
+                                 QueryTriggerInteraction.Ignore))
             {
                 SnapBuilderAimTransform.position = OffsetAimTransform.position;
                 SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
@@ -184,11 +269,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             }
 
             Transform hitTransform = GetAppropriateTransform(hit);
-            GetLocalisedHit(hit, out Vector3 localPoint, out Vector3 localNormal, hitTransform);
-            Vector3 snappedPoint = GetSnappedHitPoint(localPoint, localNormal);
+            RaycastHit localisedHit = GetLocalisedHit(hit, hitTransform);
+            RaycastHit snappedHit = GetSnappedHit(localisedHit);
+            RaycastHit snappedWorldSpaceHit = GetWorldSpaceHit(snappedHit, hitTransform);
+            RaycastHit poppedHit = PopHitOntoBestSurface(snappedWorldSpaceHit);
 
             SnapBuilderAimTransform.position = OffsetAimTransform.position;
-            SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - SnapBuilderAimTransform.position;
+            SnapBuilderAimTransform.forward = poppedHit.point - SnapBuilderAimTransform.position;
 
             return SnapBuilderAimTransform;
         }
