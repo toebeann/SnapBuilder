@@ -306,17 +306,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             // align the empty to face the chosen forward direction
             empty.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
 
-#if BELOWZERO
-            if (Builder.constructableTechType != TechType.Hoverpad)
-#endif
+            // for components that are not forced upright, align the empty's up direction with the hit.normal
+            if (!forceUpright)
             {
-                // for components that are not forced upright, align the empty's up direction with the hit.normal
-                if (!forceUpright
-                    || (hit.collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh))
-                {
-                    empty.transform.up = hit.normal;
-                    empty.transform.rotation *= Quaternion.FromToRotation(Vector3.forward, forward);
-                }
+                empty.transform.up = hit.normal;
+                empty.transform.rotation *= Quaternion.FromToRotation(Vector3.forward, forward);
             }
 
             child.transform.SetParent(empty.transform, false); // parent the child to the empty
