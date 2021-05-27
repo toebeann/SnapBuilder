@@ -385,12 +385,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     });
                     if (primitive.GetComponent<Collider>() is Collider primitiveCollider)
                         primitiveCollider.enabled = false;
-                    primitive.GetComponent<Renderer>().material = Builder.ghostStructureMaterial;
+                    primitive.GetComponent<Renderer>().material = material;
                     primitive.transform.SetParent(gameObject.transform, false);
                     break;
             }
             gameObject.transform.SetParent(collider.transform, false);
-            gameObject.transform.localScale = collider.transform.localScale * scale;
+            gameObject.transform.localScale = collider.transform.lossyScale * scale;
             UWE.CoroutineHost.StartCoroutine(DestroyNextFrame(gameObject));
         }
 
