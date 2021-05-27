@@ -160,6 +160,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                         ? CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright || Player.main.IsInsideWalkable())
                         : Quaternion.identity;
 
+                    if (!Builder.bounds.Any())
+                    {
+                        return hit; // if there are no bounds for some reason, just use the original hit
+                    }
+
                     // Get the corners of the object based on the Builder.bounds, localised to the hit point
                     IEnumerable<Vector3> corners = Builder.bounds
                         .Select(bounds => new { Bounds = bounds, Corners = bounds.GetCorners() })
