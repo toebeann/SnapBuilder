@@ -303,7 +303,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static bool IsColliderImprovable() => IsColliderImprovable(Cache.LastCollider, out Mesh _);
 
         private static Type[] ExcludedComponentTypes { get; } = new Type[] {
-            typeof(CoralBlendWhite) // default mesh is good enough and doesn't work well when upgraded
+            typeof(CoralBlendWhite), // default mesh is good enough and doesn't work well when upgraded
+            typeof(BaseCell)
         };
 
         private static bool IsExcluded(Transform transform)
