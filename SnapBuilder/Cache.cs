@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Straitjacket.ExtensionMethods.UnityEngine;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
-    using ExtensionMethods.UnityEngine;
     using SceneManagement;
 
     internal class Cache

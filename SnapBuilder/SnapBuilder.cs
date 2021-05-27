@@ -6,12 +6,12 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
-using Straitjacket.ExtensionMethods.UnityEngine;
 using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     using BepInEx.Subnautica;
+    using ExtensionMethods;
     using Patches;
 
     internal static class SnapBuilder
@@ -167,7 +167,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
                     // Get the farthest corner from the player
                     Vector3 farthestCorner = corners.OrderByDescending(x
-                        => Vector3.Distance(x, OffsetAimTransform.position)).First();
+                        => Vector3.Distance(x, Cache.OffsetAimTransform.position)).First();
 
                     // Center the corner to the hit.point on the local X and Y axes
                     var empty = new GameObject();
@@ -289,7 +289,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             RaycastHit poppedHit = PopHitOntoBestSurface(snappedWorldSpaceHit);
 
             Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
-            Cache.SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - Cache.SnapBuilderAimTransform.position;
+            Cache.SnapBuilderAimTransform.forward = poppedHit.point - Cache.SnapBuilderAimTransform.position;
 
             return Cache.SnapBuilderAimTransform;
         }
@@ -483,7 +483,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     break;
             }
             gameObject.transform.SetParent(collider.transform, false);
-            gameObject.transform.localScale = collider.transform.lossyScale * scale;
+            gameObject.transform.localScale = collider.transform.localScale * scale;
             UWE.CoroutineHost.StartCoroutine(DestroyNextFrame(gameObject));
         }
 
