@@ -96,6 +96,7 @@
     <Compile Include="Cache.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ControlHint.cs" />
+    <Compile Include="ExtensionMethods\OrientedBoundsExtensionMethods.cs" />
     <Compile Include="Lang.cs" />
     <Compile Include="Patches\BuilderPatch.cs" />
     <Compile Include="Patches\BuilderToolPatch.cs" />
