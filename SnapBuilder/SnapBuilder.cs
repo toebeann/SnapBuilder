@@ -307,22 +307,12 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             typeof(BaseCell)
         };
 
-        private static bool IsExcluded(Transform transform)
-        {
-            foreach (var componentType in ExcludedComponentTypes)
-            {
-                if (!(transform.GetComponent(componentType) is null))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        private static bool IsExcluded(Transform transform) => ExcludedComponentTypes.Select(type => transform.GetComponent(type))
+                                                                   .Any(component => component is Component);
 
-        private static bool IsColliderImproved(Collider collider)
-            => collider is Collider
-               && Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved)
-               && isImproved;
+        private static bool IsColliderImproved(Collider collider) => collider is Collider
+                                                                     && Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved)
+                                                                     && isImproved;
 
         private static bool IsColliderImprovable(Collider collider, out Mesh mesh)
         {
