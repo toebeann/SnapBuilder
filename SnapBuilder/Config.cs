@@ -40,6 +40,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [JsonIgnore]
         public float RotationFactor => FineRotation.Enabled ? FineRotationRounding : RotationRounding;
 
+        [JsonIgnore]
+        private Toggle detailedColliders;
+        [JsonIgnore]
+        public Toggle DetailedCollider => detailedColliders ??= new Toggle(DetailedColliderKey,
+                                                                           DetailedColliderMode,
+                                                                           DetailedColliderEnabledByDefault);
+
         [Toggle(LabelLanguageId = Lang.Option.DisplayControlHints)]
         public bool DisplayControlHints { get; set; } = true;
 
@@ -47,6 +54,14 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public bool EnabledByDefault { get; set; } = true;
         private void EnabledByDefaultChanged(ToggleChangedEventArgs e)
             => Snapping.EnabledByDefault = e.Value;
+
+        [Toggle(LabelLanguageId = Lang.Option.DetailedColliderEnabledByDefault), OnChange(nameof(DetailedColliderEnabledByDefaultChanged))]
+        public bool DetailedColliderEnabledByDefault { get; set; } = true;
+        private void DetailedColliderEnabledByDefaultChanged(ToggleChangedEventArgs e)
+            => DetailedCollider.EnabledByDefault = e.Value;
+
+        [Toggle(LabelLanguageId = Lang.Option.RenderImprovableColliders)]
+        public bool RenderImprovableColliders { get; set; } = true;
 
         [Keybind(LabelLanguageId = Lang.Option.ToggleSnappingKey), OnChange(nameof(ToggleSnappingKeyChanged))]
         public KeyCode ToggleSnappingKey { get; set; } = KeyCode.Mouse2;
@@ -90,7 +105,17 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public Toggle.Mode ToggleRotationMode { get; set; } = Toggle.Mode.Hold;
         private void EnableRotationModeChanged(ChoiceChangedEventArgs e)
             => Rotation.KeyMode = (Toggle.Mode)e.Index;
-        
+
+        [Keybind(LabelLanguageId = Lang.Option.DetailedColliderKey), OnChange(nameof(DetailedColliderKeyChanged))]
+        public KeyCode DetailedColliderKey { get; set; } = KeyCode.F;
+        private void DetailedColliderKeyChanged(KeybindChangedEventArgs e)
+            => DetailedCollider.KeyCode = e.Key;
+
+        [Choice(LabelLanguageId = Lang.Option.DetailedColliderMode), OnChange(nameof(DetailedColliderModeChanged))]
+        public Toggle.Mode DetailedColliderMode { get; set; } = Toggle.Mode.Press;
+        private void DetailedColliderModeChanged(ChoiceChangedEventArgs e)
+            => DetailedCollider.KeyMode = (Toggle.Mode)e.Index;
+
         [JsonConverter(typeof(FloatConverter), 2)]
         [Slider(0.01f, 1, LabelLanguageId = Lang.Option.SnapRounding, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.5f)]
         public float SnapRounding { get; set; } = 0.5f;
@@ -118,6 +143,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             FineSnapping.Reset();
             FineRotation.Reset();
             Rotation.Reset();
+            DetailedCollider.Reset();
         }
 
         private void Upgrade()

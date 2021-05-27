@@ -22,7 +22,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
         [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
         [HarmonyPostfix]
-        public static void Postfix(PlaceTool __instance, bool __state)
+        public static void CreateGhostModelPostfix(PlaceTool __instance, bool __state)
         {
             if (__state && SnapBuilder.Config.DisplayControlHints && __instance.rotationEnabled)
             {

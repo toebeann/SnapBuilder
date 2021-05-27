@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -10,7 +12,6 @@ using UnityEngine;
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     using BepInEx.Subnautica;
-    using ExtensionMethods;
     using Patches;
 
     internal static class SnapBuilder
@@ -18,6 +19,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
         public static Config Config = OptionsPanelHandler.RegisterModOptions<Config>();
+        public static Cache Cache = new Cache();
 
         private enum SupportedGame
         {
@@ -57,45 +59,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             stopwatch.Stop();
             Logger.LogInfo($"Harmony patches applied in {stopwatch.ElapsedMilliseconds}ms.");
-        }
-
-        /// <summary>
-        /// The camera transform, as per the original Builder.GetAimTransform()
-        /// </summary>
-        public static Transform BuilderAimTransform => MainCamera.camera.transform;
-        public const string SnapBuilderAimTransformName = "SnapBuilderAimTransform";
-
-        private static Transform offsetAimTransform;
-        /// <summary>
-        /// A non-moving parent of the MainCamera transform, to counteract head-bobbing
-        /// </summary>
-        public static Transform OffsetAimTransform
-        {
-            get
-            {
-                offsetAimTransform ??= BuilderAimTransform.FindAncestor("camOffset").parent
-                    ?? BuilderAimTransform.FindAncestor(transform => !transform.position.Equals(OffsetAimTransform.position))
-                    ?? BuilderAimTransform;
-                return offsetAimTransform;
-            }
-        }
-
-        private static Transform snapBuilderAimTransform;
-        /// <summary>
-        /// The transform attached to our custom GameObject for snapped aiming
-        /// </summary>
-        public static Transform SnapBuilderAimTransform
-        {
-            get
-            {
-                snapBuilderAimTransform ??= BuilderAimTransform.Find(SnapBuilderAimTransformName);
-                if (snapBuilderAimTransform is null)
-                {
-                    snapBuilderAimTransform = new GameObject(SnapBuilderAimTransformName).transform;
-                    snapBuilderAimTransform.SetParent(BuilderAimTransform, false);
-                }
-                return snapBuilderAimTransform;
-            }
         }
 
         /// <summary>
@@ -247,32 +210,76 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             return hit;
         }
 
+        private static Color ImprovedCollider { get; } = Color.black;
+        private static Color OriginalCollider { get; } = Color.gray;
+
         private static int lastCalculationFrame;
         public static Transform GetAimTransform()
         {
             if (!Config.Snapping.Enabled)
             {
-                return BuilderAimTransform;
+                return Cache.BuilderAimTransform;
             }
 
             // Skip recalculating multiple times per frame
             if (lastCalculationFrame == Time.frameCount)
             {
-                return SnapBuilderAimTransform;
+                return Cache.SnapBuilderAimTransform;
             }
             lastCalculationFrame = Time.frameCount;
 
             // If no hit, exit early
-            if (!Physics.Raycast(OffsetAimTransform.position,
-                                 BuilderAimTransform.forward,
+            if (!Physics.Raycast(Cache.OffsetAimTransform.position,
+                                 Cache.BuilderAimTransform.forward,
                                  out RaycastHit hit,
                                  Builder.placeMaxDistance,
                                  Builder.placeLayerMask,
                                  QueryTriggerInteraction.Ignore))
             {
-                SnapBuilderAimTransform.position = OffsetAimTransform.position;
-                SnapBuilderAimTransform.forward = BuilderAimTransform.forward;
-                return SnapBuilderAimTransform;
+                Cache.LastCollider = null;
+
+                Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                return Cache.SnapBuilderAimTransform;
+            }
+
+            Cache.LastCollider = hit.collider;
+            if (IsColliderImprovable())
+            {
+                if (Config.DetailedCollider.Enabled && !IsColliderImproved())
+                {
+                    ImproveColliderAndUpdateHit(ref hit);
+
+                    if (hit.collider is null)
+                    {
+                        Cache.LastCollider = null;
+
+                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                        return Cache.SnapBuilderAimTransform;
+                    }
+                }
+                else if (!Config.DetailedCollider.Enabled && IsColliderImproved())
+                {
+                    RevertColliderAndUpdateHit(ref hit);
+
+                    if (hit.collider is null)
+                    {
+                        Cache.LastCollider = null;
+
+                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
+                        return Cache.SnapBuilderAimTransform;
+                    }
+                }
+
+                Cache.LastCollider = hit.collider;
+                Cache.ColliderMaterial.SetColor(ShaderPropertyID._Tint, IsColliderImproved() ? ImprovedCollider : OriginalCollider);
+
+                if (Config.RenderImprovableColliders)
+                {
+                    RenderCollider(hit.collider, Cache.ColliderMaterial, 1.00001f);
+                }
             }
 
             Transform hitTransform = GetAppropriateTransform(hit);
@@ -281,10 +288,203 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             RaycastHit snappedWorldSpaceHit = GetWorldSpaceHit(snappedHit, hitTransform);
             RaycastHit poppedHit = PopHitOntoBestSurface(snappedWorldSpaceHit);
 
-            SnapBuilderAimTransform.position = OffsetAimTransform.position;
-            SnapBuilderAimTransform.forward = poppedHit.point - SnapBuilderAimTransform.position;
+            Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
+            Cache.SnapBuilderAimTransform.forward = hitTransform.TransformPoint(snappedPoint) - Cache.SnapBuilderAimTransform.position;
 
-            return SnapBuilderAimTransform;
+            return Cache.SnapBuilderAimTransform;
+        }
+
+        public static bool IsColliderImproved() => IsColliderImproved(Cache.LastCollider);
+        public static bool IsColliderImprovable() => IsColliderImprovable(Cache.LastCollider, out Mesh _);
+
+        private static Type[] ExcludedComponentTypes { get; } = new Type[] {
+            typeof(CoralBlendWhite) // default mesh is good enough and doesn't work well when upgraded
+        };
+
+        private static bool IsExcluded(Transform transform)
+        {
+            foreach (var componentType in ExcludedComponentTypes)
+            {
+                if (!(transform.GetComponent(componentType) is null))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool IsColliderImproved(Collider collider)
+            => collider is Collider
+               && Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved)
+               && isImproved;
+
+        private static bool IsColliderImprovable(Collider collider, out Mesh mesh)
+        {
+            mesh = null;
+
+            if (collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
+            {
+                if (Cache.ImprovedMeshByCollider.TryGetValue(meshCollider, out mesh))
+                {
+                    return true;
+                }
+
+                Transform rootTransform = UWE.Utils.GetEntityRoot(collider.transform.gameObject)?.transform ?? collider.transform;
+                IEnumerable<Mesh> potentialMeshes = rootTransform.GetComponentsInChildren<MeshFilter>()
+                    .Where(x => !IsExcluded(rootTransform))
+                    .Where(meshFilter => meshFilter is MeshFilter)
+                    .Select(meshFilter => meshFilter.sharedMesh)
+                    .AddItem(meshCollider.sharedMesh)
+                    .Where(mesh => mesh is Mesh && mesh.isReadable && (!meshCollider.convex || mesh.triangles.Count() / 3 <= 255))
+                    .Distinct()
+                    .OrderByDescending(mesh => mesh.triangles.Count());
+
+                mesh = potentialMeshes.FirstOrDefault();
+
+                if (mesh is Mesh && mesh != meshCollider.sharedMesh)
+                {
+                    Cache.ImprovedMeshByCollider[meshCollider] = mesh;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryImproveCollider(RaycastHit hit)
+        {
+            if (IsColliderImprovable(hit.collider, out Mesh mesh))
+            {
+                if (hit.collider is MeshCollider meshCollider)
+                {
+                    Cache.OriginalMeshByCollider[hit.collider] = meshCollider.sharedMesh;
+                    SetMesh(meshCollider, mesh);
+                }
+                else
+                {
+                    // code for upgrading box colliders etc. goes here...
+                }
+
+                Cache.IsImprovedByCollider[hit.collider] = true;
+                Logger.LogWarning("Upgraded mesh");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryRevertCollider(Collider collider)
+        {
+            bool reverted = false;
+
+            if (!Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved) || !isImproved)
+            {
+                return false;
+            }
+
+            if (collider is MeshCollider meshCollider)
+            {
+                if (Cache.OriginalMeshByCollider.TryGetValue(meshCollider, out Mesh originalMesh))
+                {
+                    SetMesh(meshCollider, originalMesh);
+                    reverted = true;
+                }
+            }
+            else
+            {
+                // code for reverting box colliders etc. goes here...
+            }
+
+            if (reverted)
+            {
+                Cache.IsImprovedByCollider[collider] = false;
+                Logger.LogWarning("Reverted mesh");
+            }
+
+            return reverted;
+        }
+        private static bool TryRevertCollider(RaycastHit hit) => TryRevertCollider(hit.collider);
+
+        private static void ImproveColliderAndUpdateHit(ref RaycastHit hit)
+        {
+            if (TryImproveCollider(hit)
+                && !Physics.Raycast(Cache.OffsetAimTransform.position,
+                            Cache.BuilderAimTransform.forward,
+                            out hit,
+                            Builder.placeMaxDistance,
+                            Builder.placeLayerMask,
+                            QueryTriggerInteraction.Ignore))
+            {
+                Logger.LogWarning("couldn't get a new hit...");
+            }
+        }
+
+        private static void RevertColliderAndUpdateHit(ref RaycastHit hit)
+        {
+            if (TryRevertCollider(hit)
+                && !Physics.Raycast(Cache.OffsetAimTransform.position,
+                            Cache.BuilderAimTransform.forward,
+                            out hit,
+                            Builder.placeMaxDistance,
+                            Builder.placeLayerMask,
+                            QueryTriggerInteraction.Ignore))
+            {
+                Logger.LogWarning("couldn't get a new hit...");
+            }
+        }
+
+        public static void RevertColliders()
+        {
+            Cache.LastCollider = null;
+            foreach (Collider collider in Cache.OriginalMeshByCollider.Keys)
+            {
+                TryRevertCollider(collider);
+            }
+        }
+
+        private static IEnumerator DestroyNextFrame(GameObject gameObject)
+        {
+            yield return null;
+            GameObject.Destroy(gameObject);
+        }
+
+        private static void SetMesh(MeshCollider meshCollider, Mesh mesh)
+        {
+            meshCollider.sharedMesh = mesh;
+        }
+
+        private static void RenderCollider(Collider collider, Material material, float scale = 1f)
+        {
+            if (collider is null)
+                return;
+
+            var gameObject = new GameObject("collider renderer");
+            switch (collider)
+            {
+                case MeshCollider meshCollider:
+                    gameObject.AddComponent<MeshFilter>().mesh = meshCollider.sharedMesh;
+                    var renderer = gameObject.AddComponent<MeshRenderer>();
+
+                    renderer.sharedMaterial = material;
+                    break;
+                default:
+                    var primitive = GameObject.CreatePrimitive(collider switch
+                    {
+                        BoxCollider _ => PrimitiveType.Cube,
+                        SphereCollider _ => PrimitiveType.Sphere,
+                        CapsuleCollider _ => PrimitiveType.Capsule,
+                        _ => throw new NotImplementedException()
+                    });
+                    if (primitive.GetComponent<Collider>() is Collider primitiveCollider)
+                        primitiveCollider.enabled = false;
+                    primitive.GetComponent<Renderer>().material = material;
+                    primitive.transform.SetParent(gameObject.transform, false);
+                    break;
+            }
+            gameObject.transform.SetParent(collider.transform, false);
+            gameObject.transform.localScale = collider.transform.lossyScale * scale;
+            UWE.CoroutineHost.StartCoroutine(DestroyNextFrame(gameObject));
         }
 
         private static void ImproveHitNormal(ref RaycastHit hit)
