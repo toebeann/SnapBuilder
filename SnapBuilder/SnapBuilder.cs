@@ -362,7 +362,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 }
 
                 Cache.IsImprovedByCollider[hit.collider] = true;
-                Logger.LogWarning("Upgraded mesh");
 
                 return true;
             }
@@ -395,7 +394,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             if (reverted)
             {
                 Cache.IsImprovedByCollider[collider] = false;
-                Logger.LogWarning("Reverted mesh");
             }
 
             return reverted;
