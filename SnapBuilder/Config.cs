@@ -124,10 +124,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         [Slider(0.01f, 1, LabelLanguageId = Lang.Option.FineSnapRounding, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.2f)]
         public float FineSnapRounding { get; set; } = 0.2f;
 
-        [Slider(0, 90, LabelLanguageId = Lang.Option.RotationRounding, DefaultValue = 45)]
+        [Slider(1, 90, LabelLanguageId = Lang.Option.RotationRounding, DefaultValue = 45)]
         public int RotationRounding { get; set; } = 45;
 
-        [Slider(0, 45, LabelLanguageId = Lang.Option.FineRotationRounding, DefaultValue = 5)]
+        [Slider(1, 45, LabelLanguageId = Lang.Option.FineRotationRounding, DefaultValue = 5)]
         public int FineRotationRounding { get; set; } = 5;
 
         public bool HasUpgraded = false;
