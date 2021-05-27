@@ -192,7 +192,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 #if SUBNAUTICA
                         = 0.1f; // in subnautica, the collision boundary between objects is much larger than BZ
 #elif BELOWZERO
-                        = 0.0001f;
+                        = 0.01f;
 #endif
 
                     // Now move the hit.point outward from the wall just enough so that the object can fit
