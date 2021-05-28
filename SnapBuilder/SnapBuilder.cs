@@ -32,7 +32,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
         public static void Initialise()
         {
-            Logger.LogInfo($"Initialising SnapBuilder for {TargetGame} v{Assembly.GetExecutingAssembly().GetName().Version}...");
+            Logger.LogInfo($"Initialising SnapBuilder {Assembly.GetExecutingAssembly().GetName().Version} for {TargetGame}...");
             var stopwatch = Stopwatch.StartNew();
 
             ApplyHarmonyPatches();
