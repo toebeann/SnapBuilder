@@ -65,7 +65,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         }
         public bool IsImproved => Collider switch
         {
-            MeshCollider meshCollider => meshCollider.sharedMesh == ImprovedMesh,
+            MeshCollider meshCollider => meshCollider?.sharedMesh is Mesh mesh && mesh == ImprovedMesh,
             _ => false
         };
         public Mesh OriginalMesh { get; private set; }
