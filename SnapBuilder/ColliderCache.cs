@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder
 {
     internal class ColliderCache : MonoBehaviour
     {
+        private const int CleanUpSeconds = 5;
+
         private static ColliderCache main;
         public static ColliderCache Main => main == null
             ? new GameObject("ColliderCache").AddComponent<ColliderCache>()
@@ -18,7 +22,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public ColliderRecord Record { get; private set; }
 
         /// <summary>
-        /// Returns the initialises the <see cref="Collider"/> for a given <see cref="Collider"/>
+        /// Returns or initialises the <see cref="Collider"/> for a given <see cref="Collider"/>
         /// </summary>
         /// <param name="collider"></param>
         /// <returns></returns>
@@ -32,6 +36,17 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             foreach (var record in records.Values)
             {
                 record.Revert();
+            }
+        }
+
+        private void Update()
+        {
+            foreach (var collider in records
+                .Where(pair => !pair.Value.IsImproved
+                               && DateTime.UtcNow > pair.Value.Timestamp + TimeSpan.FromSeconds(CleanUpSeconds))
+                .Select(pair => pair.Key).ToList())
+            {
+                records.Remove(collider);
             }
         }
 

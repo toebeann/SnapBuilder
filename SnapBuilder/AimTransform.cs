@@ -96,7 +96,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         {
             if (ColliderCache.Main.GetRecord(hit.collider) is ColliderRecord record && record.IsImprovable)
             {
-                if (SnapBuilder.Config.DetailedCollider.Enabled && !record.IsImproved)
+                if (SnapBuilder.Config.DetailedCollider.Enabled)
                 {
                     record.Improve();
                     if (record.IsImproved)
@@ -104,7 +104,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                         Raycast(OffsetAimTransform.position, BuilderAimTransform.forward, out hit);
                     }
                 }
-                else if (!SnapBuilder.Config.DetailedCollider.Enabled && record.IsImproved)
+                else if (!SnapBuilder.Config.DetailedCollider.Enabled)
                 {
                     record.Revert();
                     if (!record.IsImproved)

@@ -70,6 +70,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         };
         public Mesh OriginalMesh { get; private set; }
         public Mesh ImprovedMesh { get; private set; }
+        public DateTime Timestamp { get; private set; } = DateTime.UtcNow;
 
         public ColliderRecord(Collider collider)
         {
@@ -102,6 +103,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 if (Collider is MeshCollider meshCollider && OriginalMesh is Mesh)
                 {
                     meshCollider.sharedMesh = OriginalMesh;
+                    Timestamp = DateTime.UtcNow;
                 }
             }
         }
