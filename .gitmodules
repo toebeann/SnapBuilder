@@ -13,6 +13,3 @@
 [submodule "Straitjacket.Math"]
 	path = Straitjacket.Math
 	url = https://github.com/tobeyStraitjacket/Straitjacket.Math
-[submodule "Straitjacket.SceneCache"]
-	path = Straitjacket.SceneCache
-	url = https://github.com/tobeyStraitjacket/Straitjacket.SceneCache
