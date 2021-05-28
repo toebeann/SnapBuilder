@@ -3,6 +3,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 {
@@ -57,51 +58,54 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static string GetCustomUseTextPostfix(string customUseText, BuilderTool __instance, GetCustomUseTextState __state)
         {
-            if (!SnapBuilder.Config.DisplayControlHints && __state.WereHintsEnabled)
+            if (Builder.prefab is GameObject && Builder.prefab.GetComponent<ConstructableBase>() is null)
             {
-                __instance.UpdateCustomUseText();
-                return __instance.customUseText;
-            }
-            else if (SnapBuilder.Config.DisplayControlHints
-                     && Builder.isPlacing
-                     && (!__state.WereHintsEnabled
-                         || !__state.WasPlacing
-                         || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)
-                         || (ColliderCache.Main.Record?.IsImprovable ?? false != __state.WasColliderImprovable)
-                         || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
-                         || (Builder.rotationEnabled != __state.WasPlacingRotatable)))
-            {
-                __instance.UpdateCustomUseText();
-                customUseText = __instance.customUseText;
-
-                List<string> lines = customUseText.Split('\n').ToList();
-
-                lines[0] += $", {ControlHint.Get(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping)}";
-
-                if (SnapBuilder.Config.Snapping.Enabled)
+                if (!SnapBuilder.Config.DisplayControlHints && __state.WereHintsEnabled)
                 {
-                    lines.Insert(1, ControlHint.Get(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping));
-
-                    if (Builder.rotationEnabled
-                        && (!__state.WereHintsEnabled
-                            || !__state.WasPlacingRotatable
-                            || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
-                    {
-                        lines[1] += $", {ControlHint.Get(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation)}";
-                    }
-
-                    if (ColliderCache.Main.Record?.IsImprovable ?? false
-                        && (!__state.WereHintsEnabled
-                            || !__state.WasColliderImprovable
-                            || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
-                            || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
-                    {
-                        string hintId = ColliderCache.Main.Record?.IsImproved ?? false ? Lang.Hint.OriginalCollider : Lang.Hint.DetailedCollider;
-                        lines[0] += $", {ControlHint.Get(hintId, SnapBuilder.Config.DetailedCollider)}";
-                    }
+                    __instance.UpdateCustomUseText();
+                    return __instance.customUseText;
                 }
+                else if (SnapBuilder.Config.DisplayControlHints
+                         && Builder.isPlacing
+                         && (!__state.WereHintsEnabled
+                             || !__state.WasPlacing
+                             || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)
+                             || (ColliderCache.Main.Record?.IsImprovable ?? false != __state.WasColliderImprovable)
+                             || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
+                             || (Builder.rotationEnabled != __state.WasPlacingRotatable)))
+                {
+                    __instance.UpdateCustomUseText();
+                    customUseText = __instance.customUseText;
 
-                customUseText = string.Join(Environment.NewLine, lines.Distinct());
+                    List<string> lines = customUseText.Split('\n').ToList();
+
+                    lines[0] += $", {ControlHint.Get(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping)}";
+
+                    if (SnapBuilder.Config.Snapping.Enabled)
+                    {
+                        lines.Insert(1, ControlHint.Get(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping));
+
+                        if (Builder.rotationEnabled
+                            && (!__state.WereHintsEnabled
+                                || !__state.WasPlacingRotatable
+                                || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
+                        {
+                            lines[1] += $", {ControlHint.Get(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation)}";
+                        }
+
+                        if (ColliderCache.Main.Record?.IsImprovable ?? false
+                            && (!__state.WereHintsEnabled
+                                || !__state.WasColliderImprovable
+                                || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
+                                || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
+                        {
+                            string hintId = ColliderCache.Main.Record?.IsImproved ?? false ? Lang.Hint.OriginalCollider : Lang.Hint.DetailedCollider;
+                            lines[0] += $", {ControlHint.Get(hintId, SnapBuilder.Config.DetailedCollider)}";
+                        }
+                    }
+
+                    customUseText = string.Join(Environment.NewLine, lines.Distinct());
+                }
             }
 
             return __instance.customUseText = customUseText;
