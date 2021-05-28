@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <LangVersion>8.0</LangVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -93,7 +94,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache.cs" />
+    <Compile Include="AimTransform.cs" />
+    <Compile Include="ColliderCache.cs" />
+    <Compile Include="ColliderRecord.cs" />
+    <Compile Include="ExtensionMethods\UnityEngineExtensionMethods.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ControlHint.cs" />
     <Compile Include="ExtensionMethods\OrientedBoundsExtensionMethods.cs" />
@@ -116,7 +120,6 @@
   <Import Project="..\SMLHelper.Language\SMLHelper.Language\Language.projitems" Label="Shared" />
   <Import Project="..\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.projitems" Label="Shared" />
   <Import Project="..\Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.projitems" Label="Shared" />
-  <Import Project="..\Straitjacket.SceneCache\Straitjacket.SceneCache\Straitjacket.SceneCache.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y

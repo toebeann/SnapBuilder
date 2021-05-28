@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -14,12 +12,11 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     using ExtensionMethods;
     using Patches;
 
-    internal static class SnapBuilder
+    internal class SnapBuilder
     {
         public static float LastButtonHeldTime = -1f;
         public static GameInput.Button LastButton;
         public static Config Config = OptionsPanelHandler.RegisterModOptions<Config>();
-        public static Cache Cache = new Cache();
 
         private enum SupportedGame
         {
@@ -172,7 +169,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
                     // Get the farthest corner from the player
                     Vector3 farthestCorner = corners.OrderByDescending(x
-                        => Vector3.Distance(x, Cache.OffsetAimTransform.position)).First();
+                        => Vector3.Distance(x, AimTransform.Main.OffsetAimTransform.position)).First();
 
                     // Center the corner to the hit.point on the local X and Y axes
                     var empty = new GameObject();
@@ -199,12 +196,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                     Vector3 poppedPoint = hit.point + hit.normal * Vector3.Distance(farthestCornerCentered, hit.point) + hit.normal * offset;
 
                     // Try to get a new hit by aiming at the floor from this popped point
-                    if (Physics.Raycast(poppedPoint,
-                                         Vector3.down,
-                                         out RaycastHit poppedHit,
-                                         Builder.placeMaxDistance,
-                                         Builder.placeLayerMask,
-                                         QueryTriggerInteraction.Ignore))
+                    if (Raycast(poppedPoint, Vector3.down, out RaycastHit poppedHit))
                     {
                         return poppedHit;
                     }
@@ -215,75 +207,52 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             return hit;
         }
 
-        private static Color ImprovedCollider { get; } = Color.black;
-        private static Color OriginalCollider { get; } = Color.gray;
-
         private static int lastCalculationFrame;
         public static Transform GetAimTransform()
         {
             if (!Config.Snapping.Enabled)
             {
-                return Cache.BuilderAimTransform;
+                return AimTransform.Main.BuilderAimTransform;
             }
 
             // Skip recalculating multiple times per frame
             if (lastCalculationFrame == Time.frameCount)
             {
-                return Cache.SnapBuilderAimTransform;
+                return AimTransform.Main.transform;
             }
             lastCalculationFrame = Time.frameCount;
 
             // If no hit, exit early
-            if (!Physics.Raycast(Cache.OffsetAimTransform.position,
-                                 Cache.BuilderAimTransform.forward,
-                                 out RaycastHit hit,
-                                 Builder.placeMaxDistance,
-                                 Builder.placeLayerMask,
-                                 QueryTriggerInteraction.Ignore))
+            if (!Raycast(AimTransform.Main.OffsetAimTransform.position,
+                         AimTransform.Main.BuilderAimTransform.forward,
+                         out RaycastHit hit))
             {
-                Cache.LastCollider = null;
-
-                Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
-                Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
-                return Cache.SnapBuilderAimTransform;
+                AimTransform.Main.transform.position = AimTransform.Main.OffsetAimTransform.position;
+                AimTransform.Main.transform.forward = AimTransform.Main.BuilderAimTransform.forward;
+                return AimTransform.Main.transform;
             }
 
-            Cache.LastCollider = hit.collider;
-            if (IsColliderImprovable())
+            if (ColliderCache.Main.GetRecord(hit.collider) is ColliderRecord record && record.IsImprovable)
             {
-                if (Config.DetailedCollider.Enabled && !IsColliderImproved())
+                if (Config.DetailedCollider.Enabled && !record.IsImproved)
                 {
-                    ImproveColliderAndUpdateHit(ref hit);
-
-                    if (hit.collider is null)
-                    {
-                        Cache.LastCollider = null;
-
-                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
-                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
-                        return Cache.SnapBuilderAimTransform;
-                    }
+                    ImproveRecordAndUpdateHit(record, ref hit);
                 }
-                else if (!Config.DetailedCollider.Enabled && IsColliderImproved())
+                else if (!Config.DetailedCollider.Enabled && record.IsImproved)
                 {
-                    RevertColliderAndUpdateHit(ref hit);
-
-                    if (hit.collider is null)
-                    {
-                        Cache.LastCollider = null;
-
-                        Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
-                        Cache.SnapBuilderAimTransform.forward = Cache.BuilderAimTransform.forward;
-                        return Cache.SnapBuilderAimTransform;
-                    }
+                    RevertRecordAndUpdateHit(record, ref hit);
                 }
 
-                Cache.LastCollider = hit.collider;
-                Cache.ColliderMaterial.SetColor(ShaderPropertyID._Tint, IsColliderImproved() ? ImprovedCollider : OriginalCollider);
+                if (hit.collider is null)
+                {
+                    AimTransform.Main.transform.position = AimTransform.Main.OffsetAimTransform.position;
+                    AimTransform.Main.transform.forward = AimTransform.Main.BuilderAimTransform.forward;
+                    return AimTransform.Main.transform;
+                }
 
                 if (Config.RenderImprovableColliders)
                 {
-                    RenderCollider(hit.collider, Cache.ColliderMaterial, 1.00001f);
+                    record.Render();
                 }
             }
 
@@ -293,193 +262,37 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             RaycastHit snappedWorldSpaceHit = GetWorldSpaceHit(snappedHit, hitTransform);
             RaycastHit poppedHit = PopHitOntoBestSurface(snappedWorldSpaceHit);
 
-            Cache.SnapBuilderAimTransform.position = Cache.OffsetAimTransform.position;
-            Cache.SnapBuilderAimTransform.forward = poppedHit.point - Cache.SnapBuilderAimTransform.position;
+            AimTransform.Main.transform.position = AimTransform.Main.OffsetAimTransform.position;
+            AimTransform.Main.transform.forward = poppedHit.point - AimTransform.Main.transform.position;
 
-            return Cache.SnapBuilderAimTransform;
+            return AimTransform.Main.transform;
         }
 
-        public static bool IsColliderImproved() => IsColliderImproved(Cache.LastCollider);
-        public static bool IsColliderImprovable() => IsColliderImprovable(Cache.LastCollider, out Mesh _);
-
-        private static Type[] ExcludedComponentTypes { get; } = new Type[] {
-            typeof(CoralBlendWhite), // default mesh is good enough and doesn't work well when upgraded
-            typeof(BaseCell)
-        };
-
-        private static bool IsExcluded(Transform transform) => ExcludedComponentTypes.Select(type => transform.GetComponent(type))
-                                                                   .Any(component => component is Component);
-
-        private static bool IsColliderImproved(Collider collider) => collider is Collider
-                                                                     && Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved)
-                                                                     && isImproved;
-
-        private static bool IsColliderImprovable(Collider collider, out Mesh mesh)
+        private static void ImproveRecordAndUpdateHit(ColliderRecord record, ref RaycastHit hit)
         {
-            mesh = null;
-
-            if (collider is MeshCollider meshCollider && meshCollider.sharedMesh is Mesh)
+            record.Improve();
+            if (record.IsImproved)
             {
-                if (Cache.ImprovedMeshByCollider.TryGetValue(meshCollider, out mesh))
-                {
-                    return true;
-                }
-
-                Transform rootTransform = UWE.Utils.GetEntityRoot(collider.transform.gameObject)?.transform ?? collider.transform;
-                IEnumerable<Mesh> potentialMeshes = rootTransform.GetComponentsInChildren<MeshFilter>()
-                    .Where(x => !IsExcluded(rootTransform))
-                    .Where(meshFilter => meshFilter is MeshFilter)
-                    .Select(meshFilter => meshFilter.sharedMesh)
-                    .AddItem(meshCollider.sharedMesh)
-                    .Where(mesh => mesh is Mesh && mesh.isReadable && (!meshCollider.convex || mesh.triangles.Count() / 3 <= 255))
-                    .Distinct()
-                    .OrderByDescending(mesh => mesh.triangles.Count());
-
-                mesh = potentialMeshes.FirstOrDefault();
-
-                if (mesh is Mesh && mesh != meshCollider.sharedMesh)
-                {
-                    Cache.ImprovedMeshByCollider[meshCollider] = mesh;
-                    return true;
-                }
+                Raycast(AimTransform.Main.OffsetAimTransform.position,
+                          AimTransform.Main.BuilderAimTransform.forward,
+                          out hit);
             }
-
-            return false;
         }
 
-        private static bool TryImproveCollider(RaycastHit hit)
+        private static void RevertRecordAndUpdateHit(ColliderRecord record, ref RaycastHit hit)
         {
-            if (IsColliderImprovable(hit.collider, out Mesh mesh))
+            record.Revert();
+            if (!record.IsImproved)
             {
-                if (hit.collider is MeshCollider meshCollider)
-                {
-                    Cache.OriginalMeshByCollider[hit.collider] = meshCollider.sharedMesh;
-                    SetMesh(meshCollider, mesh);
-                }
-                else
-                {
-                    // code for upgrading box colliders etc. goes here...
-                }
-
-                Cache.IsImprovedByCollider[hit.collider] = true;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool TryRevertCollider(Collider collider)
-        {
-            bool reverted = false;
-
-            if (!Cache.IsImprovedByCollider.TryGetValue(collider, out bool isImproved) || !isImproved)
-            {
-                return false;
-            }
-
-            if (collider is MeshCollider meshCollider)
-            {
-                if (Cache.OriginalMeshByCollider.TryGetValue(meshCollider, out Mesh originalMesh))
-                {
-                    SetMesh(meshCollider, originalMesh);
-                    reverted = true;
-                }
-            }
-            else
-            {
-                // code for reverting box colliders etc. goes here...
-            }
-
-            if (reverted)
-            {
-                Cache.IsImprovedByCollider[collider] = false;
-            }
-
-            return reverted;
-        }
-        private static bool TryRevertCollider(RaycastHit hit) => TryRevertCollider(hit.collider);
-
-        private static void ImproveColliderAndUpdateHit(ref RaycastHit hit)
-        {
-            if (TryImproveCollider(hit)
-                && !Physics.Raycast(Cache.OffsetAimTransform.position,
-                            Cache.BuilderAimTransform.forward,
-                            out hit,
-                            Builder.placeMaxDistance,
-                            Builder.placeLayerMask,
-                            QueryTriggerInteraction.Ignore))
-            {
-                Logger.LogWarning("couldn't get a new hit...");
+                Raycast(AimTransform.Main.OffsetAimTransform.position,
+                          AimTransform.Main.BuilderAimTransform.forward,
+                          out hit);
             }
         }
 
-        private static void RevertColliderAndUpdateHit(ref RaycastHit hit)
-        {
-            if (TryRevertCollider(hit)
-                && !Physics.Raycast(Cache.OffsetAimTransform.position,
-                            Cache.BuilderAimTransform.forward,
-                            out hit,
-                            Builder.placeMaxDistance,
-                            Builder.placeLayerMask,
-                            QueryTriggerInteraction.Ignore))
-            {
-                Logger.LogWarning("couldn't get a new hit...");
-            }
-        }
-
-        public static void RevertColliders()
-        {
-            Cache.LastCollider = null;
-            foreach (Collider collider in Cache.OriginalMeshByCollider.Keys)
-            {
-                TryRevertCollider(collider);
-            }
-        }
-
-        private static IEnumerator DestroyNextFrame(GameObject gameObject)
-        {
-            yield return null;
-            GameObject.Destroy(gameObject);
-        }
-
-        private static void SetMesh(MeshCollider meshCollider, Mesh mesh)
-        {
-            meshCollider.sharedMesh = mesh;
-        }
-
-        private static void RenderCollider(Collider collider, Material material, float scale = 1f)
-        {
-            if (collider is null)
-                return;
-
-            var gameObject = new GameObject("collider renderer");
-            switch (collider)
-            {
-                case MeshCollider meshCollider:
-                    gameObject.AddComponent<MeshFilter>().mesh = meshCollider.sharedMesh;
-                    var renderer = gameObject.AddComponent<MeshRenderer>();
-
-                    renderer.sharedMaterial = material;
-                    break;
-                default:
-                    var primitive = GameObject.CreatePrimitive(collider switch
-                    {
-                        BoxCollider _ => PrimitiveType.Cube,
-                        SphereCollider _ => PrimitiveType.Sphere,
-                        CapsuleCollider _ => PrimitiveType.Capsule,
-                        _ => throw new NotImplementedException()
-                    });
-                    if (primitive.GetComponent<Collider>() is Collider primitiveCollider)
-                        primitiveCollider.enabled = false;
-                    primitive.GetComponent<Renderer>().material = material;
-                    primitive.transform.SetParent(gameObject.transform, false);
-                    break;
-            }
-            gameObject.transform.SetParent(collider.transform, false);
-            gameObject.transform.localScale = collider.transform.localScale * scale;
-            UWE.CoroutineHost.StartCoroutine(DestroyNextFrame(gameObject));
-        }
+        private static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit) =>
+            Physics.Raycast(from, direction, out hit, Builder.placeMaxDistance,
+                Builder.placeLayerMask, QueryTriggerInteraction.Ignore);
 
         private static void ImproveHitNormal(ref RaycastHit hit)
         {
@@ -504,12 +317,9 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 // Perform a raycast from each offset, pointing down toward the surface
                 foreach (Vector3 offset in offsets)
                 {
-                    Physics.Raycast(hit.point + Vector3.up * .1f + offset * .2f,
-                        Vector3.down,
-                        out RaycastHit offsetHit,
-                        Builder.placeMaxDistance,
-                        Builder.placeLayerMask.value,
-                        QueryTriggerInteraction.Ignore);
+                    Raycast(hit.point + Vector3.up * .1f + offset * .2f,
+                            Vector3.down,
+                            out RaycastHit offsetHit);
                     if (offsetHit.transform == hit.transform) // If we hit the same object, add the hit normal
                     {
                         normals.Add(offsetHit.normal);

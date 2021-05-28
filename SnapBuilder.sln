@@ -15,18 +15,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.ExtensionMetho
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.Math", "Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.shproj", "{EDF9AFB9-5A40-4818-8004-95E22D5B7BA0}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.SceneCache", "Straitjacket.SceneCache\Straitjacket.SceneCache\Straitjacket.SceneCache.shproj", "{2635AE48-3546-41B7-A036-BA190D8C8022}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Straitjacket.SceneCache\Straitjacket.SceneCache\Straitjacket.SceneCache.projitems*{2635ae48-3546-41b7-a036-ba190d8c8022}*SharedItemsImports = 13
 		Toggle\Toggle\Toggle.projitems*{2e9fec3f-6690-46e8-b676-9778d4b1292a}*SharedItemsImports = 13
 		BepInEx.Logger\Logger\Logger.projitems*{32f6ed8c-0f9a-409d-a404-ee068789c72f}*SharedItemsImports = 13
 		BepInEx.Logger\Logger\Logger.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 		SMLHelper.Language\SMLHelper.Language\Language.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 		Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 		Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
-		Straitjacket.SceneCache\Straitjacket.SceneCache\Straitjacket.SceneCache.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 		Toggle\Toggle\Toggle.projitems*{90b8cfbb-759d-4e62-b923-05c2fefe5cb3}*SharedItemsImports = 4
 		Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.projitems*{91e30b75-0933-43cc-98ff-7c9dcca7f849}*SharedItemsImports = 13
 		SMLHelper.Language\SMLHelper.Language\Language.projitems*{ad133c9e-a9a1-4dbc-bd93-7149d32cb98a}*SharedItemsImports = 13

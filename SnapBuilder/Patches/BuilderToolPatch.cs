@@ -34,8 +34,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
         private static bool wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
         private static bool wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
-        private static bool wasColliderImprovable = SnapBuilder.IsColliderImprovable();
-        private static bool wasColliderImproved = SnapBuilder.IsColliderImproved();
+        private static bool wasColliderImprovable = ColliderCache.Main.Record?.IsImprovable ?? false;
+        private static bool wasColliderImproved = ColliderCache.Main.Record?.IsImproved ?? false;
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
         [HarmonyPrefix]
         public static void GetCustomUseTextPrefix(BuilderTool __instance, out GetCustomUseTextState __state)
@@ -49,8 +49,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             wasSnappingEnabled = SnapBuilder.Config.Snapping.Enabled;
             wereHintsEnabled = SnapBuilder.Config.DisplayControlHints;
-            wasColliderImprovable = SnapBuilder.IsColliderImprovable();
-            wasColliderImproved = SnapBuilder.IsColliderImproved();
+            wasColliderImprovable = ColliderCache.Main.Record?.IsImprovable ?? false;
+            wasColliderImproved = ColliderCache.Main.Record?.IsImproved ?? false;
         }
 
         [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
@@ -67,8 +67,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                      && (!__state.WereHintsEnabled
                          || !__state.WasPlacing
                          || (SnapBuilder.Config.Snapping.Enabled != __state.WasSnappingEnabled)
-                         || (SnapBuilder.IsColliderImprovable() != __state.WasColliderImprovable)
-                         || (SnapBuilder.IsColliderImproved() != __state.WasColliderImproved)
+                         || (ColliderCache.Main.Record?.IsImprovable ?? false != __state.WasColliderImprovable)
+                         || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
                          || (Builder.rotationEnabled != __state.WasPlacingRotatable)))
             {
                 __instance.UpdateCustomUseText();
@@ -90,13 +90,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
                         lines[1] += $", {ControlHint.Get(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation)}";
                     }
 
-                    if (SnapBuilder.IsColliderImprovable()
+                    if (ColliderCache.Main.Record?.IsImprovable ?? false
                         && (!__state.WereHintsEnabled
                             || !__state.WasColliderImprovable
-                            || (SnapBuilder.IsColliderImproved() != __state.WasColliderImproved)
+                            || (ColliderCache.Main.Record?.IsImproved ?? false != __state.WasColliderImproved)
                             || (SnapBuilder.Config.Snapping.Enabled && !__state.WasSnappingEnabled)))
                     {
-                        string hintId = SnapBuilder.IsColliderImproved() ? Lang.Hint.OriginalCollider : Lang.Hint.DetailedCollider;
+                        string hintId = ColliderCache.Main.Record?.IsImproved ?? false ? Lang.Hint.OriginalCollider : Lang.Hint.DetailedCollider;
                         lines[0] += $", {ControlHint.Get(hintId, SnapBuilder.Config.DetailedCollider)}";
                     }
                 }

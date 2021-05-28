@@ -63,7 +63,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static void EndPostfix()
         {
-            SnapBuilder.RevertColliders();
+            ColliderCache.Main.RevertAll();
         }
         #endregion
     }
