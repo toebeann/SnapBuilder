@@ -43,7 +43,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         #region Builder.GetAimTransform
         [HarmonyPatch(typeof(Builder), nameof(Builder.GetAimTransform))]
         [HarmonyPostfix]
-        public static Transform GetAimTransformPostfix(Transform _) => SnapBuilder.GetAimTransform();
+        public static Transform GetAimTransformPostfix(Transform _) => AimTransform.Main.GetAimTransform();
         #endregion
 
         #region Builder.SetPlaceOnSurface
