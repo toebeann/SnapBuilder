@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using UnityEngine;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 {
@@ -14,152 +13,39 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
             __state = __instance.ghostModel == null;
 
-            SnapBuilder.ShowSnappingHint(__state);
+            if (__state && SnapBuilder.Config.DisplayControlHints)
+            {
+                ControlHint.Show(Lang.Hint.ToggleSnapping, SnapBuilder.Config.Snapping);
+                ControlHint.Show(Lang.Hint.ToggleFineSnapping, SnapBuilder.Config.FineSnapping);
+            }
         }
 
         [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
         [HarmonyPostfix]
-        public static void Postfix(PlaceTool __instance, bool __state)
+        public static void CreateGhostModelPostfix(PlaceTool __instance, bool __state)
         {
-            SnapBuilder.ShowToggleRotationHint(__state && __instance.rotationEnabled);
-            SnapBuilder.ShowToggleFineRotationHint(__state && __instance.rotationEnabled);
-            SnapBuilder.ShowHolsterHint(__state && __instance.rotationEnabled);
+            if (__state && SnapBuilder.Config.DisplayControlHints && __instance.rotationEnabled)
+            {
+                ControlHint.Show(Lang.Hint.ToggleRotation, SnapBuilder.Config.Rotation);
+                ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
+                ControlHint.Show(Lang.Hint.HolsterItem, GameInput.Button.Exit);
+            }
         }
         #endregion
 
         #region PlaceTool.LateUpdate
         [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.LateUpdate))]
-        [HarmonyPrefix]
-        public static bool LateUpdatePrefix(PlaceTool __instance)
+        [HarmonyPostfix]
+        public static void LateUpdatePostfix(PlaceTool __instance)
         {
             if (__instance.usingPlayer == null || !SnapBuilder.Config.Snapping.Enabled)
             {
                 Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
-                return true;
-            }
-
-            Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && SnapBuilder.Config.ToggleRotation.Enabled);
-
-            Transform aimTransform = Builder.GetAimTransform();
-            RaycastHit hit;
-            bool bHit = Physics.Raycast(aimTransform.position, aimTransform.forward, out hit, 5f, PlaceTool.placeLayerMask, QueryTriggerInteraction.Ignore);
-            Vector3 position = __instance.ghostModel.transform.position;
-            Quaternion rotation = __instance.ghostModel.transform.rotation;
-
-            SnapBuilder.ApplyAdditiveRotation(ref __instance.additiveRotation, out var _);
-
-            if (bHit)
-            {
-                bHit = SnapBuilder.TryGetSnappedHitPoint(PlaceTool.placeLayerMask, out hit, out Vector3 snappedHitPoint, out Vector3 snappedHitNormal);
-
-                if (bHit)
-                {
-                    position = snappedHitPoint;
-
-                    PlaceTool.SurfaceType surfaceType = PlaceTool.SurfaceType.Floor;
-                    if (Mathf.Abs(hit.normal.y) < 0.3f)
-                        surfaceType = PlaceTool.SurfaceType.Wall;
-                    else if (hit.normal.y < 0f)
-                        surfaceType = PlaceTool.SurfaceType.Ceiling;
-
-                    if (__instance.rotationEnabled)
-                    {   // New calculation of the rotation
-                        rotation = SnapBuilder.CalculateRotation(ref __instance.additiveRotation, hit, snappedHitPoint, snappedHitNormal, true);
-                    }
-                    else
-                    {   // Calculate rotation in the same manner as the original method
-                        Vector3 forward;
-
-                        if (__instance.alignWithSurface || surfaceType == PlaceTool.SurfaceType.Wall)
-                            forward = hit.normal;
-                        else
-                            forward = new Vector3(-aimTransform.forward.x, 0f, -aimTransform.forward.z).normalized;
-
-                        rotation = Quaternion.LookRotation(forward, Vector3.up);
-                        if (__instance.rotationEnabled)
-                            rotation *= Quaternion.AngleAxis(__instance.additiveRotation, Vector3.up);
-                    }
-
-                    switch (surfaceType)
-                    {
-                        case PlaceTool.SurfaceType.Floor:
-                            __instance.validPosition = __instance.allowedOnGround;
-                            break;
-                        case PlaceTool.SurfaceType.Wall:
-                            __instance.validPosition = __instance.allowedOnWalls;
-                            break;
-                        case PlaceTool.SurfaceType.Ceiling:
-                            __instance.validPosition = __instance.allowedOnCeiling;
-                            break;
-                    }
-                }
-            }
-
-            if (!bHit)
-            {   // If there is no new hit, then the position we're snapping to isn't valid
-                position = aimTransform.position + aimTransform.forward * 1.5f;
-                rotation = Quaternion.LookRotation(-aimTransform.forward, Vector3.up);
-                if (__instance.rotationEnabled)
-                    rotation *= Quaternion.AngleAxis(__instance.additiveRotation, Vector3.up);
-            }
-
-            __instance.ghostModel.transform.position = position;
-            __instance.ghostModel.transform.rotation = rotation;
-
-            if (bHit)
-            {
-                Rigidbody componentInParent = hit.collider.gameObject.GetComponentInParent<Rigidbody>();
-                __instance.validPosition = (__instance.validPosition &&
-                    (componentInParent == null || componentInParent.isKinematic || __instance.allowedOnRigidBody));
-            }
-
-            SubRoot currentSub = Player.main.GetCurrentSub();
-
-            bool isInside = Player.main.IsInsideWalkable();
-
-            if (bHit && hit.collider.gameObject.CompareTag("DenyBuilding"))
-                __instance.validPosition = false;
-
-#if BELOWZERO
-            if (!__instance.allowedUnderwater && hit.point.y < 0)
-                __instance.validPosition = false;
-#endif
-
-            if (bHit && ((__instance.allowedInBase && isInside) || (__instance.allowedOutside && !isInside)))
-            {
-                GameObject root = UWE.Utils.GetEntityRoot(hit.collider.gameObject);
-                if (!root)
-                {
-                    SceneObjectIdentifier identifier = hit.collider.GetComponentInParent<SceneObjectIdentifier>();
-                    if (identifier)
-                    {
-                        root = identifier.gameObject;
-                    }
-                    else
-                    {
-                        root = hit.collider.gameObject;
-                    }
-                }
-
-                if (currentSub == null)
-                    __instance.validPosition &= Builder.ValidateOutdoor(root);
-
-                if (!__instance.allowedOnConstructable)
-                    __instance.validPosition &= root.GetComponentInParent<Constructable>() == null;
-
-                __instance.validPosition &= Builder.CheckSpace(position, rotation, PlaceTool.localBounds, PlaceTool.placeLayerMask, hit.collider);
             }
             else
-                __instance.validPosition = false;
-
-            MaterialExtensions.SetColor(__instance.renderers, ShaderPropertyID._Tint,
-                __instance.validPosition ? PlaceTool.placeColorAllow : PlaceTool.placeColorDeny);
-            if (__instance.hideInvalidGhostModel)
             {
-                __instance.ghostModel.SetActive(__instance.validPosition);
+                Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && SnapBuilder.Config.Rotation.Enabled);
             }
-
-            return false;
         }
         #endregion
 

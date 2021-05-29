@@ -6,52 +6,66 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     {
         internal static class Hint
         {
-            public const string TOGGLE_SNAPPING = "GhostToggleSnappingHint";
-            public const string TOGGLE_FINE_SNAPPING = "GhostToggleFineSnappingHint";
-            public const string TOGGLE_ROTATION = "GhostToggleRotationHint";
-            public const string TOGGLE_FINE_ROTATION = "GhostToggleFineRotationHint";
-            public const string HOLSTER_ITEM = "GhostHolsterItemHint";
+            public const string ToggleSnapping = "Hints.ToggleSnapping";
+            public const string ToggleFineSnapping = "Hints.ToggleFineSnapping";
+            public const string ToggleRotation = "Hints.ToggleRotation";
+            public const string ToggleFineRotation = "Hints.ToggleFineRotation";
+            public const string HolsterItem = "Hints.HolsterItem";
+            public const string DetailedCollider = "Hints.DetailedCollider";
+            public const string OriginalCollider = "Hints.OriginalCollider";
         }
 
         internal static class Option
         {
-            public const string DEFAULT_SNAPPING_ENABLED = "Options.SnappingEnabledByDefault";
-            public const string TOGGLE_SNAPPING_KEY = "Options.ToggleSnappingKey";
-            public const string TOGGLE_SNAPPING_MODE = "Options.ToggleSnappingMode";
-            public const string FINE_SNAPPING_KEY = "Options.FineSnappingKey";
-            public const string FINE_SNAPPING_MODE = "Options.FineSnappingMode";
-            public const string FINE_ROTATION_KEY = "Options.FineRotationKey";
-            public const string FINE_ROTATION_MODE = "Options.FineRotationMode";
-            public const string TOGGLE_ROTATION_KEY = "Options.ToggleRotationKey";
-            public const string TOGGLE_ROTATION_MODE = "Options.ToggleRotationMode";
-            public const string SNAP_ROUNDING = "Options.SnapRounding";
-            public const string FINE_SNAP_ROUNDING = "Options.FineSnapRounding";
-            public const string ROTATION_ROUNDING = "Options.RotationRounding";
-            public const string FINE_ROTATION_ROUNDING = "Options.FineRotationRounding";
+            public const string DisplayControlHints = "Options.DisplayControlHints";
+            public const string SnappingEnabledByDefault = "Options.SnappingEnabledByDefault";
+            public const string DetailedColliderEnabledByDefault = "Options.DetailedColliderEnabledByDefault";
+            public const string RenderImprovableColliders = "Options.RenderImprovableColliders";
+            public const string ToggleSnappingKey = "Options.ToggleSnappingKey";
+            public const string ToggleSnappingMode = "Options.ToggleSnappingMode";
+            public const string FineSnappingKey = "Options.FineSnappingKey";
+            public const string FineSnappingMode = "Options.FineSnappingMode";
+            public const string FineRotationKey = "Options.FineRotationKey";
+            public const string FineRotationMode = "Options.FineRotationMode";
+            public const string ToggleRotationKey = "Options.ToggleRotationKey";
+            public const string ToggleRotationMode = "Options.ToggleRotationMode";
+            public const string DetailedColliderKey = "Options.DetailedColliderKey";
+            public const string DetailedColliderMode = "Options.DetailedColliderMode";
+            public const string SnapRounding = "Options.SnapRounding";
+            public const string FineSnapRounding = "Options.FineSnapRounding";
+            public const string RotationRounding = "Options.RotationRounding";
+            public const string FineRotationRounding = "Options.FineRotationRounding";
         }
 
         public static void Initialise()
         {
             SMLHelper.Language.Set(new Dictionary<string, string>()
             {
-                [Hint.TOGGLE_SNAPPING] = "Toggle snapping",
-                [Hint.TOGGLE_FINE_SNAPPING] = "Toggle fine snapping",
-                [Hint.TOGGLE_ROTATION] = "Toggle rotation",
-                [Hint.TOGGLE_FINE_ROTATION] = "Toggle fine rotation",
-                [Hint.HOLSTER_ITEM] = "Holster item",
-                [Option.DEFAULT_SNAPPING_ENABLED] = "Snapping enabled by default",
-                [Option.TOGGLE_SNAPPING_KEY] = "Toggle snapping button",
-                [Option.TOGGLE_SNAPPING_MODE] = "Toggle snapping mode",
-                [Option.FINE_SNAPPING_KEY] = "Fine snapping button",
-                [Option.FINE_SNAPPING_MODE] = "Fine snapping mode",
-                [Option.FINE_ROTATION_KEY] = "Fine rotation button",
-                [Option.FINE_ROTATION_MODE] = "Fine rotation mode",
-                [Option.TOGGLE_ROTATION_KEY] = "Toggle rotation button (for placeable items)",
-                [Option.TOGGLE_ROTATION_MODE] = "Toggle rotation mode (for placeable items)",
-                [Option.SNAP_ROUNDING] = "Snap rounding",
-                [Option.FINE_SNAP_ROUNDING] = "Fine snap rounding",
-                [Option.ROTATION_ROUNDING] = "Rotation rounding (degrees)",
-                [Option.FINE_ROTATION_ROUNDING] = "Fine rotation rounding (degrees)"
+                [Hint.ToggleSnapping] = "Snapping",
+                [Hint.ToggleFineSnapping] = "Fine snapping",
+                [Hint.ToggleRotation] = "Rotation",
+                [Hint.ToggleFineRotation] = "Fine rotation",
+                [Hint.HolsterItem] = "Holster item",
+                [Hint.DetailedCollider] = "Detailed collider",
+                [Hint.OriginalCollider] = "Original collider",
+                [Option.DisplayControlHints] = "Display control hints",
+                [Option.SnappingEnabledByDefault] = "Snapping enabled by default",
+                [Option.DetailedColliderEnabledByDefault] = "Detailed collider enabled by default",
+                [Option.RenderImprovableColliders] = "Render improvable colliders",
+                [Option.ToggleSnappingKey] = "Snapping button",
+                [Option.ToggleSnappingMode] = "Snapping mode",
+                [Option.FineSnappingKey] = "Fine snapping button",
+                [Option.FineSnappingMode] = "Fine snapping mode",
+                [Option.FineRotationKey] = "Fine rotation button",
+                [Option.FineRotationMode] = "Fine rotation mode",
+                [Option.ToggleRotationKey] = "Rotation button (for placeable items)",
+                [Option.ToggleRotationMode] = "Rotation mode (for placeable items)",
+                [Option.DetailedColliderKey] = "Detailed collider button",
+                [Option.DetailedColliderMode] = "Detailed collider mode",
+                [Option.SnapRounding] = "Snap rounding",
+                [Option.FineSnapRounding] = "Fine snap rounding",
+                [Option.RotationRounding] = "Rotation rounding (degrees)",
+                [Option.FineRotationRounding] = "Fine rotation rounding (degrees)"
             });
         }
     }

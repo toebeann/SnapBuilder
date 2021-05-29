@@ -2,7 +2,7 @@
     "Id": "SnapBuilder",
     "DisplayName": "SnapBuilder",
     "Author": "Tobey Blaber",
-    "Version": "1.3.7.2",
+    "Version": "1.4",
     "AssemblyName": "Straitjacket.Subnautica.Mods.SnapBuilder.dll",
     "Enable": true,
     "Game": "Subnautica",

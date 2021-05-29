@@ -10,3 +10,6 @@
 [submodule "Straitjacket.ExtensionMethods.UnityEngine"]
 	path = Straitjacket.ExtensionMethods.UnityEngine
 	url = https://github.com/tobeyStraitjacket/Straitjacket.ExtensionMethods.UnityEngine
+[submodule "Straitjacket.Math"]
+	path = Straitjacket.Math
+	url = https://github.com/tobeyStraitjacket/Straitjacket.Math

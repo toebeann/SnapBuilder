@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <LangVersion>8.0</LangVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -93,9 +94,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AimTransform.cs" />
+    <Compile Include="ColliderCache.cs" />
+    <Compile Include="ColliderRecord.cs" />
+    <Compile Include="ExtensionMethods\UnityEngineExtensionMethods.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="ControlHint.cs" />
+    <Compile Include="ExtensionMethods\OrientedBoundsExtensionMethods.cs" />
     <Compile Include="Lang.cs" />
     <Compile Include="Patches\BuilderPatch.cs" />
+    <Compile Include="Patches\BuilderToolPatch.cs" />
     <Compile Include="Patches\PlaceToolPatch.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="SnapBuilder.cs" />
@@ -106,10 +114,12 @@
     <None Include="mod_BELOWZERO.json" />
     <None Include="mod_SUBNAUTICA.json" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="..\BepInEx.Logger\Logger\Logger.projitems" Label="Shared" />
   <Import Project="..\SMLHelper.Language\SMLHelper.Language\Language.projitems" Label="Shared" />
   <Import Project="..\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.projitems" Label="Shared" />
+  <Import Project="..\Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y

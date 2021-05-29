@@ -18,7 +18,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     {
         [JsonIgnore]
         private Toggle snapping;
-
         [JsonIgnore]
         public Toggle Snapping => snapping ??= new Toggle(ToggleSnappingKey, ToggleSnappingMode, EnabledByDefault);
 
@@ -34,70 +33,101 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         public Toggle FineRotation => fineRotation ??= new Toggle(FineRotationKey, FineRotationMode, false);
 
         [JsonIgnore]
-        private Toggle toggleRotation;
+        private Toggle rotation;
         [JsonIgnore]
-        public Toggle ToggleRotation => toggleRotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
+        public Toggle Rotation => rotation ??= new Toggle(ToggleRotationKey, ToggleRotationMode, false);
 
-        [Toggle(LabelLanguageId = Lang.Option.DEFAULT_SNAPPING_ENABLED), OnChange(nameof(EnabledByDefaultChanged))]
+        [JsonIgnore]
+        public float RotationFactor => FineRotation.Enabled ? FineRotationRounding : RotationRounding;
+
+        [JsonIgnore]
+        private Toggle detailedColliders;
+        [JsonIgnore]
+        public Toggle DetailedCollider => detailedColliders ??= new Toggle(DetailedColliderKey,
+                                                                           DetailedColliderMode,
+                                                                           DetailedColliderEnabledByDefault);
+
+        [Toggle(LabelLanguageId = Lang.Option.DisplayControlHints)]
+        public bool DisplayControlHints { get; set; } = true;
+
+        [Toggle(LabelLanguageId = Lang.Option.SnappingEnabledByDefault), OnChange(nameof(EnabledByDefaultChanged))]
         public bool EnabledByDefault { get; set; } = true;
         private void EnabledByDefaultChanged(ToggleChangedEventArgs e)
             => Snapping.EnabledByDefault = e.Value;
 
-        [Keybind(LabelLanguageId = Lang.Option.TOGGLE_SNAPPING_KEY), OnChange(nameof(ToggleSnappingKeyChanged))]
+        [Toggle(LabelLanguageId = Lang.Option.DetailedColliderEnabledByDefault), OnChange(nameof(DetailedColliderEnabledByDefaultChanged))]
+        public bool DetailedColliderEnabledByDefault { get; set; } = true;
+        private void DetailedColliderEnabledByDefaultChanged(ToggleChangedEventArgs e)
+            => DetailedCollider.EnabledByDefault = e.Value;
+
+        [Toggle(LabelLanguageId = Lang.Option.RenderImprovableColliders)]
+        public bool RenderImprovableColliders { get; set; } = true;
+
+        [Keybind(LabelLanguageId = Lang.Option.ToggleSnappingKey), OnChange(nameof(ToggleSnappingKeyChanged))]
         public KeyCode ToggleSnappingKey { get; set; } = KeyCode.Mouse2;
         private void ToggleSnappingKeyChanged(KeybindChangedEventArgs e)
             => Snapping.KeyCode = e.Key;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [Choice(LabelLanguageId = Lang.Option.TOGGLE_SNAPPING_MODE), OnChange(nameof(ToggleSnappingModeChanged))]
+        [Choice(LabelLanguageId = Lang.Option.ToggleSnappingMode), OnChange(nameof(ToggleSnappingModeChanged))]
         public Toggle.Mode ToggleSnappingMode { get; set; } = Toggle.Mode.Press;
         private void ToggleSnappingModeChanged(ChoiceChangedEventArgs e)
             => Snapping.KeyMode = (Toggle.Mode)e.Index;
 
-        [Keybind(LabelLanguageId = Lang.Option.FINE_SNAPPING_KEY), OnChange(nameof(FineSnappingKeyChanged))]
+        [Keybind(LabelLanguageId = Lang.Option.FineSnappingKey), OnChange(nameof(FineSnappingKeyChanged))]
         public KeyCode FineSnappingKey { get; set; } = KeyCode.LeftControl;
         private void FineSnappingKeyChanged(KeybindChangedEventArgs e)
             => FineSnapping.KeyCode = e.Key;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [Choice(LabelLanguageId = Lang.Option.FINE_SNAPPING_MODE), OnChange(nameof(FineSnappingModeChanged))]
+        [Choice(LabelLanguageId = Lang.Option.FineSnappingMode), OnChange(nameof(FineSnappingModeChanged))]
         public Toggle.Mode FineSnappingMode { get; set; } = Toggle.Mode.Hold;
         private void FineSnappingModeChanged(ChoiceChangedEventArgs e)
             => FineSnapping.KeyMode = (Toggle.Mode)e.Index;
 
-        [Keybind(LabelLanguageId = Lang.Option.FINE_ROTATION_KEY), OnChange(nameof(FineRotationKeyChanged))]
+        [Keybind(LabelLanguageId = Lang.Option.FineRotationKey), OnChange(nameof(FineRotationKeyChanged))]
         public KeyCode FineRotationKey { get; set; } = KeyCode.LeftAlt;
         private void FineRotationKeyChanged(KeybindChangedEventArgs e)
             => FineRotation.KeyCode = e.Key;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [Choice(LabelLanguageId = Lang.Option.FINE_ROTATION_MODE), OnChange(nameof(FineRotationModeChanged))]
+        [Choice(LabelLanguageId = Lang.Option.FineRotationMode), OnChange(nameof(FineRotationModeChanged))]
         public Toggle.Mode FineRotationMode { get; set; } = Toggle.Mode.Hold;
         private void FineRotationModeChanged(ChoiceChangedEventArgs e)
             => FineRotation.KeyMode = (Toggle.Mode)e.Index;
 
-        [Keybind(LabelLanguageId = Lang.Option.TOGGLE_ROTATION_KEY), OnChange(nameof(EnableRotationKeyChanged))]
+        [Keybind(LabelLanguageId = Lang.Option.ToggleRotationKey), OnChange(nameof(EnableRotationKeyChanged))]
         public KeyCode ToggleRotationKey { get; set; } = KeyCode.Q;
         private void EnableRotationKeyChanged(KeybindChangedEventArgs e)
-            => ToggleRotation.KeyCode = e.Key;
+            => Rotation.KeyCode = e.Key;
 
-        [Choice(LabelLanguageId = Lang.Option.TOGGLE_ROTATION_MODE), OnChange(nameof(EnableRotationModeChanged))]
+        [Choice(LabelLanguageId = Lang.Option.ToggleRotationMode), OnChange(nameof(EnableRotationModeChanged))]
         public Toggle.Mode ToggleRotationMode { get; set; } = Toggle.Mode.Hold;
         private void EnableRotationModeChanged(ChoiceChangedEventArgs e)
-            => ToggleRotation.KeyMode = (Toggle.Mode)e.Index;
+            => Rotation.KeyMode = (Toggle.Mode)e.Index;
+
+        [Keybind(LabelLanguageId = Lang.Option.DetailedColliderKey), OnChange(nameof(DetailedColliderKeyChanged))]
+        public KeyCode DetailedColliderKey { get; set; } = KeyCode.F;
+        private void DetailedColliderKeyChanged(KeybindChangedEventArgs e)
+            => DetailedCollider.KeyCode = e.Key;
+
+        [Choice(LabelLanguageId = Lang.Option.DetailedColliderMode), OnChange(nameof(DetailedColliderModeChanged))]
+        public Toggle.Mode DetailedColliderMode { get; set; } = Toggle.Mode.Press;
+        private void DetailedColliderModeChanged(ChoiceChangedEventArgs e)
+            => DetailedCollider.KeyMode = (Toggle.Mode)e.Index;
 
         [JsonConverter(typeof(FloatConverter), 2)]
-        [Slider(0.01f, 1, LabelLanguageId = Lang.Option.SNAP_ROUNDING, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.5f)]
+        [Slider(0.01f, 1, LabelLanguageId = Lang.Option.SnapRounding, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.5f)]
         public float SnapRounding { get; set; } = 0.5f;
 
         [JsonConverter(typeof(FloatConverter), 2)]
-        [Slider(0.01f, 1, LabelLanguageId = Lang.Option.FINE_SNAP_ROUNDING, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.2f)]
+        [Slider(0.01f, 1, LabelLanguageId = Lang.Option.FineSnapRounding, Step = 0.01f, Format = "{0:##0%}", DefaultValue = 0.2f)]
         public float FineSnapRounding { get; set; } = 0.2f;
 
-        [Slider(0, 90, LabelLanguageId = Lang.Option.ROTATION_ROUNDING, DefaultValue = 45)]
+        [Slider(1, 90, LabelLanguageId = Lang.Option.RotationRounding, DefaultValue = 45)]
         public int RotationRounding { get; set; } = 45;
 
-        [Slider(0, 45, LabelLanguageId = Lang.Option.FINE_ROTATION_ROUNDING, DefaultValue = 5)]
+        [Slider(1, 45, LabelLanguageId = Lang.Option.FineRotationRounding, DefaultValue = 5)]
         public int FineRotationRounding { get; set; } = 5;
 
         public bool HasUpgraded = false;
@@ -112,7 +142,8 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             Snapping.Reset();
             FineSnapping.Reset();
             FineRotation.Reset();
-            ToggleRotation.Reset();
+            Rotation.Reset();
+            DetailedCollider.Reset();
         }
 
         private void Upgrade()
