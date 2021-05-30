@@ -69,9 +69,17 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.ExtensionMethods
         public static Transform GetOptimalTransform(this RaycastHit hit) => Builder.GetSurfaceType(hit.normal) switch
         {
             SurfaceType.Ground when hit.transform.parent is Transform parent
+                                    && parent.GetComponent<BaseCell>() is BaseCell => parent,
+            SurfaceType.Ground when hit.transform.parent is Transform parent
                                     && new float[] { 1, 0, 1 / Mathf.Sqrt(2) }
-                                           .Any(dot => Mathf.Approximately(dot, Mathf.Abs(Vector3.Dot(parent.forward, hit.transform.forward))))
+                                        .Any(dot => Mathf.Approximately(dot, Mathf.Abs(Vector3.Dot(parent.forward, hit.transform.forward))))
                                     => parent,
+            SurfaceType.Ground when Utils.GetEntityRoot(hit.transform.gameObject)?.transform is Transform root
+                                    && root.GetComponent<BaseCell>() is BaseCell => root,
+            SurfaceType.Ground when Utils.GetEntityRoot(hit.transform.gameObject)?.transform is Transform root
+                                    && new float[] { 1, 0, 1 / Mathf.Sqrt(2) }
+                                        .Any(dot => Mathf.Approximately(dot, Mathf.Abs(Vector3.Dot(root.forward, hit.transform.forward))))
+                                    => root,
             _ => hit.transform
         };
 
