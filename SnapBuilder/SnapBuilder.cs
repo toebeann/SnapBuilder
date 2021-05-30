@@ -112,11 +112,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
 
             // choose whether we should use the global forward, or the forward of the hitTransform
             Vector3 forward = hitTransform.forward.y != 0
-                              && !Player.main.IsInsideWalkable()
-                              && !Player.main.IsInSub()
-                              && hitTransform.GetComponent<BaseCell>() is null
-                                  ? Vector3.forward
-                                  : hitTransform.forward;
+                && !Player.main.IsInsideWalkable()
+                && hitTransform.GetComponent<BaseCell>() is null
+                    ? Vector3.forward
+                    : hitTransform.forward;
 
             // align the empty to face the chosen forward direction
             empty.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
