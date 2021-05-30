@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Straitjacket.Subnautica.Mods.SnapBuilder.ExtensionMethods
 {
@@ -67,7 +68,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.ExtensionMethods
         /// <returns></returns>
         public static Transform GetOptimalTransform(this RaycastHit hit) => Builder.GetSurfaceType(hit.normal) switch
         {
-            SurfaceType.Ground => hit.transform.parent ?? hit.transform,
+            SurfaceType.Ground when hit.transform.parent is Transform parent
+                                    && new float[] { 1, 0, 1 / Mathf.Sqrt(2) }
+                                           .Any(dot => Mathf.Approximately(dot, Mathf.Abs(Vector3.Dot(parent.forward, hit.transform.forward))))
+                                    => parent,
             _ => hit.transform
         };
 
