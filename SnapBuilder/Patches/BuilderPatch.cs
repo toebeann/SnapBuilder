@@ -24,11 +24,6 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
         [HarmonyPostfix]
         public static void BeginHintsPostfix(bool __state)
         {
-            if (Builder.prefab.GetComponent<ConstructableBase>() is ConstructableBase)
-            {
-                return;
-            }
-
             if (__state && Builder.rotationEnabled)
             {
                 ControlHint.Show(Lang.Hint.ToggleFineRotation, SnapBuilder.Config.FineRotation);
