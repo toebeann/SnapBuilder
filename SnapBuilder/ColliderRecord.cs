@@ -12,7 +12,13 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
     {
         private static Type[] ExcludedComponentTypes { get; } = new Type[] {
             typeof(CoralBlendWhite), // default mesh is good enough and doesn't work well when upgraded
-            typeof(BaseCell)
+            typeof(BaseCell),
+            typeof(ConstructableBase)
+        };
+
+        private static TechType[] ExcludedTechTypes { get; } = new TechType[]
+        {
+            TechType.BaseHatch
         };
 
         private static Material material;
@@ -63,7 +69,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
                 return (isImprovable = false).Value;
             }
         }
-        public bool IsImproved => Collider switch
+        public bool IsImproved => IsImprovable && Collider switch
         {
             MeshCollider meshCollider => meshCollider?.sharedMesh is Mesh mesh && mesh == ImprovedMesh,
             _ => false
@@ -80,9 +86,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
         private bool IsExcluded()
         {
             Transform root = Utils.GetEntityRoot(Collider.transform.gameObject)?.transform ?? Collider.transform;
-            return ExcludedComponentTypes
-                .Select(type => root.GetComponent(type))
-                .Any(component => component is Component);
+            return ExcludedTechTypes.Contains(Builder.constructableTechType)
+                   || ExcludedComponentTypes
+                          .Select(type => root.GetComponent(type))
+                          .Any(component => component is Component);
         }
 
         public void Improve()

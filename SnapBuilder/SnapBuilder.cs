@@ -111,9 +111,10 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder
             empty.transform.position = hit.point; // Set the parent transform's position to our chosen position
 
             // choose whether we should use the global forward, or the forward of the hitTransform
-            Vector3 forward = hitTransform.forward.y != 0
+            Vector3 forward = !Mathf.Approximately(Mathf.Abs(Vector3.Dot(Vector3.up, hitTransform.up)), 1)
                 && !Player.main.IsInsideWalkable()
                 && hitTransform.GetComponent<BaseCell>() is null
+                && hitTransform.GetComponent<Base>() is null
                     ? Vector3.forward
                     : hitTransform.forward;
 
