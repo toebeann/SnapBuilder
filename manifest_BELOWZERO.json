@@ -1,0 +1,10 @@
+{
+  "name": "SnapBuilder_BelowZero",
+  "version_number": "1.4.1",
+  "website_url": "https://github.com/toebeann/SnapBuilder",
+  "description": "Snap-to-Grid for Subnautica: Below Zero!",
+  "dependencies": [
+    "Subnautica_Modding-QModManager_BZ-4.4.3",
+    "Subnautica_Modding-SMLHelper_BZ-2.13.4"
+  ]
+}

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29920.165
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Straitjacket.Subnautica.Mods.SnapBuilder", "SnapBuilder\Straitjacket.Subnautica.Mods.SnapBuilder.csproj", "{90B8CFBB-759D-4E62-B923-05C2FEFE5CB3}"
 EndProject
@@ -14,6 +14,27 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.ExtensionMethods.UnityEngine", "Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine\Straitjacket.ExtensionMethods.UnityEngine.shproj", "{91E30B75-0933-43CC-98FF-7C9DCCA7F849}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Straitjacket.Math", "Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.shproj", "{EDF9AFB9-5A40-4818-8004-95E22D5B7BA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Manifests", "Manifests", "{9AEB2F8C-CCC4-4AE6-AFFF-DFF701DB6686}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Thunderstore", "Thunderstore", "{BE691FBE-8733-4C7A-8A69-6693653EA1F5}"
+	ProjectSection(SolutionItems) = preProject
+		manifest_BELOWZERO.json = manifest_BELOWZERO.json
+		manifest_SUBNAUTICA.json = manifest_SUBNAUTICA.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QModManager", "QModManager", "{085BDCC1-F047-43A0-A88F-B52FB78C796F}"
+	ProjectSection(SolutionItems) = preProject
+		mod_BELOWZERO.json = mod_BELOWZERO.json
+		mod_SUBNAUTICA.json = mod_SUBNAUTICA.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{83E3D718-72C9-492A-A56D-74F1103766A3}"
+	ProjectSection(SolutionItems) = preProject
+		icon.png = icon.png
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -40,6 +61,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9AEB2F8C-CCC4-4AE6-AFFF-DFF701DB6686} = {83E3D718-72C9-492A-A56D-74F1103766A3}
+		{BE691FBE-8733-4C7A-8A69-6693653EA1F5} = {9AEB2F8C-CCC4-4AE6-AFFF-DFF701DB6686}
+		{085BDCC1-F047-43A0-A88F-B52FB78C796F} = {9AEB2F8C-CCC4-4AE6-AFFF-DFF701DB6686}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3A915A15-381C-45D8-8D89-B8ACCFD8B345}

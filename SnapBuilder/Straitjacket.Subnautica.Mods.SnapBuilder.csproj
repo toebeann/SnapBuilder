@@ -111,10 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="mod_BELOWZERO.json" />
-    <None Include="mod_SUBNAUTICA.json" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\Toggle\Toggle\Toggle.projitems" Label="Shared" />
   <Import Project="..\BepInEx.Logger\Logger\Logger.projitems" Label="Shared" />
   <Import Project="..\SMLHelper.Language\SMLHelper.Language\Language.projitems" Label="Shared" />
@@ -122,8 +119,9 @@
   <Import Project="..\Straitjacket.Math\Straitjacket.Math\Straitjacket.Math.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy "$(ProjectDir)mod_$(ConfigurationName).json" "$(TargetDir)$(SolutionName)\mod.json" /y
-if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -ProjectDir $(ProjectDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath)</PostBuildEvent>
+    <PostBuildEvent>echo f | xcopy "$(SolutionDir)mod_$(ConfigurationName).json" "$(TargetDir)\QMods\$(SolutionName)\mod.json" /y
+echo f | xcopy "$(SolutionDir)manifest_$(ConfigurationName).json" "$(TargetDir)\manifest.json" /y
+if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -SolutionDir $(SolutionDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />
 </Project>
