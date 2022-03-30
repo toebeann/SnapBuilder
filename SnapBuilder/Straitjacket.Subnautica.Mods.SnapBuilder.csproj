@@ -121,6 +121,8 @@
   <PropertyGroup>
     <PostBuildEvent>echo f | xcopy "$(SolutionDir)mod_$(ConfigurationName).json" "$(TargetDir)\QMods\$(SolutionName)\mod.json" /y
 echo f | xcopy "$(SolutionDir)manifest_$(ConfigurationName).json" "$(TargetDir)\manifest.json" /y
+echo f | xcopy "$(SolutionDir)icon_$(ConfigurationName).png" "$(TargetDir)\icon.png" /y
+echo f | xcopy "$(SolutionDir)README_$(ConfigurationName).md" "$(TargetDir)\README.md" /y
 if exist "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "E:\Toadbomb\Documents\PowerShell Scripts\Subnautica Modding\post-build.ps1" -ProjectName $(SolutionName) -ConfigurationName $(ConfigurationName) -SolutionDir $(SolutionDir) -TargetDir $(TargetDir) -TargetPath $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />

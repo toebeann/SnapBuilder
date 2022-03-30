@@ -1,17 +1,8 @@
-# SnapBuilder <!-- omit in toc -->
+# SnapBuilder: Below Zero Edition
 
-## Contents <!-- omit in toc -->
-- [Check out SnapBuilder in action!](#check-out-snapbuilder-in-action)
-- [Installating SnapBuilder](#installating-snapbuilder)
-  - [Recommended installation (automated)](#recommended-installation-automated)
-  - [Manual installation](#manual-installation)
-- [Default keybinds](#default-keybinds)
-- [Need help?](#need-help)
-- [Changelogs](#changelogs)
+## Finally, we can buld perfectly aligned and rotated items!
 
-## Finally, we can buld perfectly aligned and rotated items! <!-- omit in toc -->
-
-### Fully customisable! <!-- omit in toc -->
+### Fully customisable!
 
 By default, snapping is enabled with this mod installed. The level of snapping can be fine-tuned in the Mod options menu, as can all keybinds.
 
@@ -34,8 +25,8 @@ Big thanks to [Sketchy](https://www.youtube.com/channel/UCDz6lJ5Ba3S_FsI0hpoUMXg
 ### Manual installation
 1. Make sure you first install all of the dependencies listed above under **This mod requires the following mods to function**, and install their dependencies, and so on...
 2. Click the **Manual Download** button at the top of the page.
-3. Extract **only** the QMods folder from the archive into `<Steam Location>\steamapps\common\Subnautica`.
-4. Check that you have installed it correctly. You should have the SnapBuilder folder at the following location: `<Steam Location>\steamapps\common\Subnautica\QMods\SnapBuilder`.
+3. Extract **only** the QMods folder from the archive into `<Steam Location>\steamapps\common\SubnauticaZero`.
+4. Check that you have installed it correctly. You should have the SnapBuilder folder at the following location: `<Steam Location>\steamapps\common\SubnauticaZero\QMods\SnapBuilder`.
 
 ## Default keybinds
 | Action                                 | Keybind        |
@@ -168,14 +159,26 @@ If however you've stumbled on a bug, feel free to [file an issue on GitHub](http
 </details>
 
 <details>
-  <summary>Version 1.0.2</summary>
+  <summary>Version 1.0.4</summary>
   
   * Bugfix: Toggle snapping key can be changed as intended.
 </details>
 
 <details>
-  <summary>Version 1.0.1</summary>
+  <summary>Version 1.0.3</summary>
   
   * Updated to Harmony version 1.2.0.1
   * Reworked rotation to be more consistent across different button types (hold, scroll etc.)
+</details>
+
+<details>
+  <summary>Version 1.0.2</summary>
+  
+  * Bugfix: Items on multipurpose roofs should now align correctly.
+</details>
+
+<details>
+  <summary>Version 1.0.1</summary>
+  
+  * Bugfix: Snowfox Hoverpad should now work as expected.
 </details>

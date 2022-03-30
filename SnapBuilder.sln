@@ -31,9 +31,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QModManager", "QModManager"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{83E3D718-72C9-492A-A56D-74F1103766A3}"
 	ProjectSection(SolutionItems) = preProject
-		icon.png = icon.png
+		icon_BELOWZERO.png = icon_BELOWZERO.png
+		icon_SUBNAUTICA.png = icon_SUBNAUTICA.png
 		LICENSE = LICENSE
-		README.md = README.md
+		README_BELOWZERO.md = README_BELOWZERO.md
+		README_SUBNAUTICA.md = README_SUBNAUTICA.md
 	EndProjectSection
 EndProject
 Global
