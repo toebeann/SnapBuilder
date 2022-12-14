@@ -11,7 +11,7 @@ namespace Straitjacket.Subnautica.Mods.SnapBuilder.Patches
 
     internal static class BuilderToolPatch
     {
-        #region Builder.GetCustomUseText
+        #region BuilderTool.GetCustomUseText
         public struct GetCustomUseTextState
         {
             public bool WasPlacing { get; }
