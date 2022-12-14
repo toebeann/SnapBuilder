@@ -1,15 +1,3 @@
-[submodule "Toggle"]
-	path = Toggle
-	url = https://github.com/tobeyStraitjacket/Straitjacket.Toggle
-[submodule "BepInEx.Logger"]
-	path = BepInEx.Logger
-	url = https://github.com/tobeyStraitjacket/BepInEx.Logger
-[submodule "SMLHelper.Language"]
-	path = SMLHelper.Language
-	url = https://github.com/tobeyStraitjacket/SMLHelper.Language
-[submodule "Straitjacket.ExtensionMethods.UnityEngine"]
-	path = Straitjacket.ExtensionMethods.UnityEngine
-	url = https://github.com/tobeyStraitjacket/Straitjacket.ExtensionMethods.UnityEngine
-[submodule "Straitjacket.Math"]
-	path = Straitjacket.Math
-	url = https://github.com/tobeyStraitjacket/Straitjacket.Math
+[submodule "BepInEx.ConfigurationManager"]
+	path = BepInEx.ConfigurationManager
+	url = https://github.com/toebeann/BepInEx.ConfigurationManager

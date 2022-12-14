@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tobey.SnapBuilder", "Tobey.SnapBuilder\Tobey.SnapBuilder.csproj", "{D12D9885-567E-468F-A7B1-35919EA8E869}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BepInEx.ConfigurationManager", "BepInEx.ConfigurationManager\BepInEx.ConfigurationManager\BepInEx.ConfigurationManager.shproj", "{F9BC4E11-B6B8-478A-9D3A-D9A42DAF70D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D12D9885-567E-468F-A7B1-35919EA8E869}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D12D9885-567E-468F-A7B1-35919EA8E869}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D12D9885-567E-468F-A7B1-35919EA8E869}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D12D9885-567E-468F-A7B1-35919EA8E869}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B6E0C065-A735-4273-86C0-001949367C07}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BepInEx.ConfigurationManager\BepInEx.ConfigurationManager\BepInEx.ConfigurationManager.projitems*{d12d9885-567e-468f-a7b1-35919ea8e869}*SharedItemsImports = 5
+		BepInEx.ConfigurationManager\BepInEx.ConfigurationManager\BepInEx.ConfigurationManager.projitems*{f9bc4e11-b6b8-478a-9d3a-d9a42daf70d1}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal
