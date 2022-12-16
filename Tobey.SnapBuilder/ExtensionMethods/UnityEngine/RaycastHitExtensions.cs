@@ -81,7 +81,7 @@ internal static class RaycastHitExtensions
                     (Vector3.back + Vector3.left) * .707f
             };
 
-            List<Vector3> normals = new List<Vector3>();
+            HashSet<Vector3> normals = new();
             // Perform a raycast from each offset, pointing down toward the surface
             foreach (Vector3 offset in offsets)
             {

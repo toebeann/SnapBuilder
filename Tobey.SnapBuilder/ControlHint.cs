@@ -18,7 +18,7 @@ internal class ControlHint
     private static string GetDisplayText(Toggle toggle) => toggle switch
     {
         { Shortcut.MainKey: KeyCode.None } => NoInputAssigned,
-        _ => GetDisplayText(new List<KeyCode>(toggle.Shortcut.Modifiers).Prepend(toggle.Shortcut.MainKey).Where(keyCode => keyCode != KeyCode.None))
+        _ => GetDisplayText(new HashSet<KeyCode>(toggle.Shortcut.Modifiers).Prepend(toggle.Shortcut.MainKey).Where(keyCode => keyCode != KeyCode.None))
     };
 
     public static string Get(string hint, Toggle toggle) => $"{hint} ({FormatButton(toggle)})";

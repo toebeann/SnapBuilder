@@ -53,7 +53,7 @@ public class ColliderCache : MonoBehaviour
         foreach (var collider in records
             .Where(pair => !pair.Value.IsImproved
                            && DateTime.UtcNow > pair.Value.Timestamp + TimeSpan.FromSeconds(CleanUpSeconds))
-            .Select(pair => pair.Key).ToList())
+            .Select(pair => pair.Key).ToHashSet())
         {
             records.Remove(collider);
         }
