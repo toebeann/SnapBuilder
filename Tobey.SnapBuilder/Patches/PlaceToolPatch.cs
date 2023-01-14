@@ -41,13 +41,13 @@ internal static class PlaceToolPatch
     [HarmonyPostfix]
     public static void LateUpdatePostfix(PlaceTool __instance)
     {
-        if (__instance.usingPlayer == null || !Toggles.Snapping.IsEnabled)
+        if (__instance?.usingPlayer == null || !Toggles.Snapping.IsEnabled)
         {
-            Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
+            Inventory.main?.quickSlots.SetIgnoreHotkeyInput(false);
         }
         else
         {
-            Inventory.main.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && Toggles.Rotation.IsEnabled);
+            Inventory.main?.quickSlots.SetIgnoreHotkeyInput(__instance.rotationEnabled && Toggles.Rotation.IsEnabled);
         }
     }
     #endregion
