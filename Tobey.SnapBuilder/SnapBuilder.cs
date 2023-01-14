@@ -143,30 +143,42 @@ public class SnapBuilder : BaseUnityPlugin
                 : hitTransform.forward;
 
         // align the empty to face the chosen forward direction
-        empty.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        empty.transform.localRotation = Quaternion.LookRotation(forward, Vector3.up);
 
         // for components that are not forced upright, align the empty's up direction with the hit.normal
         if (!forceUpright)
         {
             empty.transform.up = hit.normal;
-            empty.transform.rotation *= Quaternion.FromToRotation(Vector3.forward, forward);
+            empty.transform.localRotation *= Quaternion.FromToRotation(Vector3.forward, forward);
         }
 
         child.transform.SetParent(empty.transform, false); // parent the child to the empty
 
         // Rotate the child transform to look at the player (so that the object will face the player by default, as in the original)
-        child.transform.LookAt(Player.main.transform);
+        if (Builder.GetSurfaceType(hit.normal) != SurfaceType.Wall)
+        {
+            child.transform.LookAt(Player.main.transform);
+        }
+        var final = new GameObject();
+        final.transform.SetParent(child.transform, true);
+        final.transform.localRotation = GetDefaultRotation();
 
         // Round/snap the Y axis of the child transform's local rotation based on the user's rotation factor, after adding the additiveRotation
-        child.transform.localEulerAngles
-            = new Vector3(0, Math.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, RotationFactor.Value) % 360, 0);
+        child.transform.localEulerAngles = Builder.GetSurfaceType(hit.normal) == SurfaceType.Wall
+            ? new Vector3(Math.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, RotationFactor.Value) % 360, 0, 0)
+            : new Vector3(0, Math.RoundToNearest(child.transform.localEulerAngles.y + additiveRotation, RotationFactor.Value) % 360, 0);
 
-        Quaternion rotation = child.transform.rotation; // Our final rotation
+        Quaternion rotation = final.transform.rotation; // Our final rotation
 
         // Clean up after ourselves
+        DestroyImmediate(final);
         DestroyImmediate(child);
         DestroyImmediate(empty);
 
         return rotation;
     }
+
+    public Transform GetMetadata() => Builder.ghostModel?.transform.Find("SnapBuilder");
+
+    public Quaternion GetDefaultRotation() => GetMetadata()?.localRotation ?? Quaternion.identity;
 }

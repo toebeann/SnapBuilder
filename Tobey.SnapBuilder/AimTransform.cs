@@ -223,52 +223,52 @@ public class AimTransform : MonoBehaviour
             case SurfaceType.Wall
             when !Builder.allowedSurfaceTypes.Contains(SurfaceType.Wall)
                 && Builder.allowedSurfaceTypes.Contains(SurfaceType.Ground):
-
-                // Get the rotation of the object
-                Quaternion rotation = Builder.rotationEnabled
-                    ? SnapBuilder.Instance.CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright || Player.main.IsInsideWalkable())
-                    : Quaternion.identity;
-
-                if (!Builder.bounds.Any())
                 {
-                    return hit; // if there are no bounds for some reason, just use the original hit
+                    // Get the rotation of the object
+                    Quaternion rotation = Builder.rotationEnabled
+                        ? SnapBuilder.Instance.CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright || Player.main.IsInsideWalkable())
+                        : SnapBuilder.Instance.GetDefaultRotation();
+
+                    if (!Builder.bounds.Any())
+                    {
+                        return hit; // if there are no bounds for some reason, just use the original hit
+                    }
+
+                    // Get the corners of the object based on the Builder.bounds, localised to the hit point
+                    IEnumerable<Vector3> corners = Builder.bounds
+                        .Select(bounds => new { Bounds = bounds, Corners = bounds.GetCorners() })
+                        .SelectMany(x => x.Corners.Select(corner => hit.point + rotation * corner));
+
+                    // Get the farthest corner from the player
+                    Vector3 farthestCorner = corners.OrderByDescending(x => Vector3.Distance(x, OffsetAimTransform.position)).First();
+
+                    // Center the corner to the hit.point on the local x and y axes
+                    var empty = new GameObject();
+                    var child = new GameObject();
+                    empty.transform.position = hit.point;
+                    empty.transform.forward = hit.normal;
+                    child.transform.SetParent(empty.transform);
+                    child.transform.position = farthestCorner;
+                    child.transform.localPosition = new Vector3(0, 0, child.transform.localPosition.z);
+                    Vector3 farthestCornerCentered = child.transform.position;
+
+                    // Clean up the GameObjects
+                    Destroy(child);
+                    Destroy(empty);
+
+                    float offset = SnapBuilder.Instance.HasLargeRoom
+                        ? 0.02f
+                        : 0.1f; // in sn1 prior to large room addition, the collision boundary between objects is much larger than in BZ
+
+                    // Now move the hit.point outward from the wall just enough so that the object can fit
+                    Vector3 poppedPoint = hit.point + hit.normal * Vector3.Distance(farthestCornerCentered, hit.point) + hit.normal * offset;
+
+                    // Try to get a new hit by aiming at the floor from this popped point
+                    if (Raycast(poppedPoint, Vector3.down, out RaycastHit poppedHit))
+                    {
+                        return poppedHit;
+                    }
                 }
-
-                // Get the corners of the object based on the Builder.bounds, localised to the hit point
-                IEnumerable<Vector3> corners = Builder.bounds
-                    .Select(bounds => new { Bounds = bounds, Corners = bounds.GetCorners() })
-                    .SelectMany(x => x.Corners.Select(corner => hit.point + rotation * corner));
-
-                // Get the farthest corner from the player
-                Vector3 farthestCorner = corners.OrderByDescending(x => Vector3.Distance(x, OffsetAimTransform.position)).First();
-
-                // Center the corner to the hit.point on the local x and y axes
-                var empty = new GameObject();
-                var child = new GameObject();
-                empty.transform.position = hit.point;
-                empty.transform.forward = hit.normal;
-                child.transform.SetParent(empty.transform);
-                child.transform.position = farthestCorner;
-                child.transform.localPosition = new Vector3(0, 0, child.transform.localPosition.z);
-                Vector3 farthestcornerCentered = child.transform.position;
-
-                // Clean up the GameObjects
-                Destroy(child);
-                Destroy(empty);
-
-                float offset = SnapBuilder.Instance.HasLargeRoom
-                    ? 0.02f
-                    : 0.1f; // in sn1 prior to large room addition, the collision boundary between objects is much larger than in BZ
-
-                // Now move the hit.point outward from the wal just enough so that the object can fit
-                Vector3 poppedPoint = hit.point + hit.normal * Vector3.Distance(farthestcornerCentered, hit.point) + hit.normal * offset;
-
-                // Try to get a new hit by aiming at the floor from this popped point
-                if (Raycast(poppedPoint, Vector3.down, out RaycastHit poppedHit))
-                {
-                    return poppedHit;
-                }
-
                 break;
         }
 

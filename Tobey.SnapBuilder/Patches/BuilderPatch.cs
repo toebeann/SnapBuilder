@@ -60,11 +60,15 @@ internal static class BuilderPatch
     [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    public static void SetPlaceOnSurfacePostfix(RaycastHit hit, ref Quaternion rotation)
+    public static void SetPlaceOnSurfacePostfix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
     {
-        if (Toggles.Snapping.IsEnabled && Builder.rotationEnabled)
+        if (Toggles.Snapping.IsEnabled)
         {
-            rotation = SnapBuilder.Instance.CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright);
+            position += SnapBuilder.Instance.GetMetadata()?.localPosition ?? Vector3.zero;
+
+            rotation = (Builder.rotationEnabled
+                ? SnapBuilder.Instance.CalculateRotation(ref Builder.additiveRotation, hit, Builder.forceUpright)
+                : rotation * SnapBuilder.Instance.GetDefaultRotation());
         }
     }
     #endregion
