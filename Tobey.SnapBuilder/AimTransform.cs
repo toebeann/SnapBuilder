@@ -47,8 +47,26 @@ public class AimTransform : MonoBehaviour
         Destroy(GetComponent<ColliderCache>());
     }
 
-    public static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit) =>
-        Physics.Raycast(from, direction, out hit, Builder.placeMaxDistance, Builder.placeLayerMask, QueryTriggerInteraction.Ignore);
+    private static PlaceTool GetPlaceTool() => Inventory.main?.GetHeld()?.GetComponent<PlaceTool>();
+
+    public static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit)
+    {
+        var placeTool = GetPlaceTool();
+        if (placeTool == null)
+        {
+            return Physics.Raycast(from, direction, out hit, Builder.placeMaxDistance, Builder.placeLayerMask, QueryTriggerInteraction.Ignore);
+        }
+        else
+        {
+            int max = UWE.Utils.RaycastIntoSharedBuffer(from, direction, 5f, -5, QueryTriggerInteraction.UseGlobal);
+            var hits = new ArraySegment<RaycastHit>(UWE.Utils.sharedHitBuffer, 0, max)
+                .Where(h => !h.collider.isTrigger && !UWE.Utils.SharingHierarchy(placeTool.gameObject, h.collider.gameObject))
+                .OrderBy(h => h.distance);
+
+            hit = hits.FirstOrDefault();
+            return hits.Any();
+        }
+    }
 
     private Transform GetOrientedTransform(Vector3? position = null, Vector3? forward = null)
     {
@@ -213,7 +231,7 @@ public class AimTransform : MonoBehaviour
     /// <returns></returns>
     private RaycastHit PopHitOntoBestSurface(RaycastHit hit)
     {
-        if (!Player.main.IsInsideWalkable())
+        if (!Player.main.IsInsideWalkable() || GetPlaceTool() != null)
         {
             return hit;
         }
