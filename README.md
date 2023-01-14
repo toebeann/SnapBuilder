@@ -8,7 +8,7 @@
 
 From SnapBuilder 2.0 onwards, SnapBuilder will no longer be released as a mod for [QModManager](https://www.nexusmods.com/subnautica/mods/201). Moving forward, SnapBuilder will be released as a [BepInEx](https://www.nexusmods.com/subnautica/mods/1108) plugin.
 
-This change is to facilitate compatibility with the Subnautica 2.0 Living Large update, and is **fully compatible with QModManager!**
+This change is to facilitate compatibility with the Subnautica 2.0 Living Large update.
 
 ## What is this?
 
@@ -21,8 +21,6 @@ By default, snapping is enabled with the mod installed. The level of snapping ca
 ![Configuring SnapBuilder](https://staticdelivery.nexusmods.com/mods/1155/images/427/427-1671005686-1718616155.png)
 
 ## Manual installation
-
-Installation is **fully compatible with QModManager!** Whether QModManager is installed or not, simply follow these steps:
 
 1. [Install the latest version of BepInEx](https://www.nexusmods.com/subnautica/mods/1108).
 2. [Install BepInEx Tweaks](https://www.nexusmods.com/subnautica/mods/1104?tab=files).
