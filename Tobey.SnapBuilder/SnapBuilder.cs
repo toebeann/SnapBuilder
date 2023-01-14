@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -182,7 +181,4 @@ public class SnapBuilder : BaseUnityPlugin
     public Transform GetMetadata() => Builder.ghostModel?.transform.Find("SnapBuilder");
 
     public Quaternion GetDefaultRotation() => GetMetadata()?.localRotation ?? Quaternion.identity;
-
-    [Obsolete]
-    public static void QMMEntryPoint() => Chainloader.ManagerObject.AddComponent<SnapBuilder>();
 }

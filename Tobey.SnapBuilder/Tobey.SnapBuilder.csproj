@@ -11,14 +11,8 @@
   </PropertyGroup>
 
   <Target Name="ZipBuild" AfterTargets="AfterBuild">
-    <ItemGroup>
-      <CleanUpFiles Include="$(OutputPath)\zip\**\*" />
-    </ItemGroup>
-    <Delete Files="@(CleanUpFiles)"/>
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zip\SnapBuilder" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zip\plugins" />
     <ZipDirectory SourceDirectory="$(OutputPath)\zip" DestinationFile="$(OutputPath)\$(Product).zip" Overwrite="true" />
-    <Copy SourceFiles="$(OutputPath)\mod.json" DestinationFolder="$(OutputPath)\zip\SnapBuilder" />
-    <ZipDirectory SourceDirectory="$(OutputPath)\zip" DestinationFile="$(OutputPath)\$(Product)_BZ.zip" Overwrite="true" />
   </Target>
 
   <ItemGroup>
@@ -41,12 +35,6 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica.experimental\Subnautica_Data\Managed\publicized-assemblies\Assembly-CSharp-publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="mod.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   
   <ItemGroup>
