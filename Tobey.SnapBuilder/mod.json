@@ -1,0 +1,11 @@
+﻿{
+  "Id": "SnapBuilder",
+  "DisplayName": "SnapBuilder",
+  "Author": "Tobey Blaber",
+  "Version": "2.1.0",
+  "Enable": true,
+  "Game": "BelowZero",
+  "AssemblyName": "Tobey.SnapBuilder.dll",
+  "NitroxCompat": true,
+  "EntryMethod": "Tobey.SnapBuilder.SnapBuilder.QMMEntryPoint"
+}
