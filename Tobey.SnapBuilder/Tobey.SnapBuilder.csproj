@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Tobey.SnapBuilder</AssemblyName>
     <Description>Snap-to-Grid for Subnautica!</Description>
-    <Version>2.2.0</Version>
+    <Version>2.2.1</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>10.0</LangVersion>
     <Product>SnapBuilder</Product>
