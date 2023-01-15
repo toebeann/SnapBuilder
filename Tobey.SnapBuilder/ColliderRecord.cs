@@ -68,7 +68,7 @@ public class ColliderRecord
     }
     public bool IsImproved => IsImprovable && Collider switch
     {
-        MeshCollider meshCollider => meshCollider?.sharedMesh is Mesh mesh && mesh == ImprovedMesh,
+        MeshCollider meshCollider when meshCollider != null => meshCollider.sharedMesh is Mesh mesh && mesh == ImprovedMesh,
         _ => false
     };
     public Mesh OriginalMesh { get; private set; }
