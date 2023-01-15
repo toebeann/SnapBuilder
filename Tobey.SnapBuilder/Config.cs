@@ -63,6 +63,8 @@ public static class Config
 
     public static class General
     {
+        internal static void Initialise() { }
+
         public static ConfigEntry<bool> DisplayControlHints { get; } =
             Cfg.Bind(
                 section: nameof(General),
@@ -82,6 +84,8 @@ public static class Config
 
     public static class Keybinds
     {
+        internal static void Initialise() { }
+
         public static ConfigEntry<KeyboardShortcut> Snapping { get; } =
             Cfg.Bind(
                 section: nameof(Keybinds),
@@ -189,6 +193,8 @@ public static class Config
 
     public static class Snapping
     {
+        internal static void Initialise() { }
+
         public static ConfigEntry<bool> EnabledByDefault { get; } =
             Cfg.Bind(
                 section: nameof(Snapping),
@@ -275,6 +281,8 @@ public static class Config
 
     public static class Toggles
     {
+        internal static void Initialise() { }
+
         public static Toggle Snapping { get; } =
             new(
                 shortcut: Keybinds.Snapping,

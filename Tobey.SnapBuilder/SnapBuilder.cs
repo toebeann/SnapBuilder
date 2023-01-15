@@ -43,6 +43,12 @@ public class SnapBuilder : BaseUnityPlugin
 
     private void OnEnable()
     {
+        General.Initialise();
+        Snapping.Initialise();
+        Keybinds.Initialise();
+        Toggles.Initialise();
+        Localisation.Initialise();
+
         Toggles.Bind();
         ApplyHarmonyPatches();
     }
