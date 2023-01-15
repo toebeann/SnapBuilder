@@ -39,8 +39,6 @@ public class SnapBuilder : BaseUnityPlugin
         }
     }
 
-    private void Start() => Localisation.Initialise();
-
     private void OnEnable()
     {
         General.Initialise();
@@ -49,8 +47,20 @@ public class SnapBuilder : BaseUnityPlugin
         Toggles.Initialise();
         Localisation.Initialise();
 
+        General.BuildRangeMultiplier.SettingChanged -= BuildRangeMultiplier_SettingChanged;
+        General.BuildRangeMultiplier.SettingChanged += BuildRangeMultiplier_SettingChanged;
+
         Toggles.Bind();
         ApplyHarmonyPatches();
+    }
+
+    private void BuildRangeMultiplier_SettingChanged(object sender, EventArgs e)
+    {
+        foreach (var constructable in ConstructablePatch.constructableDistances)
+        {
+            constructable.Key.placeDefaultDistance = constructable.Value.Item1 * General.BuildRangeMultiplier.Value;
+            constructable.Key.placeMaxDistance = constructable.Value.Item2 * General.BuildRangeMultiplier.Value;
+        }
     }
 
     private void ApplyHarmonyPatches()
@@ -58,10 +68,13 @@ public class SnapBuilder : BaseUnityPlugin
         Harmony.PatchAll(typeof(BuilderPatch));
         Harmony.PatchAll(typeof(PlaceToolPatch));
         Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
+        Harmony.PatchAll(typeof(PhysicsPatch));
+        Harmony.PatchAll(typeof(ConstructablePatch));
     }
 
     private void OnDisable()
     {
+        General.BuildRangeMultiplier.SettingChanged -= BuildRangeMultiplier_SettingChanged;
         Toggles.Unbind();
         Harmony.UnpatchSelf();
         Destroy(AimTransform.Instance);

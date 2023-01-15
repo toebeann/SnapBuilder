@@ -80,6 +80,14 @@ public static class Config
                 defaultValue: true,
                 description: "Whether detailed colliders are rendered while using the Habitat Builder."
             );
+
+        public static ConfigEntry<float> BuildRangeMultiplier { get; } =
+            Cfg.Bind(
+                section: nameof(General),
+                key: "Build range multiplier",
+                defaultValue: 1.75f,
+                description: "The multiplier applied to the build range when using the Habitat Builder."
+            );
     }
 
     public static class Keybinds

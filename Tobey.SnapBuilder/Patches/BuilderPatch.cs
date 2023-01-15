@@ -45,6 +45,26 @@ internal static class BuilderPatch
     public static void BeginResetTogglesPostFix() => Toggles.Reset();
     #endregion
 
+    #region Builder.CreateGhost
+    [HarmonyPatch(typeof(Builder), nameof(Builder.CreateGhost))]
+    [HarmonyPostfix, HarmonyWrapSafe]
+    public static void CreateGhostPostfix()
+    {
+        var constructable = Builder.prefab.GetComponent<Constructable>();
+        if (constructable != null && !ConstructablePatch.constructableDistances.ContainsKey(constructable))
+        {
+            ConstructablePatch.constructableDistances.Add(constructable, new(constructable.placeDefaultDistance, constructable.placeMaxDistance));
+            Builder.placeDefaultDistance = constructable.placeDefaultDistance *= General.BuildRangeMultiplier.Value;
+            Builder.placeMaxDistance = constructable.placeMaxDistance *= General.BuildRangeMultiplier.Value;
+        }
+        else
+        {
+            Builder.placeDefaultDistance = ConstructablePatch.constructableDistances[constructable].Item1 * General.BuildRangeMultiplier.Value;
+            Builder.placeMaxDistance = ConstructablePatch.constructableDistances[constructable].Item2 * General.BuildRangeMultiplier.Value;
+        }
+    }
+    #endregion
+
     #region Builder.GetAimTransform
     [HarmonyPatch(typeof(Builder), nameof(Builder.GetAimTransform))]
     [HarmonyPostfix, HarmonyWrapSafe]

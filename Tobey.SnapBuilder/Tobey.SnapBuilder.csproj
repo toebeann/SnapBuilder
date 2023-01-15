@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Tobey.SnapBuilder</AssemblyName>
     <Description>Snap-to-Grid for Subnautica!</Description>
-    <Version>2.2.1</Version>
+    <Version>2.3.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>10.0</LangVersion>
     <Product>SnapBuilder</Product>
@@ -28,11 +28,11 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica.experimental\Subnautica_Data\Managed\publicized-assemblies\Assembly-CSharp-firstpass-publicized.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized\Assembly-CSharp-firstpass-publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica.experimental\Subnautica_Data\Managed\publicized-assemblies\Assembly-CSharp-publicized.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized\Assembly-CSharp-publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

@@ -49,7 +49,8 @@ public class AimTransform : MonoBehaviour
         Destroy(GetComponent<ColliderCache>());
     }
 
-    private static PlaceTool GetPlaceTool() => Inventory.main?.GetHeld()?.GetComponent<PlaceTool>();
+    internal static BuilderTool GetBuilderTool() => Inventory.main?.GetHeld()?.GetComponent<BuilderTool>();
+    internal static PlaceTool GetPlaceTool() => Inventory.main?.GetHeld()?.GetComponent<PlaceTool>();
 
     public static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit)
     {
@@ -60,7 +61,7 @@ public class AimTransform : MonoBehaviour
         }
         else
         {
-            int max = UWE.Utils.RaycastIntoSharedBuffer(from, direction, 5f, -5, QueryTriggerInteraction.UseGlobal);
+            int max = UWE.Utils.RaycastIntoSharedBuffer(from, direction, 5f * General.BuildRangeMultiplier.Value, -5, QueryTriggerInteraction.UseGlobal);
             var hits = new ArraySegment<RaycastHit>(UWE.Utils.sharedHitBuffer, 0, max)
                 .Where(h => !h.collider.isTrigger && !UWE.Utils.SharingHierarchy(placeTool.gameObject, h.collider.gameObject))
                 .OrderBy(h => h.distance);
