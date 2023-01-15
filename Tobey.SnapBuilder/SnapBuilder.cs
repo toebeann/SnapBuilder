@@ -19,11 +19,6 @@ public class SnapBuilder : BaseUnityPlugin
 
     public Harmony Harmony { get; } = new Harmony(PluginInfo.PLUGIN_GUID);
 
-    private bool? hasBuilderTool;
-    public bool HasBuilderTool => hasBuilderTool ??= BuilderTool_GetCustomUseText_Patch.TargetMethod() is not null;
-
-    public bool HasLargeRoom { get; } = Enum.TryParse<Base.CellType>("LargeRoom", out _);
-
     public ConfigEntry<int> RotationFactor => Toggles.FineRotation.IsEnabled switch
     {
         true => Snapping.FineRotationRounding,
@@ -56,11 +51,7 @@ public class SnapBuilder : BaseUnityPlugin
     {
         Harmony.PatchAll(typeof(BuilderPatch));
         Harmony.PatchAll(typeof(PlaceToolPatch));
-
-        if (HasBuilderTool)
-        {
-            Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
-        }
+        Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
     }
 
     private void OnDisable()

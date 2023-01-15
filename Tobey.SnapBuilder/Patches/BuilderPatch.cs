@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using BepInEx;
+using HarmonyLib;
 using UnityEngine;
 
 namespace Tobey.SnapBuilder.Patches;
@@ -8,13 +9,11 @@ internal static class BuilderPatch
     private static ColliderCache ColliderCache => AimTransform.Instance?.ColliderCache;
 
     #region Builder.Begin
-    // SN1 only
     [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
-    [HarmonyWrapSafe]
-    [HarmonyPrefix]
+    [HarmonyPrefix, HarmonyWrapSafe]
     public static void BeginHintsPrefix(out bool __state)
     {
-        __state = General.DisplayControlHints.Value && Builder.ghostModel == null;
+        __state = Paths.ProcessName == "Subnautica" && General.DisplayControlHints.Value && Builder.ghostModel == null;
 
         if (__state)
         {
@@ -23,10 +22,8 @@ internal static class BuilderPatch
         }
     }
 
-    // SN1 only
     [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
-    [HarmonyPostfix]
-    [HarmonyWrapSafe]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void BeginHintsPostfix(bool __state)
     {
         if (__state && Builder.rotationEnabled)
@@ -44,22 +41,19 @@ internal static class BuilderPatch
     }
 
     [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
-    [HarmonyPostfix]
-    [HarmonyWrapSafe]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void BeginResetTogglesPostFix() => Toggles.Reset();
     #endregion
 
     #region Builder.GetAimTransform
     [HarmonyPatch(typeof(Builder), nameof(Builder.GetAimTransform))]
-    [HarmonyPostfix]
-    [HarmonyWrapSafe]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static Transform GetAimTransformPostfix(Transform _) => AimTransform.Instance?.GetAimTransform();
     #endregion
 
     #region Builder.SetPlaceOnSurface
     [HarmonyPatch(typeof(Builder), nameof(Builder.SetPlaceOnSurface))]
-    [HarmonyPostfix]
-    [HarmonyWrapSafe]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void SetPlaceOnSurfacePostfix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
     {
         if (Toggles.Snapping.IsEnabled)
@@ -75,8 +69,7 @@ internal static class BuilderPatch
 
     #region Builder.End
     [HarmonyPatch(typeof(Builder), nameof(Builder.End))]
-    [HarmonyWrapSafe]
-    [HarmonyPostfix]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void EndPostfix() => ColliderCache.RevertAll();
     #endregion
 }

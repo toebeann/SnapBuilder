@@ -6,8 +6,7 @@ internal static class PlaceToolPatch
 {
     #region PlaceTool.CreateGhostModel
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
-    [HarmonyWrapSafe]
-    [HarmonyPrefix]
+    [HarmonyPrefix, HarmonyWrapSafe]
     public static void CreateGhostModelPrefix(PlaceTool __instance, ref bool __state)
     {
         Toggles.Reset();
@@ -22,8 +21,7 @@ internal static class PlaceToolPatch
     }
 
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
-    [HarmonyWrapSafe]
-    [HarmonyPostfix]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void CreateGhostModelPostfix(PlaceTool __instance, bool __state)
     {
         if (__state && General.DisplayControlHints.Value && __instance.rotationEnabled)
@@ -37,8 +35,7 @@ internal static class PlaceToolPatch
 
     #region PlaceTool.LateUpdate
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.LateUpdate))]
-    [HarmonyWrapSafe]
-    [HarmonyPostfix]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void LateUpdatePostfix(PlaceTool __instance)
     {
         if (__instance?.usingPlayer == null || !Toggles.Snapping.IsEnabled)
@@ -55,8 +52,7 @@ internal static class PlaceToolPatch
     #region PlaceTool.OnPlace | PlaceTool.OnHolster
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnPlace))]
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnHolster))]
-    [HarmonyWrapSafe]
-    [HarmonyPostfix]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static void OnPlaceOrOnHolsterPostfix() => Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
     #endregion
 }

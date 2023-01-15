@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 
 namespace Tobey.SnapBuilder;
+
+using BepInEx;
 using ExtensionMethods;
 using ExtensionMethods.UnityEngine;
 using static Config;
@@ -274,9 +276,7 @@ public class AimTransform : MonoBehaviour
                     Destroy(child);
                     Destroy(empty);
 
-                    float offset = SnapBuilder.Instance.HasLargeRoom
-                        ? 0.02f
-                        : 0.1f; // in sn1 prior to large room addition, the collision boundary between objects is much larger than in BZ
+                    float offset = 0.001f;
 
                     // Now move the hit.point outward from the wall just enough so that the object can fit
                     Vector3 poppedPoint = hit.point + hit.normal * Vector3.Distance(farthestCornerCentered, hit.point) + hit.normal * offset;

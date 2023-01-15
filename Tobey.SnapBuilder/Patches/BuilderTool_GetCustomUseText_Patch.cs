@@ -8,8 +8,6 @@ namespace Tobey.SnapBuilder.Patches;
 using static Config;
 internal static class BuilderTool_GetCustomUseText_Patch
 {
-    public static MethodBase TargetMethod() => AccessTools.Method("BuilderTool:GetCustomUseText");
-
     public struct GetCustomUseTextState
     {
         public bool WasPlacing;
@@ -30,8 +28,8 @@ internal static class BuilderTool_GetCustomUseText_Patch
     private static bool wasColliderImprovable = false;
     private static bool wasColliderImproved = false;
 
-    [HarmonyWrapSafe]
-    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
+    [HarmonyPrefix, HarmonyWrapSafe]
     public static void GetCustomUseTextPrefix(object __instance, out GetCustomUseTextState __state)
     {
         var builderTool = Traverse.Create(__instance);
@@ -52,8 +50,8 @@ internal static class BuilderTool_GetCustomUseText_Patch
         wasColliderImproved = IsColliderImproved;
     }
 
-    [HarmonyWrapSafe]
-    [HarmonyPostfix]
+    [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
+    [HarmonyPostfix, HarmonyWrapSafe]
     public static string GetCustomUseTextPostfix(string customUseText, object __instance, GetCustomUseTextState __state)
     {
         var builderTool = Traverse.Create(__instance);
