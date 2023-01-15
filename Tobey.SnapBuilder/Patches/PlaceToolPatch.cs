@@ -16,8 +16,8 @@ internal static class PlaceToolPatch
 
         if (__state && General.DisplayControlHints.Value)
         {
-            ControlHint.Show("Snapping", Toggles.Snapping);
-            ControlHint.Show("Fine snapping", Toggles.FineSnapping);
+            ControlHint.Show(Localisation.ToggleSnapping.Value, Toggles.Snapping);
+            ControlHint.Show(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping);
         }
     }
 
@@ -28,9 +28,9 @@ internal static class PlaceToolPatch
     {
         if (__state && General.DisplayControlHints.Value && __instance.rotationEnabled)
         {
-            ControlHint.Show("Rotation", Toggles.Rotation);
-            ControlHint.Show("Fine rotation", Toggles.FineRotation);
-            ControlHint.Show("Holster item", GameInput.Button.Exit);
+            ControlHint.Show(Localisation.ToggleRotation.Value, Toggles.Rotation);
+            ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
+            ControlHint.Show(Localisation.HolsterItem.Value, GameInput.Button.Exit);
         }
     }
     #endregion

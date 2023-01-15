@@ -18,8 +18,8 @@ internal static class BuilderPatch
 
         if (__state)
         {
-            ControlHint.Show("Snapping", Toggles.Snapping);
-            ControlHint.Show("Fine snapping", Toggles.FineSnapping);
+            ControlHint.Show(Localisation.ToggleSnapping.Value, Toggles.Snapping);
+            ControlHint.Show(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping);
         }
     }
 
@@ -31,14 +31,14 @@ internal static class BuilderPatch
     {
         if (__state && Builder.rotationEnabled)
         {
-            ControlHint.Show("Fine rotation", Toggles.FineRotation);
+            ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
         }
 
         if (__state && (ColliderCache?.Record?.IsImprovable ?? false))
         {
             string hintId = ColliderCache.Record.IsImproved
-                ? "Original collider"
-                : "Detailed collider";
+                ? Localisation.OriginalCollider.Value
+                : Localisation.DetailedCollider.Value;
             ControlHint.Show(hintId, Toggles.DetailedColliders);
         }
     }

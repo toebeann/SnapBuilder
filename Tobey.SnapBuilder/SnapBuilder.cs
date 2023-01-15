@@ -44,6 +44,8 @@ public class SnapBuilder : BaseUnityPlugin
         }
     }
 
+    private void Start() => Localisation.Initialise();
+
     private void OnEnable()
     {
         Toggles.Bind();

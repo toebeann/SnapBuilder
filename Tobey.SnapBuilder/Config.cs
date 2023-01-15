@@ -7,6 +7,60 @@ public static class Config
 {
     internal static ConfigFile Cfg => SnapBuilder.Instance.Config;
 
+    public static class Localisation
+    {
+        public static void Initialise() { }
+
+        public static ConfigEntry<string> ToggleSnapping { get; } =
+                Cfg.Bind(
+                    section: nameof(Localisation),
+                    key: nameof(ToggleSnapping),
+                    defaultValue: "Snapping"
+                );
+
+        public static ConfigEntry<string> ToggleFineSnapping { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(ToggleFineSnapping),
+                defaultValue: "Fine snapping"
+            );
+
+        public static ConfigEntry<string> ToggleRotation { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(ToggleRotation),
+                defaultValue: "Rotation"
+            );
+
+        public static ConfigEntry<string> ToggleFineRotation { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(ToggleFineRotation),
+                defaultValue: "Fine rotation"
+            );
+
+        public static ConfigEntry<string> HolsterItem { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(HolsterItem),
+                defaultValue: "Holster item"
+            );
+
+        public static ConfigEntry<string> DetailedCollider { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(DetailedCollider),
+                defaultValue: "Detailed collider"
+            );
+
+        public static ConfigEntry<string> OriginalCollider { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(OriginalCollider),
+                defaultValue: "Original collider"
+            );
+    }
+
     public static class General
     {
         public static ConfigEntry<bool> DisplayControlHints { get; } =

@@ -80,20 +80,20 @@ internal static class BuilderTool_GetCustomUseText_Patch
                 customUseText = customUseTextField.GetValue<string>();
 
                 List<string> lines = customUseText.Split('\n').ToList();
-                lines[0] += $", {ControlHint.Get("Snapping", Toggles.Snapping)}";
+                lines[0] += $", {ControlHint.Get(Localisation.ToggleSnapping.Value, Toggles.Snapping)}";
 
                 if (Toggles.Snapping.IsEnabled)
                 {
-                    lines.Insert(1, ControlHint.Get("Fine snapping", Toggles.FineSnapping));
+                    lines.Insert(1, ControlHint.Get(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping));
 
                     if (Builder.rotationEnabled
                         && (!__state.WereHintsEnabled
                             || !__state.WasPlacingRotatable
                             || (IsSnappingEnabled && !__state.WasSnappingEnabled)))
                     {
-                        lines[1] += $", {ControlHint.Get("Fine rotation", Toggles.FineRotation)}";
+                        lines[1] += $", {ControlHint.Get(Localisation.ToggleFineRotation.Value, Toggles.FineRotation)}";
                     }
-
+                    
                     if (IsColliderImprovable
                         && (!__state.WereHintsEnabled
                             || !__state.WasColliderImprovable
@@ -101,8 +101,8 @@ internal static class BuilderTool_GetCustomUseText_Patch
                             || (IsSnappingEnabled && !__state.WasSnappingEnabled)))
                     {
                         string hint = IsColliderImproved
-                            ? "Original collider"
-                            : "Detailed collider";
+                            ? Localisation.OriginalCollider.Value
+                            : Localisation.DetailedCollider.Value;
                         lines[0] += $", {ControlHint.Get(hint, Toggles.DetailedColliders)}";
                     }
                 }
