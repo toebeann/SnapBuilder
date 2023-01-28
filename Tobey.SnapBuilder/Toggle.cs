@@ -10,17 +10,18 @@ public class Toggle : IDisposable
         Press, Hold
     }
 
+    private readonly ConfigEntry<KeyCode> keyCodeConfigEntry;
     private readonly ConfigEntry<KeyboardShortcut> shortcutConfigEntry;
     private readonly ConfigEntry<ToggleMode> modeConfigEntry;
     private readonly ConfigEntry<bool> enabledByDefaultConfigEntry;
     private readonly bool enabledByDefault;
 
+    public KeyCode KeyCode => keyCodeConfigEntry.Value;
     public KeyboardShortcut Shortcut => shortcutConfigEntry.Value;
     public ToggleMode Mode => modeConfigEntry.Value;
     public bool EnabledByDefault => enabledByDefaultConfigEntry?.Value ?? enabledByDefault;
 
     private bool enabled;
-    private int lastFrame = -1;
     private bool disposed;
 
     public bool IsEnabled
@@ -30,19 +31,17 @@ public class Toggle : IDisposable
             switch (modeConfigEntry.Value)
             {
                 case ToggleMode.Press:
-                    int currentFrame = Time.frameCount;
-                    if (shortcutConfigEntry.Value.IsDown() && currentFrame > lastFrame)
+                    if (shortcutConfigEntry?.Value.IsDown() ?? Input.GetKeyDown(keyCodeConfigEntry.Value))
                     {
-                        lastFrame = currentFrame;
                         enabled = !enabled;
                     }
                     break;
                 case ToggleMode.Hold:
-                    if (shortcutConfigEntry.Value.IsDown())
+                    if (shortcutConfigEntry?.Value.IsPressed() ?? Input.GetKey(keyCodeConfigEntry.Value))
                     {
                         enabled = !EnabledByDefault;
                     }
-                    else if (shortcutConfigEntry.Value.IsUp())
+                    else
                     {
                         enabled = EnabledByDefault;
                     }
@@ -50,6 +49,21 @@ public class Toggle : IDisposable
             }
             return enabled;
         }
+    }
+
+    public Toggle(ConfigEntry<KeyCode> keyCode, ConfigEntry<ToggleMode> mode, ConfigEntry<bool> enabledByDefault)
+    {
+        keyCodeConfigEntry = keyCode;
+        modeConfigEntry = mode;
+        enabledByDefaultConfigEntry = enabledByDefault;
+        enabled = enabledByDefault.Value;
+    }
+
+    public Toggle(ConfigEntry<KeyCode> keyCode, ConfigEntry<ToggleMode> mode, bool enabledByDefault = false)
+    {
+        keyCodeConfigEntry = keyCode;
+        modeConfigEntry = mode;
+        this.enabledByDefault = enabled = enabledByDefault;
     }
 
     public Toggle(ConfigEntry<KeyboardShortcut> shortcut, ConfigEntry<ToggleMode> mode, ConfigEntry<bool> enabledByDefault)
@@ -69,7 +83,14 @@ public class Toggle : IDisposable
 
     public void Bind()
     {
-        shortcutConfigEntry.SettingChanged += Reset;
+        if (shortcutConfigEntry is not null)
+        {
+            shortcutConfigEntry.SettingChanged += Reset;
+        }
+        if (keyCodeConfigEntry is not null)
+        {
+            keyCodeConfigEntry.SettingChanged += Reset;
+        }
         modeConfigEntry.SettingChanged += Reset;
         if (enabledByDefaultConfigEntry is not null)
         {
@@ -79,7 +100,14 @@ public class Toggle : IDisposable
 
     public void Unbind()
     {
-        shortcutConfigEntry.SettingChanged -= Reset;
+        if (shortcutConfigEntry is not null)
+        {
+            shortcutConfigEntry.SettingChanged -= Reset;
+        }
+        if (keyCodeConfigEntry is not null)
+        {
+            keyCodeConfigEntry.SettingChanged -= Reset;
+        }
         modeConfigEntry.SettingChanged -= Reset;
         if (enabledByDefaultConfigEntry is not null)
         {
