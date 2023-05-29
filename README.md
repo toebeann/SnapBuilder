@@ -2,30 +2,52 @@
 
 # SnapBuilder - Snap-to-Grid for Subnautica!
 
-## ATTENTION
-
-**The dependencies and the installation process of SnapBuilder have changed.**
-
-From SnapBuilder 2.0 onwards, SnapBuilder will no longer be released as a mod for [QModManager](https://www.nexusmods.com/subnautica/mods/201). Moving forward, SnapBuilder will be released as a [BepInEx](https://www.nexusmods.com/subnautica/mods/1108) plugin.
-
-This change is to facilitate compatibility with the Subnautica 2.0 Living Large update.
-
 ## What is this?
 
-**Finally, we can build perfectly aligned and rotated items with the Habitat Builder!**
+SnapBuilder is **the** snap-to-grid mod for Subnautica & Subnautica: Below Zero you've been dreaming of!
 
-Fully customisable - all keybinds and snapping parameters can be tweaked in-game with [Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/). Simply press F5 to open the configuration window.
+### Features
 
-By default, snapping is enabled with the mod installed. The level of snapping can be fine-tuned in-game.
+-   Snap-to-grid enabled for all items! (Doesn't apply to rooms as they already snap together)
+-   [When aiming at a wall or the side of another item, will automatically snap the item into position!](https://i.imgur.com/kY9Xefg.mp4)
+-   [Automatically upgrades inaccurate hitboxes so that items can properly snap to them!](https://i.imgur.com/D8DycbH.mp4) (Mostly only applies to Subnautica: Below Zero)
+-   Fully compatible with [Decorations Mod](https://www.nexusmods.com/subnautica/mods/102)!
+-   The range for building can be extended and customised! (On the legacy branch of Subnautica, this only applies to items, not rooms)
+-   All keybinds and parameters can be tweaking in-game with [Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/). Simply press F5 to open the configuration window.
 
 ![Configuring SnapBuilder](https://staticdelivery.nexusmods.com/mods/1155/images/427/427-1671005686-1718616155.png)
 
-## Manual installation
+## Installation
 
-1. [Install the latest version of BepInEx](https://www.nexusmods.com/subnautica/mods/1108).
-2. [Install BepInEx Tweaks](https://www.nexusmods.com/subnautica/mods/1104?tab=files).
-3. For in-game configuration, [install Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/).
-4. [Download SnapBuilder from Nexus Mods](https://www.nexusmods.com/subnautica/mods/427?tab=files) and extract the contents of the archive into the `[game dir]\BepInEx` folder.
+### Prerequisites (install these first)
+
+#### **Required**
+
+-   The relevant BepInEx pack for your game:
+    -   [**BepInEx pack for Subnautica**](https://www.nexusmods.com/subnautica/mods/1108)
+    -   [**BepInEx pack for Subnautica: Below Zero**](https://www.nexusmods.com/subnauticabelowzero/mods/344)
+
+#### Highly recommended
+
+-   [**Vortex Mod Manager**](https://www.nexusmods.com/about/vortex/) (Windows only) - Makes installing mods a breeze.
+-   [**BepInEx Tweaks**](https://www.nexusmods.com/subnautica/mods/1104) - Without this, SnapBuilder and many other BepInEx plugins will be disabled whenever you back out to the main menu and will not work again until you restart the game.
+-   [**Configuration Manager**](https://www.nexusmods.com/subnautica/mods/1112) - Allows you to configure your settings for this and many other BepInEx plugins in-game.
+
+### Installating SnapBuilder
+
+#### Automatic (Windows only)
+
+1. Get [Vortex Mod Manager](https://www.nexusmods.com/about/vortex/)
+2. Click the `Vortex` button at the top of the relevant Nexus Mods page for this mod to install:
+    - [SnapBuilder for Subnautica](https://www.nexusmods.com/subnautica/mods/427)
+    - [SnapBuilder for Subnautica: Below zero](https://www.nexusmods.com/subnauticabelowzero/mods/57)
+
+#### Manual
+
+1. Click the `Manual Download` button under the main file of the SnapBuilder from the Files tab of the relevant Nexus Mods page:
+    - [SnapBuilder for Subnautica](https://www.nexusmods.com/subnautica/mods/427?tab=files)
+    - [SnapBuilder for Subnautica: Below zero](https://www.nexusmods.com/subnauticabelowzero/mods/57?tab=files)
+2. Extract the contents of the archive into the `[game dir]\BepInEx` folder.
 
 ## Default controls
 
@@ -34,6 +56,15 @@ The following controls are entirely configurable in-game with [Configuration Man
 -   Toggle snap-to-grid/freehand placement: `middle mouse`
 -   Toggle fine grid snapping: `left ctrl`
 -   Toggle fine rotation snapping: `left alt`
+-   Toggle detailed colliders: `f`
+-   Toggle extended build range: `b`
+-   Increase extended build range: `mouse4`
+-   Decresae extended build range: `mouse3`
+-   Reset extended build range: `mouse4` + `mouse3`
+
+## Need help?
+
+Most issues are resolved by carefully re-reading the installation instructions or stickies at the top of the Posts tab on the relevant Nexus Mods page ([Subnautica](https://www.nexusmods.com/subnautica/mods/427?tab=posts), [Below Zero](https://www.nexusmods.com/subnauticabelowzero/mods/57?tab=posts)), but if you have stumbled on a bug, please file a bug report on the Bugs tab ([Subnautica](https://www.nexusmods.com/subnautica/mods/427?tab=bugs), [Below Zero](https://www.nexusmods.com/subnauticabelowzero/mods/57?tab=bugs)) with as much information as possible to help me find the cause and get it squashed in an update.
 
 ## I'm a dev, how do I make my mod compatible?
 
@@ -62,7 +93,10 @@ For example:
         }
 ```
 
-## Need help?
-Your first port of call when in need of help with a Subnautica mod should be the [Subnautica Modding discord server](https://discord.gg/UpWuWwq). Hop into one of the `#help-and-support` channels where you can find many helpful, knowledgeable people who can guide you through configuration and installation issues.
+## Check out these other mods by Tobey!
 
-If however you've stumbled on a bug, please file an issue here on GitHub, or on the [Nexus Mods bugs tab](https://www.nexusmods.com/subnautica/mods/427?tab=bugs) with as much information as possible to help me find the cause and get it squashed in an update.
+### [Fast Loading Screen](https://www.nexusmods.com/subnautica/mods/763)
+
+[![Fast Loading Screen](https://staticdelivery.nexusmods.com/mods/2706/images/thumbnails/171/171-1621479562-543452583.jpeg)](https://www.nexusmods.com/subnautica/mods/763)
+
+Turboboost your Subnautica loading times!
