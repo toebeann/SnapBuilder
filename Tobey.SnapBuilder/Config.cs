@@ -39,6 +39,13 @@ public static class Config
                 defaultValue: "Fine rotation"
             );
 
+        public static ConfigEntry<string> PlaceItem { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(PlaceItem),
+                defaultValue: "Place item"
+            );
+
         public static ConfigEntry<string> HolsterItem { get; } =
             Cfg.Bind(
                 section: nameof(Localisation),

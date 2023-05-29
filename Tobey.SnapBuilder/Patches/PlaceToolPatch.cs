@@ -15,10 +15,13 @@ internal static class PlaceToolPatch
     {
         __state = __instance.ghostModel == null;
 
-        if (__state && General.DisplayControlHints.Value)
+        if (__state && General.DisplayControlHints.Value && !SnapBuilder.Instance.HasLargeRoom)
         {
-            ControlHint.Show(Localisation.ToggleSnapping.Value, Toggles.Snapping);
             ControlHint.Show(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping);
+            if (__instance.rotationEnabled)
+            {
+                ControlHint.Show(Localisation.ToggleRotation.Value, Toggles.Rotation);
+            }
         }
     }
 
@@ -26,10 +29,9 @@ internal static class PlaceToolPatch
     [HarmonyPostfix, HarmonyWrapSafe]
     public static void CreateGhostModelPostfix(PlaceTool __instance, bool __state)
     {
-        if (__state && General.DisplayControlHints.Value && __instance.rotationEnabled)
+        if (__state && General.DisplayControlHints.Value)
         {
-            ControlHint.Show(Localisation.ToggleRotation.Value, Toggles.Rotation);
-            ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
+            ControlHint.Show(Localisation.PlaceItem.Value, GameInput.Button.RightHand);
             ControlHint.Show(Localisation.HolsterItem.Value, GameInput.Button.Exit);
         }
     }
