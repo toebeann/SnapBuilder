@@ -51,6 +51,7 @@ internal static class BuilderTool_GetCustomUseText_Patch
 
     [HarmonyPatch(typeof(BuilderTool), nameof(BuilderTool.GetCustomUseText))]
     [HarmonyPostfix, HarmonyWrapSafe]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Method Declaration", "Harmony003:Harmony non-ref patch parameters modified", Justification = "I'm using them locally.")]
     public static string GetCustomUseTextPostfix(string customUseText, object __instance, GetCustomUseTextState __state)
     {
         var builderTool = Traverse.Create(__instance);
