@@ -11,11 +11,11 @@ internal static class BuilderPatch
     #region Builder.Begin
     [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
     [HarmonyPrefix, HarmonyWrapSafe]
-    public static void BeginHintsPrefix(out bool __state)
+    public static void BeginHintsPrefix(GameObject modulePrefab, out bool __state)
     {
         __state = Paths.ProcessName == "Subnautica" && General.DisplayControlHints.Value && Builder.ghostModel == null;
 
-        if (__state)
+        if (__state && modulePrefab.GetComponent<ConstructableBase>() == null)
         {
             ControlHint.Show(Localisation.ToggleSnapping.Value, Toggles.Snapping);
             ControlHint.Show(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping);
@@ -24,9 +24,9 @@ internal static class BuilderPatch
 
     [HarmonyPatch(typeof(Builder), nameof(Builder.Begin))]
     [HarmonyPostfix, HarmonyWrapSafe]
-    public static void BeginHintsPostfix(bool __state)
+    public static void BeginHintsPostfix(GameObject modulePrefab, bool __state)
     {
-        if (__state && Builder.rotationEnabled)
+        if (__state && modulePrefab.GetComponent<ConstructableBase>() == null)
         {
             ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
         }
