@@ -78,7 +78,8 @@ public class AimTransform : MonoBehaviour
     /// <returns></returns>
     public Transform GetAimTransform()
     {
-        if (!Toggles.Snapping.IsEnabled)
+        if (!Toggles.Snapping.IsEnabled ||
+            (GetPlaceTool() ?? GetBuilderTool() as PlayerTool) == null)
         {
             return BuilderAimTransform;
         }
