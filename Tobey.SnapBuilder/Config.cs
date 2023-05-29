@@ -59,6 +59,24 @@ public static class Config
                 key: nameof(OriginalCollider),
                 defaultValue: "Original collider"
             );
+
+        public static ConfigEntry<string> ToggleExtendedBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(ToggleExtendedBuildRange),
+                defaultValue: "Extended build range");
+
+        public static ConfigEntry<string> AdjustBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(AdjustBuildRange),
+                defaultValue: "Adjust build range");
+
+        public static ConfigEntry<string> ResetBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Localisation),
+                key: nameof(ResetBuildRange),
+                defaultValue: "Reset build range");
     }
 
     public static class General
@@ -79,14 +97,6 @@ public static class Config
                 key: "Render detailed colliders",
                 defaultValue: true,
                 description: "Whether detailed colliders are rendered while using the Habitat Builder."
-            );
-
-        public static ConfigEntry<float> BuildRangeMultiplier { get; } =
-            Cfg.Bind(
-                section: nameof(General),
-                key: "Build range multiplier",
-                defaultValue: 1.75f,
-                description: "The multiplier applied to the build range when using the Habitat Builder."
             );
     }
 
@@ -110,11 +120,11 @@ public static class Config
                 description: "Whether snapping is toggled on keypress or while holding the shortcut."
             );
 
-        public static ConfigEntry<KeyboardShortcut> FineSnapping { get; } =
+        public static ConfigEntry<KeyCode> FineSnapping { get; } =
             Cfg.Bind(
                 section: nameof(Keybinds),
                 key: "Toggle fine snapping",
-                defaultValue: new KeyboardShortcut(KeyCode.LeftControl),
+                defaultValue: KeyCode.LeftControl,
                 configDescription: new(
                     description: "Shortcut to toggle fine snapping.",
                     tags: new[] { new ConfigurationManagerAttributes { Order = -10 } }
@@ -132,11 +142,11 @@ public static class Config
                 )
             );
 
-        public static ConfigEntry<KeyboardShortcut> FineRotation { get; } =
+        public static ConfigEntry<KeyCode> FineRotation { get; } =
             Cfg.Bind(
                 section: nameof(Keybinds),
                 key: "Toggle fine rotation",
-                defaultValue: new KeyboardShortcut(KeyCode.LeftAlt),
+                defaultValue: KeyCode.LeftAlt,
                 configDescription: new(
                     description: "Shortcut to toggle fine rotation.",
                     tags: new[] { new ConfigurationManagerAttributes { Order = -20 } }
@@ -195,6 +205,50 @@ public static class Config
                 configDescription: new(
                     description: "Whether detailed colliders are toggled on keypress or while holding the shortcut.",
                     tags: new[] { new ConfigurationManagerAttributes { Order = -40 } }
+                )
+            );
+
+        public static ConfigEntry<KeyCode> ExtendedBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Keybinds),
+                key: "Toggle extended build range",
+                defaultValue: KeyCode.B,
+                configDescription: new(
+                    description: "Shortcut to toggle the extended build range.",
+                    tags: new[] { new ConfigurationManagerAttributes { Order = -50 } }
+                )
+            );
+
+        public static ConfigEntry<Toggle.ToggleMode> ExtendedBuildRangeMode { get; } =
+            Cfg.Bind(
+                section: nameof(Keybinds),
+                key: "Toggle extended build range mode",
+                defaultValue: Toggle.ToggleMode.Press,
+                configDescription: new(
+                    description: "Whether the extended build range is toggled on keypress or while holding the key.",
+                    tags: new[] { new ConfigurationManagerAttributes { Order = -50 } }
+                )
+            );
+
+
+        public static ConfigEntry<KeyCode> IncreaseExtendedBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Keybinds),
+                key: "Increase extended build range",
+                defaultValue: KeyCode.Mouse4,
+                configDescription: new(
+                    description: "Shortcut to increase the extended build range.",
+                    tags: new[] { new ConfigurationManagerAttributes { Order = -60 } }
+                )
+            );
+        public static ConfigEntry<KeyCode> DecreaseExtendedBuildRange { get; } =
+            Cfg.Bind(
+                section: nameof(Keybinds),
+                key: "Decrease extended build range",
+                defaultValue: KeyCode.Mouse3,
+                configDescription: new(
+                    description: "Shortcut to decrease the extended build range.",
+                    tags: new[] { new ConfigurationManagerAttributes { Order = -61 } }
                 )
             );
     }
@@ -287,6 +341,32 @@ public static class Config
             );
     }
 
+    public static class ExtendedBuildRange
+    {
+        public const string Section = "Extended build range";
+
+        internal static void Initialise() { }
+
+        public static ConfigEntry<bool> EnabledByDefault { get; } =
+            Cfg.Bind(
+                section: Section,
+                key: "Enable extended build range by default",
+                defaultValue: false,
+                description: "Whether the extended build range is enabled by default."
+            );
+
+        public static ConfigEntry<float> Multiplier { get; } =
+            Cfg.Bind(
+                section: Section,
+                key: "Build range multiplier",
+                defaultValue: 1.5f,
+                configDescription: new(
+                    description: "The multiplier applied to the build range when using the Habitat Builder with the extended build range.",
+                    tags: new[] { new ConfigurationManagerAttributes { Order = -10 } }
+                )
+            );
+    }
+
     public static class Toggles
     {
         internal static void Initialise() { }
@@ -300,13 +380,13 @@ public static class Config
 
         public static Toggle FineSnapping { get; } =
             new(
-                shortcut: Keybinds.FineSnapping,
+                keyCode: Keybinds.FineSnapping,
                 mode: Keybinds.FineSnappingMode
             );
 
         public static Toggle FineRotation { get; } =
             new(
-                shortcut: Keybinds.FineRotation,
+                keyCode: Keybinds.FineRotation,
                 mode: Keybinds.FineRotationMode
             );
 
@@ -323,6 +403,13 @@ public static class Config
                 enabledByDefault: Config.Snapping.DetailedCollidersEnabledByDefault
             );
 
+        public static Toggle ExtendBuildRange { get; } =
+            new(
+                keyCode: Keybinds.ExtendedBuildRange,
+                mode: Keybinds.ExtendedBuildRangeMode,
+                enabledByDefault: ExtendedBuildRange.EnabledByDefault
+            );
+
         public static void Bind()
         {
             Snapping.Bind();
@@ -330,6 +417,7 @@ public static class Config
             FineRotation.Bind();
             Rotation.Bind();
             DetailedColliders.Bind();
+            ExtendBuildRange.Bind();
         }
 
         public static void Unbind()
@@ -339,6 +427,7 @@ public static class Config
             FineRotation.Unbind();
             Rotation.Unbind();
             DetailedColliders.Unbind();
+            ExtendBuildRange.Unbind();
         }
 
         public static void Reset()
@@ -348,6 +437,7 @@ public static class Config
             FineRotation.Reset();
             Rotation.Reset();
             DetailedColliders.Reset();
+            ExtendBuildRange.Reset();
         }
 
         public static void Dispose()
@@ -357,6 +447,7 @@ public static class Config
             FineRotation.Dispose();
             Rotation.Dispose();
             DetailedColliders.Dispose();
+            ExtendBuildRange.Dispose();
         }
     }
 }

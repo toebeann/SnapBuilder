@@ -25,6 +25,9 @@ public class SnapBuilder : BaseUnityPlugin
         false => Snapping.RotationRounding
     };
 
+    public bool IsSN1 => Paths.ProcessName == "Subnautica";
+    public bool HasLargeRoom => Enum.TryParse<TechType>("BaseLargeRoom", out var _);
+
     private void Awake()
     {
         // enforce singleton
@@ -43,38 +46,101 @@ public class SnapBuilder : BaseUnityPlugin
     {
         General.Initialise();
         Snapping.Initialise();
+        ExtendedBuildRange.Initialise();
         Keybinds.Initialise();
         Toggles.Initialise();
         Localisation.Initialise();
 
-        General.BuildRangeMultiplier.SettingChanged -= BuildRangeMultiplier_SettingChanged;
-        General.BuildRangeMultiplier.SettingChanged += BuildRangeMultiplier_SettingChanged;
+        ExtendedBuildRange.Multiplier.SettingChanged -= Multiplier_SettingChanged;
+        ExtendedBuildRange.Multiplier.SettingChanged += Multiplier_SettingChanged;
 
         Toggles.Bind();
         ApplyHarmonyPatches();
     }
 
-    private void BuildRangeMultiplier_SettingChanged(object sender, EventArgs e)
+    private void Multiplier_SettingChanged(object sender, EventArgs e)
     {
-        foreach (var constructable in ConstructablePatch.constructableDistances)
+        foreach (var entry in ConstructablePatch.constructableDistances)
         {
-            constructable.Key.placeDefaultDistance = constructable.Value.Item1 * General.BuildRangeMultiplier.Value;
-            constructable.Key.placeMaxDistance = constructable.Value.Item2 * General.BuildRangeMultiplier.Value;
+            if (Toggles.ExtendBuildRange.IsEnabled)
+            {
+                entry.Key.placeDefaultDistance = entry.Value.Item1 * ExtendedBuildRange.Multiplier.Value;
+                entry.Key.placeMaxDistance = entry.Value.Item2 * ExtendedBuildRange.Multiplier.Value;
+            }
+            else
+            {
+                entry.Key.placeDefaultDistance = entry.Value.Item1;
+                entry.Key.placeMaxDistance = entry.Value.Item2;
+            }
         }
     }
 
     private void ApplyHarmonyPatches()
     {
         Harmony.PatchAll(typeof(BuilderPatch));
-        Harmony.PatchAll(typeof(PlaceToolPatch));
-        Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
-        Harmony.PatchAll(typeof(PhysicsPatch));
+        if (!IsSN1)
+        {
+            Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
+        }
         Harmony.PatchAll(typeof(ConstructablePatch));
+        Harmony.PatchAll(typeof(PlaceToolPatch));
+        Harmony.PatchAll(typeof(PhysicsPatch));
+    }
+
+    private bool wasReset;
+    private void Update()
+    {
+        if (Builder.isPlacing)
+        {
+            if (Toggles.ExtendBuildRange.IsEnabled)
+            {
+                if (wasReset)
+                {
+                    if (!Input.GetKey(Keybinds.IncreaseExtendedBuildRange.Value) && !Input.GetKey(Keybinds.DecreaseExtendedBuildRange.Value))
+                    {
+                        wasReset = false;
+                    }
+                }
+                else
+                {
+                    if (Input.GetKey(Keybinds.IncreaseExtendedBuildRange.Value) && Input.GetKey(Keybinds.DecreaseExtendedBuildRange.Value))
+                    {
+                        ExtendedBuildRange.Multiplier.Value = (float)ExtendedBuildRange.Multiplier.DefaultValue;
+                        wasReset = true;
+                    }
+                    else if (Input.GetKey(Keybinds.IncreaseExtendedBuildRange.Value))
+                    {
+                        ExtendedBuildRange.Multiplier.Value += .02f;
+                    }
+                    else if (Input.GetKey(Keybinds.DecreaseExtendedBuildRange.Value))
+                    {
+                        ExtendedBuildRange.Multiplier.Value -= .02f;
+                    }
+                }
+            }
+
+            if (Toggles.ExtendBuildRange.IsEnabled)
+            {
+                foreach (var constructable in ConstructablePatch.constructableDistances)
+                {
+                    constructable.Key.placeDefaultDistance = constructable.Value.Item1 * ExtendedBuildRange.Multiplier.Value;
+                    constructable.Key.placeMaxDistance = constructable.Value.Item2 * ExtendedBuildRange.Multiplier.Value;
+                }
+            }
+            else
+            {
+                foreach (var constructable in ConstructablePatch.constructableDistances)
+                {
+                    constructable.Key.placeDefaultDistance = constructable.Value.Item1;
+                    constructable.Key.placeMaxDistance = constructable.Value.Item2;
+                }
+            }
+        }
     }
 
     private void OnDisable()
     {
-        General.BuildRangeMultiplier.SettingChanged -= BuildRangeMultiplier_SettingChanged;
+        ExtendedBuildRange.Multiplier.SettingChanged -= Multiplier_SettingChanged;
         Toggles.Unbind();
         Harmony.UnpatchSelf();
         Destroy(AimTransform.Instance);

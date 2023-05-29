@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,8 +56,9 @@ internal static class BuilderTool_GetCustomUseText_Patch
         var builderTool = Traverse.Create(__instance);
         var updateCustomUseTextMethod = builderTool.Method("UpdateCustomUseText");
         var customUseTextField = builderTool.Field("customUseText");
+        var isPlacingBasePiece = Builder.prefab?.GetComponent<ConstructableBase>() != null;
 
-        if (Builder.isPlacing && Builder.prefab.GetComponent<ConstructableBase>() is null)
+        if (Builder.isPlacing)
         {
             if (!AreHintsEnabled && __state.WereHintsEnabled)
             {
@@ -66,7 +66,6 @@ internal static class BuilderTool_GetCustomUseText_Patch
                 return customUseTextField.GetValue<string>();
             }
             else if (AreHintsEnabled
-                     && Builder.isPlacing
                      && (!__state.WereHintsEnabled
                          || !__state.WasPlacing
                          || IsSnappingEnabled != __state.WasSnappingEnabled
@@ -78,34 +77,46 @@ internal static class BuilderTool_GetCustomUseText_Patch
                 customUseText = customUseTextField.GetValue<string>();
 
                 List<string> lines = customUseText.Split('\n').ToList();
-                lines[0] += $", {ControlHint.Get(Localisation.ToggleSnapping.Value, Toggles.Snapping)}";
 
-                if (Toggles.Snapping.IsEnabled)
+                if (!isPlacingBasePiece && IsColliderImprovable
+                    && (!__state.WereHintsEnabled
+                        || !__state.WasColliderImprovable
+                        || IsColliderImproved != __state.WasColliderImproved
+                        || (IsSnappingEnabled && !__state.WasSnappingEnabled)))
                 {
-                    lines.Insert(1, ControlHint.Get(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping));
+                    lines[0] += $", {ControlHint.Get((IsColliderImproved ? Localisation.OriginalCollider : Localisation.DetailedCollider).Value, Toggles.DetailedColliders)}";
+                }
 
-                    if (Builder.rotationEnabled
-                        && (!__state.WereHintsEnabled
-                            || !__state.WasPlacingRotatable
-                            || (IsSnappingEnabled && !__state.WasSnappingEnabled)))
+                lines.Insert(1, string.Join(", ",
+                    ControlHint.Get(Localisation.ToggleExtendedBuildRange.Value, Toggles.ExtendBuildRange),
+                    ControlHint.Get(Localisation.AdjustBuildRange.Value, Keybinds.IncreaseExtendedBuildRange.Value, Keybinds.DecreaseExtendedBuildRange.Value),
+                    ControlHint.Get(Localisation.ResetBuildRange.Value, new[] { Keybinds.IncreaseExtendedBuildRange.Value, Keybinds.DecreaseExtendedBuildRange.Value })));
+
+
+                if (!isPlacingBasePiece)
+                {
+                    lines.Insert(1, string.Join(", ",
+                        ControlHint.Get(Localisation.ToggleSnapping.Value, Toggles.Snapping),
+                        ControlHint.Get(Localisation.ToggleFineSnapping.Value, Toggles.FineSnapping)));
+                }
+
+                if (Builder.rotationEnabled)
+                {
+                    try
                     {
-                        lines[1] += $", {ControlHint.Get(Localisation.ToggleFineRotation.Value, Toggles.FineRotation)}";
+                        var localisedRotate = Language.main.TryGet("GhostRotateInputHint", out string str)
+                            ? str.Split('(').First().Trim()
+                            : "Rotate";
+                        var rotateIndex = lines.FindIndex(x => x.StartsWith(localisedRotate));
+                        lines[rotateIndex] += $", {ControlHint.Get(Localisation.ToggleFineRotation.Value, Toggles.FineRotation)}";
                     }
-                    
-                    if (IsColliderImprovable
-                        && (!__state.WereHintsEnabled
-                            || !__state.WasColliderImprovable
-                            || IsColliderImproved != __state.WasColliderImproved
-                            || (IsSnappingEnabled && !__state.WasSnappingEnabled)))
+                    catch
                     {
-                        string hint = IsColliderImproved
-                            ? Localisation.OriginalCollider.Value
-                            : Localisation.DetailedCollider.Value;
-                        lines[0] += $", {ControlHint.Get(hint, Toggles.DetailedColliders)}";
+                        lines.Add(ControlHint.Get(Localisation.ToggleFineRotation.Value, Toggles.FineRotation));
                     }
                 }
 
-                customUseText = string.Join(Environment.NewLine, lines.Distinct());
+                customUseText = string.Join("\n", lines.Distinct());
             }
         }
 

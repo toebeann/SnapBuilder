@@ -1,5 +1,5 @@
-﻿using BepInEx;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System.Linq;
 using UnityEngine;
 
 namespace Tobey.SnapBuilder.Patches;
@@ -13,7 +13,10 @@ internal static class BuilderPatch
     [HarmonyPrefix, HarmonyWrapSafe]
     public static void BeginHintsPrefix(GameObject modulePrefab, out bool __state)
     {
-        __state = Paths.ProcessName == "Subnautica" && General.DisplayControlHints.Value && Builder.ghostModel == null;
+        __state =
+            SnapBuilder.Instance.IsSN1 &&
+            General.DisplayControlHints.Value &&
+            Builder.ghostModel == null;
 
         if (__state && modulePrefab.GetComponent<ConstructableBase>() == null)
         {
@@ -26,17 +29,29 @@ internal static class BuilderPatch
     [HarmonyPostfix, HarmonyWrapSafe]
     public static void BeginHintsPostfix(GameObject modulePrefab, bool __state)
     {
-        if (__state && modulePrefab.GetComponent<ConstructableBase>() == null)
+        if (__state)
         {
-            ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
-        }
+            var isPlacingBasePiece = modulePrefab.GetComponent<ConstructableBase>() != null;
 
-        if (__state && (ColliderCache?.Record?.IsImprovable ?? false))
-        {
-            string hintId = ColliderCache.Record.IsImproved
-                ? Localisation.OriginalCollider.Value
-                : Localisation.DetailedCollider.Value;
-            ControlHint.Show(hintId, Toggles.DetailedColliders);
+            if (!isPlacingBasePiece && Builder.rotationEnabled)
+            {
+                ControlHint.Show(Localisation.ToggleFineRotation.Value, Toggles.FineRotation);
+            }
+
+            if (!isPlacingBasePiece || SnapBuilder.Instance.HasLargeRoom)
+            {
+                ControlHint.Show(Localisation.ToggleExtendedBuildRange.Value, Toggles.ExtendBuildRange);
+                ControlHint.Show(Localisation.AdjustBuildRange.Value, Keybinds.IncreaseExtendedBuildRange.Value, Keybinds.DecreaseExtendedBuildRange.Value);
+                ControlHint.Show(Localisation.ResetBuildRange.Value, new[] { Keybinds.IncreaseExtendedBuildRange.Value, Keybinds.DecreaseExtendedBuildRange.Value });
+            }
+
+            if (!isPlacingBasePiece && ColliderCache?.Record?.IsImprovable == true)
+            {
+                string hintId = ColliderCache.Record.IsImproved
+                    ? Localisation.OriginalCollider.Value
+                    : Localisation.DetailedCollider.Value;
+                ControlHint.Show(hintId, Toggles.DetailedColliders);
+            }
         }
     }
 
@@ -51,16 +66,24 @@ internal static class BuilderPatch
     public static void CreateGhostBuildRangePostfix()
     {
         var constructable = Builder.prefab.GetComponent<Constructable>();
-        if (constructable != null && !ConstructablePatch.constructableDistances.ContainsKey(constructable))
+
+        if (constructable != null)
         {
-            ConstructablePatch.constructableDistances.Add(constructable, new(constructable.placeDefaultDistance, constructable.placeMaxDistance));
-            Builder.placeDefaultDistance = constructable.placeDefaultDistance *= General.BuildRangeMultiplier.Value;
-            Builder.placeMaxDistance = constructable.placeMaxDistance *= General.BuildRangeMultiplier.Value;
-        }
-        else
-        {
-            Builder.placeDefaultDistance = ConstructablePatch.constructableDistances[constructable].Item1 * General.BuildRangeMultiplier.Value;
-            Builder.placeMaxDistance = ConstructablePatch.constructableDistances[constructable].Item2 * General.BuildRangeMultiplier.Value;
+            if (!ConstructablePatch.constructableDistances.ContainsKey(constructable))
+            {
+                ConstructablePatch.constructableDistances.Add(constructable, new(constructable.placeDefaultDistance, constructable.placeMaxDistance));
+            }
+
+            if (Toggles.ExtendBuildRange.IsEnabled)
+            {
+                Builder.placeDefaultDistance = constructable.placeDefaultDistance = ConstructablePatch.constructableDistances[constructable].Item1 * ExtendedBuildRange.Multiplier.Value;
+                Builder.placeMaxDistance = constructable.placeMaxDistance = ConstructablePatch.constructableDistances[constructable].Item2 * ExtendedBuildRange.Multiplier.Value;
+            }
+            else
+            {
+                Builder.placeDefaultDistance = constructable.placeDefaultDistance = ConstructablePatch.constructableDistances[constructable].Item1;
+                Builder.placeMaxDistance = constructable.placeMaxDistance = ConstructablePatch.constructableDistances[constructable].Item2;
+            }
         }
     }
     #endregion
@@ -91,5 +114,21 @@ internal static class BuilderPatch
     [HarmonyPatch(typeof(Builder), nameof(Builder.End))]
     [HarmonyPostfix, HarmonyWrapSafe]
     public static void EndRevertCollidersPostfix() => ColliderCache.RevertAll();
+
+    [HarmonyPatch(typeof(Builder), nameof(Builder.End))]
+    [HarmonyPrefix, HarmonyWrapSafe]
+    public static void EndResetConstructablesPrefix()
+    {
+        foreach (var key in ConstructablePatch.constructableDistances.Keys.Where(k => k == null))
+        {
+            ConstructablePatch.constructableDistances.Remove(key);
+        }
+
+        foreach (var entry in ConstructablePatch.constructableDistances)
+        {
+            Builder.placeDefaultDistance = entry.Key.placeDefaultDistance = entry.Value.Item1;
+            Builder.placeMaxDistance = entry.Key.placeMaxDistance = entry.Value.Item2;
+        }
+    }
     #endregion
 }

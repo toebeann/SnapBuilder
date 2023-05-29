@@ -15,7 +15,7 @@ internal static class PhysicsPatch
             && Vector3.Distance(origin, AimTransform.Instance.transform.position) <= Vector3.kEpsilon
             && Vector3.Distance(direction, AimTransform.Instance.transform.forward) <= Vector3.kEpsilon)
         {
-            maxDistance *= General.BuildRangeMultiplier.Value;
+            maxDistance *= ExtendedBuildRange.Multiplier.Value;
         }
     }
 
@@ -28,7 +28,7 @@ internal static class PhysicsPatch
     {
         if (AimTransform.GetBuilderTool() != null)
         {
-            maxDistance *= General.BuildRangeMultiplier.Value;
+            maxDistance *= ExtendedBuildRange.Multiplier.Value;
         }
     }
 }

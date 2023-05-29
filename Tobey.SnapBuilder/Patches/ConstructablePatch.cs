@@ -15,8 +15,12 @@ internal static class ConstructablePatch
         if (!constructableDistances.ContainsKey(__instance))
         {
             constructableDistances.Add(__instance, new(__instance.placeDefaultDistance, __instance.placeMaxDistance));
-            __instance.placeDefaultDistance *= General.BuildRangeMultiplier.Value;
-            __instance.placeMaxDistance *= General.BuildRangeMultiplier.Value;
+
+            if (Toggles.ExtendBuildRange.IsEnabled)
+            {
+                __instance.placeDefaultDistance *= ExtendedBuildRange.Multiplier.Value;
+                __instance.placeMaxDistance *= ExtendedBuildRange.Multiplier.Value;
+            }
         }
     }
 
