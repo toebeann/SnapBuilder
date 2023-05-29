@@ -48,7 +48,7 @@ internal static class BuilderPatch
     #region Builder.CreateGhost
     [HarmonyPatch(typeof(Builder), nameof(Builder.CreateGhost))]
     [HarmonyPostfix, HarmonyWrapSafe]
-    public static void CreateGhostPostfix()
+    public static void CreateGhostBuildRangePostfix()
     {
         var constructable = Builder.prefab.GetComponent<Constructable>();
         if (constructable != null && !ConstructablePatch.constructableDistances.ContainsKey(constructable))
@@ -90,6 +90,6 @@ internal static class BuilderPatch
     #region Builder.End
     [HarmonyPatch(typeof(Builder), nameof(Builder.End))]
     [HarmonyPostfix, HarmonyWrapSafe]
-    public static void EndPostfix() => ColliderCache.RevertAll();
+    public static void EndRevertCollidersPostfix() => ColliderCache.RevertAll();
     #endregion
 }

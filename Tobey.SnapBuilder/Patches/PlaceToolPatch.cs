@@ -7,10 +7,12 @@ internal static class PlaceToolPatch
     #region PlaceTool.CreateGhostModel
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
     [HarmonyPrefix, HarmonyWrapSafe]
-    public static void CreateGhostModelPrefix(PlaceTool __instance, ref bool __state)
-    {
-        Toggles.Reset();
+    public static void CreateGhostModelResetTogglesPrefix() => Toggles.Reset();
 
+    [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.CreateGhostModel))]
+    [HarmonyPrefix, HarmonyWrapSafe]
+    public static void CreateGhostModelHintsPrefix(PlaceTool __instance, ref bool __state)
+    {
         __state = __instance.ghostModel == null;
 
         if (__state && General.DisplayControlHints.Value)
@@ -53,6 +55,6 @@ internal static class PlaceToolPatch
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnPlace))]
     [HarmonyPatch(typeof(PlaceTool), nameof(PlaceTool.OnHolster))]
     [HarmonyPostfix, HarmonyWrapSafe]
-    public static void OnPlaceOrOnHolsterPostfix() => Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
+    public static void OnPlaceOrOnHolsterResetIgnoreHotkeyInputPostfix() => Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
     #endregion
 }
