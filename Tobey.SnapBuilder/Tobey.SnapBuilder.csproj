@@ -10,8 +10,16 @@
     <Product>SnapBuilder</Product>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  
+  <Target Name="CleanZip" AfterTargets="AfterClean">
+    <Delete Files="$(OutputPath)\$(Product).zip;$(OutputPath\zip\plugins\Tobey\SnapBuilder\$(TargetFileName)" />
+  </Target>
+  
   <Target Name="ZipBuild" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zip\plugins" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zip\plugins\Tobey\SnapBuilder" />
     <ZipDirectory SourceDirectory="$(OutputPath)\zip" DestinationFile="$(OutputPath)\$(Product).zip" Overwrite="true" />
   </Target>
 
