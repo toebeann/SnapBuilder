@@ -44,7 +44,7 @@ SnapBuilder is **the** snap-to-grid mod for Subnautica & Subnautica: Below Zero 
 
 #### Manual
 
-1. Click the `Manual Download` button under the main file of the SnapBuilder from the Files tab of the relevant Nexus Mods page:
+1. Click the `Manual Download` button under the main file of the SnapBuilder from the Files tab of the relevant Nexus Mods page to download:
     - [SnapBuilder for Subnautica](https://www.nexusmods.com/subnautica/mods/427?tab=files)
     - [SnapBuilder for Subnautica: Below zero](https://www.nexusmods.com/subnauticabelowzero/mods/57?tab=files)
 2. Extract the contents of the archive into the `[game dir]\BepInEx` folder.
