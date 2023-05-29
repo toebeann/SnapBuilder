@@ -26,7 +26,7 @@ internal static class PhysicsPatch
     [HarmonyPrefix, HarmonyWrapSafe]
     public static void GetTargetPrefix(ref float maxDistance)
     {
-        if (AimTransform.GetBuilderTool() != null)
+        if (AimTransform.GetBuilderTool() != null && Builder.isPlacing && Toggles.ExtendBuildRange.IsEnabled)
         {
             maxDistance *= ExtendedBuildRange.Multiplier.Value;
         }
