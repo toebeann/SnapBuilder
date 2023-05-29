@@ -110,7 +110,7 @@ public class AimTransform : MonoBehaviour
         }
 
         RaycastHit improvedColliderHit = GetImprovedColliderHit(hit);
-        if (improvedColliderHit.collider is null)
+        if (improvedColliderHit.collider == null)
         {
             return GetOrientedTransform();
         }

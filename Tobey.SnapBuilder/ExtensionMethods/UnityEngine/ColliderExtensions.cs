@@ -7,7 +7,7 @@ internal static class ColliderExtensions
 {
     public static void Render(this Collider collider, Material material, float scale = 1f)
     {
-        if (collider is null || collider == null)
+        if (collider == null)
         {
             return;
         }

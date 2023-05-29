@@ -149,8 +149,8 @@ public class SnapBuilder : BaseUnityPlugin
         // choose whether we should use the global forward, or the forward of the hitTransform
         Vector3 forward = !Mathf.Approximately(Mathf.Abs(Vector3.Dot(Vector3.up, hitTransform.up)), 1)
             && !Player.main.IsInsideWalkable()
-            && hitTransform.GetComponent<BaseCell>() is null
-            && hitTransform.GetComponent<Base>() is null
+            && hitTransform.GetComponent<BaseCell>() == null
+            && hitTransform.GetComponent<Base>() == null
                 ? Vector3.forward
                 : hitTransform.forward;
 
