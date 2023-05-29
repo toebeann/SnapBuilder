@@ -13,7 +13,7 @@ SnapBuilder is **the** snap-to-grid mod for Subnautica & Subnautica: Below Zero 
 -   [Automatically upgrades inaccurate hitboxes so that items can properly snap to them!](https://i.imgur.com/D8DycbH.mp4) (Mostly only applies to Subnautica: Below Zero)
 -   Fully compatible with [Decorations Mod](https://www.nexusmods.com/subnautica/mods/102)!
 -   The range for building can be extended and customised! (On the legacy branch of Subnautica, this only applies to items, not rooms)
--   All keybinds and parameters can be tweaking in-game with [Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/). Simply press F5 to open the configuration window.
+-   All keybinds and parameters can be tweaking in-game with [Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/)! (Simply press F5 to open the configuration window)
 
 ![Configuring SnapBuilder](https://staticdelivery.nexusmods.com/mods/1155/images/427/427-1671005686-1718616155.png)
 
