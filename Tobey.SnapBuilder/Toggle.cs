@@ -16,8 +16,8 @@ public class Toggle : IDisposable
     private readonly ConfigEntry<bool> enabledByDefaultConfigEntry;
     private readonly bool enabledByDefault;
 
-    public KeyCode KeyCode => keyCodeConfigEntry.Value;
-    public KeyboardShortcut Shortcut => shortcutConfigEntry.Value;
+    public KeyCode? KeyCode => keyCodeConfigEntry?.Value;
+    public KeyboardShortcut? Shortcut => shortcutConfigEntry?.Value;
     public ToggleMode Mode => modeConfigEntry.Value;
     public bool EnabledByDefault => enabledByDefaultConfigEntry?.Value ?? enabledByDefault;
 
