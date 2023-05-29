@@ -78,13 +78,14 @@ public class SnapBuilder : BaseUnityPlugin
     private void ApplyHarmonyPatches()
     {
         Harmony.PatchAll(typeof(BuilderPatch));
+        Harmony.PatchAll(typeof(PlaceToolPatch));
+        Harmony.PatchAll(typeof(PhysicsPatch));
+        Harmony.PatchAll(typeof(ConstructablePatch));
+        
         if (!IsSN1)
         {
             Harmony.PatchAll(typeof(BuilderTool_GetCustomUseText_Patch));
         }
-        Harmony.PatchAll(typeof(ConstructablePatch));
-        Harmony.PatchAll(typeof(PlaceToolPatch));
-        Harmony.PatchAll(typeof(PhysicsPatch));
     }
 
     private bool wasReset;
