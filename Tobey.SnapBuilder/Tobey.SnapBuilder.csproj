@@ -6,7 +6,7 @@
     <Description>Snap-to-Grid for Subnautica!</Description>
     <Version>2.3.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Product>SnapBuilder</Product>
   </PropertyGroup>
 
