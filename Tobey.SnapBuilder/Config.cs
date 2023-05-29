@@ -362,6 +362,7 @@ public static class Config
                 defaultValue: 1.5f,
                 configDescription: new(
                     description: "The multiplier applied to the build range when using the Habitat Builder with the extended build range.",
+                    acceptableValues: new AcceptableValueRange<float>(0.5f, 50f),
                     tags: new[] { new ConfigurationManagerAttributes { Order = -10 } }
                 )
             );
