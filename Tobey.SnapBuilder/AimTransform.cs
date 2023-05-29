@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Tobey.SnapBuilder;
 
-using BepInEx;
 using ExtensionMethods;
 using ExtensionMethods.UnityEngine;
 using static Config;
@@ -52,24 +51,14 @@ public class AimTransform : MonoBehaviour
     internal static BuilderTool GetBuilderTool() => Inventory.main?.GetHeld()?.GetComponent<BuilderTool>();
     internal static PlaceTool GetPlaceTool() => Inventory.main?.GetHeld()?.GetComponent<PlaceTool>();
 
-    public static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit)
-    {
-        var placeTool = GetPlaceTool();
-        if (placeTool == null)
-        {
-            return Physics.Raycast(from, direction, out hit, Builder.placeMaxDistance, Builder.placeLayerMask, QueryTriggerInteraction.Ignore);
-        }
-        else
-        {
-            int max = UWE.Utils.RaycastIntoSharedBuffer(from, direction, 5f * General.BuildRangeMultiplier.Value, -5, QueryTriggerInteraction.UseGlobal);
-            var hits = new ArraySegment<RaycastHit>(UWE.Utils.sharedHitBuffer, 0, max)
-                .Where(h => !h.collider.isTrigger && !UWE.Utils.SharingHierarchy(placeTool.gameObject, h.collider.gameObject))
-                .OrderBy(h => h.distance);
-
-            hit = hits.FirstOrDefault();
-            return hits.Any();
-        }
-    }
+    public static bool Raycast(Vector3 from, Vector3 direction, out RaycastHit hit) =>
+        Physics.Raycast(
+            origin: from,
+            direction: direction,
+            hitInfo: out hit,
+            maxDistance: Builder.placeMaxDistance,
+            layerMask: Builder.placeLayerMask,
+            queryTriggerInteraction: QueryTriggerInteraction.Ignore);
 
     private Transform GetOrientedTransform(Vector3? position = null, Vector3? forward = null)
     {
