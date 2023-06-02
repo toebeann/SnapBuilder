@@ -1,6 +1,6 @@
 ![SnapBuilder - Snap-to-Grid for Subnautica!](https://staticdelivery.nexusmods.com/mods/1155/images/427/427-1671005676-1635506048.png)
 
-# SnapBuilder - Snap-to-Grid for Subnautica!
+# SnapBuilder - Snap-to-Grid for Subnautica & Subnautica: Below Zero!
 
 ## What is this?
 
@@ -13,7 +13,7 @@ SnapBuilder is **the** snap-to-grid mod for Subnautica & Subnautica: Below Zero 
 -   [Automatically upgrades inaccurate hitboxes so that items can properly snap to them!](https://i.imgur.com/D8DycbH.mp4) (Mostly only applies to Subnautica: Below Zero)
 -   The range for building can be extended and customised! (On the legacy branch of Subnautica, this only applies to items, not rooms)
 -   All keybinds and parameters can be tweaked in-game with [Configuration Manager](https://www.nexusmods.com/subnautica/mods/1112/)! (Simply press F5 to open the configuration window)
--   Fully compatible with the legacy branch and QMods!
+-   Fully compatible with the QMods and the legacy branch of Subnautica!
 -   Fully compatible with [Decorations Mod](https://www.nexusmods.com/subnautica/mods/102)!
 
 ![Configuring SnapBuilder](https://staticdelivery.nexusmods.com/mods/1155/images/427/427-1671005686-1718616155.png)
@@ -69,9 +69,9 @@ Most issues are resolved by carefully re-reading the installation instructions o
 
 ## I'm a dev, how do I make my mod compatible?
 
-By default, most items added to the game by other mods should work just fine with SnapBuilder assuming they also work fine in-game. For the edge cases where they do not and SnapBuilder does not understand which way to rotate your items by default, it is easy to make your items compatible without requiring your users to install SnapBuilder.
+By default, most items added to the game by other mods should work just fine with SnapBuilder assuming they also work fine in-game. For the edge cases where they do not and SnapBuilder does not understand which way to rotate your items by default, it is easy to make your items compatible without a dependency on SnapBuilder.
 
-On your prefab's model `GameObject`, simply add a child `GameObject` named `SnapBuilder`. Whatever you set the `localRotation` and `localPosition` of this `GameObject` to, SnapBuilder will treat these as the default translations for the item.
+On your prefab's model `GameObject`, simply add a child `GameObject` named `SnapBuilder`. Whatever you set the `localRotation` and `localPosition` of this `GameObject` to, SnapBuilder will treat these as the default transformations for the item.
 
 The `GameObject` named `SnapBuilder` must be the direct child of the `GameObject` located at `Builder.ghostModel` when the user is interacting with the Habitat Builder.
 
